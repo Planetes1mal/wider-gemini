@@ -1,47 +1,44 @@
 # Wider Gemini
 
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](#)
+[![JavaScript](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](#)
+[![License：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 一个用于调节 Google Gemini 对话界面宽度的 Chrome 浏览器插件。
 
 ## 功能特点
 
-- 🎯 **自定义宽度调节**: 通过滑块或预设按钮轻松调整 Gemini 对话区域的宽度
-- 💾 **自动保存设置**: 设置会自动保存,下次访问时自动应用
-- 🎨 **美观的界面**: 现代化的渐变设计,操作简单直观
-- ⚡ **即时生效**: 调整宽度后立即应用到所有 Gemini 标签页
-- 🔒 **不影响其他元素**: 只修改对话区域宽度,网页其他元素保持不变
+- 🎯 **自定义宽度调节**：通过滑块或预设按钮轻松调整 Gemini 对话区域的宽度
+- 💾 **自动保存设置**：设置会自动保存，下次访问时自动应用
+- 🎨 **美观的界面**：现代化的渐变设计，操作简单直观
+- ⚡ **即时生效**：调整宽度后立即应用到所有 Gemini 标签页
+- 🔒 **不影响其他元素**：只修改对话区域宽度，网页其他元素保持不变
 
-## 安装方法
-
-### 方法一: 开发者模式安装 (本地)
+## 安装方法：开发者模式安装（本地）
 
 1. 下载或克隆此项目到本地
-2. 打开 Chrome 浏览器,访问 `chrome://extensions/`
+2. 打开 Chrome 浏览器，访问 `chrome://extensions/`
 3. 开启右上角的「开发者模式」
 4. 点击「加载已解压的扩展程序」
 5. 选择项目文件夹
 6. 安装完成!
 
-### 方法二: Chrome 网上应用店 (待上架)
-
-敬请期待...
-
 ## 使用说明
 
-1. 安装插件后,访问 [Google Gemini](https://gemini.google.com/)
+1. 安装插件后，访问 [Google Gemini](https://gemini.google.com/)
 2. 点击浏览器工具栏中的插件图标
-3. 使用滑块调整宽度 (600px - 2000px)
+3. 使用滑块调整宽度（800px - 1400px）
 4. 或点击预设按钮快速切换:
-   - **默认**: 800px
-   - **宽**: 1000px
-   - **更宽**: 1400px
-   - **超宽**: 1800px
+   - **默认**：1000px
+   - **宽**：1200px
+   - **更宽**：1400px
 5. 设置会自动保存并立即生效
 
 ## 技术栈
 
 - Manifest V3
 - Vanilla JavaScript
-- CSS3 (自定义属性 + 渐变)
+- CSS3（自定义属性 + 渐变）
 - Chrome Storage API
 - Chrome Messaging API
 
@@ -67,7 +64,7 @@ wider-gemini/
 
 ### 本地调试
 
-1. 修改代码后,在 `chrome://extensions/` 页面点击刷新按钮
+1. 修改代码后，在 `chrome://extensions/` 页面点击刷新按钮
 2. 刷新 Gemini 页面即可看到效果
 
 ### 修改默认宽度
@@ -75,7 +72,7 @@ wider-gemini/
 在 `content.js` 中修改默认值:
 
 ```javascript
-const width = result.chatWidth || 800; // 修改这里的 800
+const width = result.chatWidth || 1000; // 修改这里的 1000
 ```
 
 ### 修改宽度范围
@@ -83,12 +80,12 @@ const width = result.chatWidth || 800; // 修改这里的 800
 在 `popup.html` 中修改滑块范围:
 
 ```html
-<input type="range" id="widthSlider" min="600" max="2000" step="50">
+<input type="range" id="widthSlider" min="800" max="1400" step="50">
 ```
 
 ## 版本历史
 
-### v1.0.0 (2024-10-14)
+### v1.0.0（2025-10-14）
 - 🎉 首次发布
 - ✨ 支持宽度自定义调节
 - 💾 设置自动保存功能
@@ -96,7 +93,7 @@ const width = result.chatWidth || 800; // 修改这里的 800
 
 ## 许可证
 
-MIT License
+[MIT License](./LICENSE)
 
 ## 反馈与贡献
 
@@ -104,4 +101,4 @@ MIT License
 
 ---
 
-**注意**: 此插件仅修改页面样式,不收集任何用户数据,不影响 Gemini 的功能。
+**注意**：此插件仅修改页面样式，不收集任何用户数据，不影响 Gemini 的功能。

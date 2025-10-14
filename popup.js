@@ -4,7 +4,7 @@ const presetButtons = document.querySelectorAll('.preset-btn');
 
 // 加载已保存的宽度设置
 chrome.storage.sync.get(['chatWidth'], function (result) {
-    const width = result.chatWidth || 1000;
+    const width = result.chatWidth || 800;
     widthSlider.value = width;
     widthValue.textContent = width;
 });

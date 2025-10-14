@@ -1,7 +1,7 @@
 // 从存储中获取宽度设置并应用
 function applyWidth() {
     chrome.storage.sync.get(['chatWidth'], function (result) {
-        const width = result.chatWidth || 1000;
+        const width = result.chatWidth || 800;
         applyWidthStyle(width);
     });
 }

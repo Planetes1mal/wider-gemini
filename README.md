@@ -29,8 +29,8 @@
 2. 点击浏览器工具栏中的插件图标
 3. 使用滑块调整宽度（800px - 1400px）
 4. 或点击预设按钮快速切换:
-   - **默认**：800px
-   - **宽**：1000px
+   - **窄**：800px
+   - **默认**：1000px
    - **更宽**：1200px
    - **超宽**：1350px
 5. 设置会自动保存并立即生效
@@ -73,7 +73,7 @@ wider-gemini/
 在 `content.js` 中修改默认值:
 
 ```javascript
-const width = result.chatWidth || 800; // 修改这里的 800
+const width = result.chatWidth || 1000; // 修改这里的 1000
 ```
 
 ### 修改宽度范围
@@ -81,7 +81,7 @@ const width = result.chatWidth || 800; // 修改这里的 800
 在 `popup.html` 中修改滑块范围:
 
 ```html
-<input type="range" id="widthSlider" min="800" max="1400" step="50">
+<input type="range" id="widthSlider" min="800" max="1350" step="50">
 ```
 
 ## 版本历史

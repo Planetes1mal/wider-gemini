@@ -1,6 +1,6 @@
 /* 调整Gemini对话区域的最大宽度 */
 :root {
-    --gemini-chat-width: 800px;
+    --gemini-chat-width: 1000px;
 }
 
 /* 针对Gemini的对话容器 */

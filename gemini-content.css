@@ -1,0 +1,86 @@
+/* 调整Gemini对话区域的最大宽度 */
+:root {
+    --gemini-chat-width: 1000px;
+}
+
+/* 针对Gemini的对话容器 */
+.conversation-container {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 针对用户提问内容区域，使其与AI回答右对齐 */
+.user-query-content {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 覆盖Gemini原生的476px限制 - 使用Angular的属性选择器 */
+.user-query-bubble-with-background[class*="ngcontent"]:not(.edit-mode) {
+    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    width: fit-content !important;
+    min-width: auto !important;
+}
+
+/* 针对用户提问气泡容器 - 右对齐贴边，宽度为AI回答的75% */
+.user-query-bubble-with-background {
+    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    width: fit-content !important;
+    min-width: auto !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    display: inline-block !important;
+}
+
+/* 使用属性选择器增加优先级 */
+[class~="user-query-bubble-with-background"] {
+    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    width: fit-content !important;
+    min-width: auto !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+/* 针对ng-star-inserted类的组合 */
+.ng-star-inserted.user-query-bubble-with-background {
+    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    width: fit-content !important;
+    min-width: auto !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+/* 针对用户提问的父容器 - 使其右对齐 */
+[class*="user-query"] {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* 针对用户提问的祖先容器 */
+.user-query-bubble-with-background * {
+    max-width: none !important;
+}
+
+/* 针对包含用户提问气泡的所有父元素 - 右对齐 */
+*:has(> .user-query-bubble-with-background) {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* 针对消息容器确保宽度一致 */
+.message-container,
+[class*="message-content"] {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}

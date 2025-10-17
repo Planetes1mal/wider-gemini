@@ -48,8 +48,8 @@
 ```
 wider-gemini/
 ├── manifest.json       # 插件配置文件
-├── content.js          # 内容脚本 - 注入到 Gemini 页面
-├── content.css         # 样式调整
+├── gemini-content.js          # 内容脚本 - 注入到 Gemini 页面
+├── gemini-content.css         # 样式调整
 ├── popup.html          # 弹出窗口界面
 ├── popup.css           # 弹出窗口样式
 ├── popup.js            # 弹出窗口逻辑

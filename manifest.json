@@ -25,10 +25,10 @@
                 "https://gemini.google.com/*"
             ],
             "js": [
-                "content.js"
+                "gemini-content.js"
             ],
             "css": [
-                "content.css"
+                "gemini-content.css"
             ],
             "run_at": "document_start"
         }

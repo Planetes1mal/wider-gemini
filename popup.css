@@ -141,3 +141,139 @@ label {
 .info p:last-child {
     margin-bottom: 0;
 }
+
+/* 分隔线 */
+.divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+    margin: 24px 0;
+}
+
+/* 开关按钮容器 */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 开关样式 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider-toggle {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.slider-toggle:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider-toggle {
+    background-color: #667eea;
+}
+
+input:checked+.slider-toggle:before {
+    transform: translateX(22px);
+}
+
+input:focus+.slider-toggle {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* 状态文本 */
+.status-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    min-width: 40px;
+}
+
+input:checked~.status-text {
+    color: #667eea;
+}
+
+/* 提示文本 */
+.toggle-hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+/* 刷新提示 */
+.refresh-notice {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 8px;
+    border: 2px solid #667eea;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.refresh-notice.show {
+    display: flex;
+}
+
+.refresh-icon {
+    font-size: 16px;
+    animation: rotate 1s linear infinite;
+}
+
+.refresh-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: #667eea;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

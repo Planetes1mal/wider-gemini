@@ -84,3 +84,166 @@
     margin-left: auto !important;
     margin-right: auto !important;
 }
+
+/* ========== 输入框区域样式 ========== */
+
+/* 底部输入框容器 */
+/* 使用box-sizing确保padding不会导致溢出 */
+.input-area-container,
+[class*="input-area"],
+[class*="composer"],
+.ql-container,
+.input-container {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 输入框的父容器 */
+*:has(> .ql-container),
+*:has(> [class*="input-area"]),
+*:has(> [class*="composer"]) {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* 输入框内部容器 */
+.ql-editor,
+[contenteditable="true"],
+textarea[class*="input"],
+[class*="text-input"] {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 底部固定栏 */
+[class*="bottom-container"],
+[class*="input-container-wrapper"],
+[class*="prompt-input"] {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 针对Gemini特定的输入区域结构 */
+mat-sidenav-content,
+.mat-drawer-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* 确保底部输入区域的直接父容器宽度正确 */
+form[class*="input"],
+form[class*="prompt"] {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 修复输入框内的按钮不会溢出 */
+form button,
+form [role="button"],
+[class*="input"] button,
+[class*="prompt"] button,
+[class*="composer"] button {
+    box-sizing: border-box !important;
+}
+
+/* 确保输入框区域的所有子元素都使用border-box */
+[class*="input-area"] *,
+[class*="prompt"] *,
+[class*="composer"] * {
+    box-sizing: border-box !important;
+}
+
+/* 针对rich-textarea和输入框的特殊处理 */
+rich-textarea,
+[role="textbox"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 确保包含输入框的form元素正确处理宽度 */
+form:has(rich-textarea),
+form:has([role="textbox"]) {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* 针对输入框的直接父容器 */
+*:has(> rich-textarea),
+*:has(> [role="textbox"]) {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 修复按钮容器的定位问题 */
+form>div,
+[class*="input-area"]>div,
+[class*="prompt"]>div {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* ========== 代码区域自动换行样式 ========== */
+
+/* 代码换行开启时的样式 */
+body.code-wrap-enabled pre,
+body.code-wrap-enabled pre code {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* 针对Gemini的代码容器 */
+body.code-wrap-enabled .code-container,
+body.code-wrap-enabled .code-container.formatted {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    overflow-x: visible !important;
+}
+
+/* 代码块容器 */
+body.code-wrap-enabled .code-block pre,
+body.code-wrap-enabled .code-block code {
+    white-space: pre-wrap !important;
+    overflow-x: visible !important;
+}
+
+/* 确保代码块内部容器也支持换行 */
+body.code-wrap-enabled .formatted-code-block-internal-container pre,
+body.code-wrap-enabled .formatted-code-block-internal-container code {
+    white-space: pre-wrap !important;
+}
+
+/* 代码换行关闭时保持原样（默认） */
+body:not(.code-wrap-enabled) pre,
+body:not(.code-wrap-enabled) pre code {
+    white-space: pre !important;
+    overflow-x: auto !important;
+}
+
+body:not(.code-wrap-enabled) .code-container,
+body:not(.code-wrap-enabled) .code-container.formatted {
+    white-space: pre !important;
+    overflow-x: auto !important;
+}

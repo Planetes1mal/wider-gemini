@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 代码区域样式提取器</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .instruction {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .instruction h3 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .instruction ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .instruction li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 20px;
+            background: #1e1e1e;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            min-height: 150px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #d4d4d4;
+        }
+
+        .success {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .feature-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .feature-list h4 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        .feature-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .feature-list li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔍 Gemini 代码区域样式提取器</h1>
+        <p class="subtitle">专门用于分析 Gemini 回答中的代码块样式信息</p>
+
+        <div class="feature-list">
+            <h4>📋 本工具将提取以下信息：</h4>
+            <ul>
+                <li>✅ 代码块容器的样式（pre、code 标签）</li>
+                <li>✅ 代码内容区域的样式（white-space、word-wrap 等）</li>
+                <li>✅ 复制按钮的位置和样式</li>
+                <li>✅ 代码块的父容器结构</li>
+                <li>✅ 所有相关的 CSS 类名和属性</li>
+                <li>✅ 滚动条和溢出处理方式</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ 重要提示：</strong><br>
+            请确保在 Gemini 页面中有包含代码块的回答，否则可能提取不到数据！<br>
+            建议先向 Gemini 提问一个编程问题，等待它生成包含代码的回答后再运行脚本。
+        </div>
+
+        <div class="instruction">
+            <h3>📖 使用步骤：</h3>
+            <ol>
+                <li>打开 <strong>Gemini 页面</strong>（https://gemini.google.com/app）</li>
+                <li><strong>确保页面中有包含代码块的回答</strong>（如果没有，先问一个编程问题）</li>
+                <li>按 <strong>F12</strong> 打开浏览器开发者工具</li>
+                <li>切换到 <strong>Console（控制台）</strong> 标签</li>
+                <li>点击下方"<strong>生成提取脚本</strong>"按钮</li>
+                <li>点击"<strong>复制到剪贴板</strong>"按钮</li>
+                <li>在 Gemini 页面的控制台中 <strong>粘贴并按回车</strong> 运行</li>
+                <li>脚本会自动下载一个 <strong>JSON 文件</strong></li>
+                <li>将下载的 JSON 文件发送给我进行分析</li>
+            </ol>
+        </div>
+
+        <div class="button-group">
+            <button onclick="generateScript()">🚀 生成提取脚本</button>
+            <button onclick="copyToClipboard()">📋 复制到剪贴板</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let generatedScript = '';
+
+        function generateScript() {
+            const output = document.getElementById('output');
+
+            generatedScript = `
+// ============================================
+// Gemini 代码区域样式提取脚本 v1.0
+// ============================================
+(function() {
+    console.log('🔍 开始分析 Gemini 代码区域...');
+    
+    const data = {
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        viewport: {
+            width: window.innerWidth,
+            height: window.innerHeight
+        },
+        codeBlocks: {
+            summary: {},
+            elements: []
+        },
+        relatedStyles: []
+    };
+
+    // 查找所有可能的代码块相关元素
+    const codeSelectors = [
+        'pre',
+        'code',
+        'pre code',
+        '[class*="code"]',
+        '[class*="Code"]',
+        '[class*="snippet"]',
+        '[class*="block"]',
+        '.code-block',
+        '.code-container',
+        '[data-language]',
+        'div[class*="highlight"]'
+    ];
+
+    let totalCodeBlocks = 0;
+    const processedElements = new Set();
+
+    // 提取所有代码块元素
+    codeSelectors.forEach(selector => {
+        try {
+            const elements = document.querySelectorAll(selector);
+            console.log(\`找到 \${elements.length} 个匹配 "\${selector}" 的元素\`);
+            
+            elements.forEach((el, idx) => {
+                // 避免重复处理同一个元素
+                if (processedElements.has(el)) return;
+                processedElements.add(el);
+                
+                const computedStyle = window.getComputedStyle(el);
+                const rect = el.getBoundingClientRect();
+                
+                // 检查是否真的是代码块（包含代码内容）
+                const textContent = el.textContent || '';
+                const hasCodeContent = textContent.length > 10 && 
+                    (el.tagName === 'PRE' || el.tagName === 'CODE' || 
+                     textContent.includes('{') || textContent.includes('function') ||
+                     textContent.includes('class') || textContent.includes('import'));
+                
+                const elementData = {
+                    id: \`code-\${totalCodeBlocks}\`,
+                    selector: selector,
+                    index: idx,
+                    tagName: el.tagName,
+                    className: el.className,
+                    id_attr: el.id,
+                    hasCodeContent: hasCodeContent,
+                    textLength: textContent.length,
+                    textPreview: textContent.substring(0, 100).replace(/\\n/g, '↵'),
+                    position: {
+                        top: rect.top,
+                        left: rect.left,
+                        right: rect.right,
+                        bottom: rect.bottom,
+                        width: rect.width,
+                        height: rect.height
+                    },
+                    computedStyles: {
+                        // 布局相关
+                        display: computedStyle.display,
+                        position: computedStyle.position,
+                        width: computedStyle.width,
+                        maxWidth: computedStyle.maxWidth,
+                        minWidth: computedStyle.minWidth,
+                        height: computedStyle.height,
+                        maxHeight: computedStyle.maxHeight,
+                        
+                        // 文本换行相关（关键！）
+                        whiteSpace: computedStyle.whiteSpace,
+                        wordWrap: computedStyle.wordWrap,
+                        wordBreak: computedStyle.wordBreak,
+                        overflowWrap: computedStyle.overflowWrap,
+                        textWrap: computedStyle.textWrap,
+                        
+                        // 溢出处理
+                        overflow: computedStyle.overflow,
+                        overflowX: computedStyle.overflowX,
+                        overflowY: computedStyle.overflowY,
+                        
+                        // 间距
+                        margin: computedStyle.margin,
+                        padding: computedStyle.padding,
+                        
+                        // 字体
+                        fontFamily: computedStyle.fontFamily,
+                        fontSize: computedStyle.fontSize,
+                        lineHeight: computedStyle.lineHeight,
+                        
+                        // 背景和边框
+                        background: computedStyle.background,
+                        backgroundColor: computedStyle.backgroundColor,
+                        border: computedStyle.border,
+                        borderRadius: computedStyle.borderRadius,
+                        
+                        // 其他
+                        boxSizing: computedStyle.boxSizing,
+                        zIndex: computedStyle.zIndex
+                    },
+                    inlineStyles: el.style.cssText,
+                    attributes: {}
+                };
+
+                // 获取所有属性
+                Array.from(el.attributes).forEach(attr => {
+                    elementData.attributes[attr.name] = attr.value;
+                });
+
+                // 查找复制按钮
+                const copyButton = el.parentElement?.querySelector('button[aria-label*="复制"], button[aria-label*="Copy"], button[title*="复制"], button[title*="Copy"]');
+                if (copyButton) {
+                    const btnRect = copyButton.getBoundingClientRect();
+                    const btnStyle = window.getComputedStyle(copyButton);
+                    elementData.copyButton = {
+                        found: true,
+                        text: copyButton.textContent,
+                        ariaLabel: copyButton.getAttribute('aria-label'),
+                        position: {
+                            top: btnRect.top,
+                            left: btnRect.left,
+                            right: btnRect.right,
+                            bottom: btnRect.bottom,
+                            width: btnRect.width,
+                            height: btnRect.height
+                        },
+                        styles: {
+                            position: btnStyle.position,
+                            top: btnStyle.top,
+                            right: btnStyle.right,
+                            zIndex: btnStyle.zIndex
+                        }
+                    };
+                }
+
+                // 获取父容器链
+                elementData.parentChain = [];
+                let parent = el.parentElement;
+                let depth = 0;
+                while (parent && depth < 6) {
+                    const parentRect = parent.getBoundingClientRect();
+                    const parentComputed = window.getComputedStyle(parent);
+                    elementData.parentChain.push({
+                        depth: depth,
+                        tagName: parent.tagName,
+                        className: parent.className,
+                        id: parent.id,
+                        position: {
+                            width: parentRect.width,
+                            height: parentRect.height
+                        },
+                        styles: {
+                            display: parentComputed.display,
+                            position: parentComputed.position,
+                            width: parentComputed.width,
+                            maxWidth: parentComputed.maxWidth,
+                            overflow: parentComputed.overflow,
+                            overflowX: parentComputed.overflowX,
+                            whiteSpace: parentComputed.whiteSpace,
+                            wordWrap: parentComputed.wordWrap
+                        }
+                    });
+                    parent = parent.parentElement;
+                    depth++;
+                }
+
+                data.codeBlocks.elements.push(elementData);
+                if (hasCodeContent) totalCodeBlocks++;
+            });
+        } catch (e) {
+            console.warn('处理选择器出错:', selector, e);
+        }
+    });
+
+    // 提取页面中所有与代码相关的 CSS 规则
+    try {
+        const styleSheets = Array.from(document.styleSheets);
+        styleSheets.forEach((sheet, sheetIdx) => {
+            try {
+                const rules = Array.from(sheet.cssRules || sheet.rules || []);
+                rules.forEach((rule, ruleIdx) => {
+                    if (rule.selectorText) {
+                        const selector = rule.selectorText.toLowerCase();
+                        // 只提取与代码块相关的规则
+                        if (selector.includes('code') || 
+                            selector.includes('pre') || 
+                            selector.includes('snippet') ||
+                            selector.includes('highlight') ||
+                            rule.style.whiteSpace ||
+                            rule.style.wordWrap) {
+                            data.relatedStyles.push({
+                                sheet: sheetIdx,
+                                rule: ruleIdx,
+                                selector: rule.selectorText,
+                                cssText: rule.style.cssText,
+                                whiteSpace: rule.style.whiteSpace,
+                                wordWrap: rule.style.wordWrap,
+                                wordBreak: rule.style.wordBreak,
+                                overflow: rule.style.overflow
+                            });
+                        }
+                    }
+                });
+            } catch (e) {
+                // 跨域样式表无法访问，忽略
+            }
+        });
+    } catch (e) {
+        console.warn('提取 CSS 规则出错:', e);
+    }
+
+    // 统计信息
+    data.codeBlocks.summary = {
+        totalElements: data.codeBlocks.elements.length,
+        codeBlocksWithContent: totalCodeBlocks,
+        relatedStyleRules: data.relatedStyles.length
+    };
+
+    console.log('✅ 分析完成！');
+    console.log('📊 统计信息:', data.codeBlocks.summary);
+    console.log('📦 找到的代码块元素:', totalCodeBlocks);
+
+    // 转换为JSON并下载
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = \`gemini-code-blocks-\${Date.now()}.json\`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    console.log('💾 JSON 文件已下载！');
+    console.log('📁 文件名:', a.download);
+    
+    return data;
+})();
+`;
+
+            output.innerHTML = '<div class="success">✅ 脚本已生成！请复制下方代码到 Gemini 页面的控制台运行：</div><div class="code-block">' + escapeHtml(generatedScript) + '</div>';
+        }
+
+        function copyToClipboard() {
+            if (!generatedScript) {
+                alert('❌ 请先生成脚本！');
+                return;
+            }
+
+            navigator.clipboard.writeText(generatedScript).then(() => {
+                alert('✅ 已复制到剪贴板！\n\n现在请：\n1. 打开 Gemini 页面\n2. 按 F12 打开控制台\n3. 粘贴脚本并按回车\n4. 等待 JSON 文件自动下载');
+            }).catch(err => {
+                alert('❌ 复制失败：' + err);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 页面加载时自动生成脚本
+        window.onload = function () {
+            generateScript();
+        };
+    </script>
+</body>
+
+</html>

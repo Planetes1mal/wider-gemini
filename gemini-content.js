@@ -7,7 +7,7 @@ function isExtensionContextValid() {
     }
 }
 
-// 从存储中获取宽度设置并应用
+// 从存储中获取设置并应用
 function applyWidth() {
     if (!isExtensionContextValid()) {
         console.log('[Wider Gemini] 扩展上下文已失效，停止运行');
@@ -15,13 +15,26 @@ function applyWidth() {
     }
 
     try {
-        chrome.storage.sync.get(['chatWidth'], function (result) {
+        chrome.storage.sync.get(['chatWidth', 'codeWrap'], function (result) {
             if (!isExtensionContextValid()) return;
             const width = result.chatWidth || 1000;
+            const codeWrap = result.codeWrap !== undefined ? result.codeWrap : false;
             applyWidthStyle(width);
+            applyCodeWrap(codeWrap);
         });
     } catch (e) {
         console.log('[Wider Gemini] 获取存储失败:', e.message);
+    }
+}
+
+// 应用代码换行设置
+function applyCodeWrap(enabled) {
+    if (enabled) {
+        document.body.classList.add('code-wrap-enabled');
+        console.log('[Wider Gemini] 代码自动换行已开启');
+    } else {
+        document.body.classList.remove('code-wrap-enabled');
+        console.log('[Wider Gemini] 代码自动换行已关闭');
     }
 }
 
@@ -37,7 +50,18 @@ function applyWidthStyle(width) {
         '.user-query-bubble-with-background',
         '[class*="user-query"]',
         '.message-container',
-        '[class*="message-content"]'
+        '[class*="message-content"]',
+        // 输入框相关选择器
+        '.input-area-container',
+        '[class*="input-area"]',
+        '[class*="composer"]',
+        '.ql-container',
+        '.input-container',
+        '[class*="bottom-container"]',
+        '[class*="input-container-wrapper"]',
+        '[class*="prompt-input"]',
+        'form[class*="input"]',
+        'form[class*="prompt"]'
     ];
 
     let totalApplied = 0;
@@ -47,7 +71,7 @@ function applyWidthStyle(width) {
             // 使用setProperty with 'important'来确保优先级最高
             if (element.classList.contains('user-query-bubble-with-background') ||
                 selector.includes('user-query')) {
-                // 用户提问区域：右对齐贴边，宽度为AI回答的75%
+                // 用户提问区域：右对齐贴边，宽度为AI回答的55%
                 const userQueryWidth = Math.round(width * 0.55);
                 element.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
                 element.style.setProperty('width', 'fit-content', 'important');
@@ -72,6 +96,15 @@ function applyWidthStyle(width) {
                         depth++;
                     }
                 }
+            } else if (selector.includes('input') || selector.includes('composer') ||
+                selector.includes('prompt') || selector.includes('bottom')) {
+                // 输入框区域：与对话区域等宽，居中对齐，使用box-sizing防止溢出
+                element.style.setProperty('max-width', `${width}px`, 'important');
+                element.style.setProperty('width', '100%', 'important');
+                element.style.setProperty('margin-left', 'auto', 'important');
+                element.style.setProperty('margin-right', 'auto', 'important');
+                element.style.setProperty('box-sizing', 'border-box', 'important');
+                element.style.setProperty('overflow', 'visible', 'important');
             } else {
                 // 其他容器（AI回答等）：居中对齐
                 element.style.setProperty('max-width', `${width}px`, 'important');
@@ -83,17 +116,68 @@ function applyWidthStyle(width) {
         });
     });
 
+    // 额外处理：查找所有可能的输入框容器
+    applyInputAreaStyles(width);
+
     if (totalApplied > 0) {
         console.log(`[Wider Gemini] 已应用宽度 ${width}px 到 ${totalApplied} 个容器`);
     }
+}
+
+// 专门处理输入框区域的样式
+function applyInputAreaStyles(width) {
+    // 查找所有可能的输入框容器
+    const inputSelectors = [
+        'rich-textarea',
+        '[role="textbox"]',
+        '.input-area',
+        '.composer-container',
+        '[class*="InputArea"]',
+        '[class*="PromptInput"]',
+        '[class*="TextInput"]'
+    ];
+
+    inputSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            // 向上查找父容器并应用宽度
+            let parent = element.parentElement;
+            let depth = 0;
+            while (parent && depth < 8) {
+                const tagName = parent.tagName.toLowerCase();
+                const className = String(parent.className || '');
+
+                // 如果是可能的输入区域容器
+                if (tagName === 'form' ||
+                    className.includes('input') ||
+                    className.includes('prompt') ||
+                    className.includes('composer') ||
+                    className.includes('bottom')) {
+                    parent.style.setProperty('max-width', `${width}px`, 'important');
+                    parent.style.setProperty('width', '100%', 'important');
+                    parent.style.setProperty('margin-left', 'auto', 'important');
+                    parent.style.setProperty('margin-right', 'auto', 'important');
+                    parent.style.setProperty('box-sizing', 'border-box', 'important');
+                    parent.style.setProperty('overflow', 'visible', 'important');
+                }
+
+                parent = parent.parentElement;
+                depth++;
+            }
+        });
+    });
 }
 
 // 监听来自popup的消息
 if (isExtensionContextValid()) {
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (!isExtensionContextValid()) return;
+
         if (request.action === 'updateWidth') {
             applyWidthStyle(request.width);
+            sendResponse({ success: true });
+        } else if (request.action === 'updateCodeWrap') {
+            applyCodeWrap(request.enabled);
             sendResponse({ success: true });
         }
     });
@@ -113,10 +197,17 @@ function init() {
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === 1) {
-                            if (node.classList?.contains('conversation-container') ||
-                                node.classList?.contains('user-query-bubble-with-background') ||
+                            const classList = node.classList || [];
+                            const classString = String(node.className || '');
+
+                            if (classList.contains('conversation-container') ||
+                                classList.contains('user-query-bubble-with-background') ||
                                 node.querySelector?.('.conversation-container') ||
-                                node.querySelector?.('.user-query-bubble-with-background')) {
+                                node.querySelector?.('.user-query-bubble-with-background') ||
+                                node.querySelector?.('[role="textbox"]') ||
+                                classString.includes('input') ||
+                                classString.includes('prompt') ||
+                                classString.includes('composer')) {
                                 shouldReapply = true;
                             }
                         }
@@ -207,8 +298,14 @@ if (document.readyState === 'loading') {
 if (isExtensionContextValid()) {
     chrome.storage.onChanged.addListener(function (changes, namespace) {
         if (!isExtensionContextValid()) return;
-        if (namespace === 'sync' && changes.chatWidth) {
-            applyWidthStyle(changes.chatWidth.newValue);
+
+        if (namespace === 'sync') {
+            if (changes.chatWidth) {
+                applyWidthStyle(changes.chatWidth.newValue);
+            }
+            if (changes.codeWrap) {
+                applyCodeWrap(changes.codeWrap.newValue);
+            }
         }
     });
 }

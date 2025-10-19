@@ -65,7 +65,6 @@ wider-gemini/
 │   ├── icon48.png
 │   ├── icon128.png
 │   └── icon.svg
-├── archive/            # 样式分析文件存档
 └── README.md           # 说明文档
 ```
 

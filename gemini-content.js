@@ -43,7 +43,30 @@ function applyWidthStyle(width) {
     const root = document.documentElement;
     root.style.setProperty('--gemini-chat-width', `${width}px`);
 
-    // 应用到所有相关容器
+    // 检查是否是 Deep Research 页面（通过检测特定元素）
+    const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
+    if (isDeepResearch) {
+        console.log('[Wider Gemini] 检测到 Deep Research 页面，应用专用宽度设置');
+        // Deep Research 页面：设置 chat-window 为 1600px
+        const chatWindow = document.querySelector('chat-window');
+        if (chatWindow) {
+            chatWindow.style.setProperty('max-width', '1600px', 'important');
+            chatWindow.style.setProperty('width', '100%', 'important');
+            chatWindow.style.setProperty('margin-left', 'auto', 'important');
+            chatWindow.style.setProperty('margin-right', 'auto', 'important');
+            console.log('[Wider Gemini] Deep Research chat-window 宽度已设置为 1600px');
+        }
+        return;
+    }
+
+    // 检查是否在 chat-window 内（只在普通对话页面应用样式）
+    const chatWindow = document.querySelector('chat-window');
+    if (!chatWindow) {
+        console.log('[Wider Gemini] 未找到 chat-window，跳过样式应用');
+        return;
+    }
+
+    // 应用到所有相关容器（只在 chat-window 内查找）
     const selectors = [
         '.conversation-container',
         '.user-query-content',
@@ -66,7 +89,8 @@ function applyWidthStyle(width) {
 
     let totalApplied = 0;
     selectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
+        // 只在 chat-window 内查找元素
+        const elements = chatWindow.querySelectorAll(selector);
         elements.forEach(element => {
             // 使用setProperty with 'important'来确保优先级最高
             if (element.classList.contains('user-query-bubble-with-background') ||
@@ -126,7 +150,19 @@ function applyWidthStyle(width) {
 
 // 专门处理输入框区域的样式
 function applyInputAreaStyles(width) {
-    // 查找所有可能的输入框容器
+    // 检查是否是 Deep Research 页面
+    const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
+    if (isDeepResearch) {
+        return; // Deep Research 页面，不应用样式
+    }
+
+    // 检查是否在 chat-window 内
+    const chatWindow = document.querySelector('chat-window');
+    if (!chatWindow) {
+        return; // 不应用样式
+    }
+
+    // 查找所有可能的输入框容器（只在 chat-window 内）
     const inputSelectors = [
         'rich-textarea',
         '[role="textbox"]',
@@ -138,7 +174,7 @@ function applyInputAreaStyles(width) {
     ];
 
     inputSelectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
+        const elements = chatWindow.querySelectorAll(selector);
         elements.forEach(element => {
             // 向上查找父容器并应用宽度
             let parent = element.parentElement;
@@ -247,7 +283,27 @@ function init() {
             return;
         }
 
-        const userQueryBubbles = document.querySelectorAll('.user-query-bubble-with-background');
+        // 检查是否是 Deep Research 页面
+        const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
+        if (isDeepResearch) {
+            // Deep Research 页面：持续应用 1600px 宽度
+            const chatWindow = document.querySelector('chat-window');
+            if (chatWindow) {
+                chatWindow.style.setProperty('max-width', '1600px', 'important');
+                chatWindow.style.setProperty('width', '100%', 'important');
+                chatWindow.style.setProperty('margin-left', 'auto', 'important');
+                chatWindow.style.setProperty('margin-right', 'auto', 'important');
+            }
+            return; // Deep Research 页面，跳过其他样式应用
+        }
+
+        // 检查是否在 chat-window 内
+        const chatWindow = document.querySelector('chat-window');
+        if (!chatWindow) {
+            return; // 跳过
+        }
+
+        const userQueryBubbles = chatWindow.querySelectorAll('.user-query-bubble-with-background');
         if (userQueryBubbles.length > 0) {
             try {
                 chrome.storage.sync.get(['chatWidth'], function (result) {

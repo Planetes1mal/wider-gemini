@@ -95,29 +95,70 @@ function applyWidthStyle(width) {
             // 使用setProperty with 'important'来确保优先级最高
             if (element.classList.contains('user-query-bubble-with-background') ||
                 selector.includes('user-query')) {
-                // 用户提问区域：右对齐贴边，宽度为AI回答的55%
-                const userQueryWidth = Math.round(width * 0.55);
-                element.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
-                element.style.setProperty('width', 'fit-content', 'important');
-                element.style.setProperty('min-width', 'auto', 'important');
-                element.style.setProperty('margin-left', 'auto', 'important');
-                element.style.setProperty('margin-right', '0', 'important');
 
-                if (element.classList.contains('user-query-bubble-with-background')) {
-                    element.style.setProperty('display', 'inline-block', 'important');
-                }
+                // 检查是否处于编辑模式（包含编辑框）
+                const isEditing = element.querySelector('textarea') ||
+                    element.querySelector('[contenteditable="true"]') ||
+                    element.querySelector('[role="textbox"]');
 
-                // 修改父元素使其支持右对齐
-                if (element.classList.contains('user-query-bubble-with-background')) {
-                    let parent = element.parentElement;
-                    let depth = 0;
-                    while (parent && depth < 5) {
-                        parent.style.setProperty('max-width', `${width}px`, 'important');
-                        parent.style.setProperty('width', '100%', 'important');
-                        parent.style.setProperty('display', 'flex', 'important');
-                        parent.style.setProperty('justify-content', 'flex-end', 'important');
-                        parent = parent.parentElement;
-                        depth++;
+                if (isEditing) {
+                    // 编辑模式：使用全宽并居中
+                    element.style.setProperty('max-width', `${width}px`, 'important');
+                    element.style.setProperty('width', '100%', 'important');
+                    element.style.setProperty('margin-left', 'auto', 'important');
+                    element.style.setProperty('margin-right', 'auto', 'important');
+                    element.style.setProperty('display', 'block', 'important');
+                    element.style.setProperty('box-sizing', 'border-box', 'important');
+                    element.style.setProperty('overflow', 'visible', 'important');
+                    element.style.setProperty('padding-left', '0', 'important');
+                    element.style.setProperty('padding-right', '0', 'important');
+
+                    // 修改父元素为居中对齐
+                    if (element.classList.contains('user-query-bubble-with-background')) {
+                        let parent = element.parentElement;
+                        let depth = 0;
+                        while (parent && depth < 5) {
+                            parent.style.setProperty('max-width', `${width}px`, 'important');
+                            parent.style.setProperty('width', '100%', 'important');
+                            parent.style.setProperty('display', 'flex', 'important');
+                            parent.style.setProperty('justify-content', 'center', 'important');
+                            parent = parent.parentElement;
+                            depth++;
+                        }
+
+                        // 确保编辑框内部的所有直接子元素也应用正确的样式
+                        const children = element.querySelectorAll(':scope > *');
+                        children.forEach(child => {
+                            child.style.setProperty('max-width', '100%', 'important');
+                            child.style.setProperty('width', '100%', 'important');
+                            child.style.setProperty('box-sizing', 'border-box', 'important');
+                        });
+                    }
+                } else {
+                    // 正常模式：用户提问区域右对齐贴边，宽度为AI回答的55%
+                    const userQueryWidth = Math.round(width * 0.55);
+                    element.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
+                    element.style.setProperty('width', 'fit-content', 'important');
+                    element.style.setProperty('min-width', 'auto', 'important');
+                    element.style.setProperty('margin-left', 'auto', 'important');
+                    element.style.setProperty('margin-right', '0', 'important');
+
+                    if (element.classList.contains('user-query-bubble-with-background')) {
+                        element.style.setProperty('display', 'inline-block', 'important');
+                    }
+
+                    // 修改父元素使其支持右对齐
+                    if (element.classList.contains('user-query-bubble-with-background')) {
+                        let parent = element.parentElement;
+                        let depth = 0;
+                        while (parent && depth < 5) {
+                            parent.style.setProperty('max-width', `${width}px`, 'important');
+                            parent.style.setProperty('width', '100%', 'important');
+                            parent.style.setProperty('display', 'flex', 'important');
+                            parent.style.setProperty('justify-content', 'flex-end', 'important');
+                            parent = parent.parentElement;
+                            depth++;
+                        }
                     }
                 }
             } else if (selector.includes('input') || selector.includes('composer') ||
@@ -314,24 +355,63 @@ function init() {
 
                     const width = result.chatWidth || 1000;
                     userQueryBubbles.forEach(bubble => {
-                        const userQueryWidth = Math.round(width * 0.55);
-                        bubble.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
-                        bubble.style.setProperty('width', 'fit-content', 'important');
-                        bubble.style.setProperty('min-width', 'auto', 'important');
-                        bubble.style.setProperty('margin-left', 'auto', 'important');
-                        bubble.style.setProperty('margin-right', '0', 'important');
-                        bubble.style.setProperty('display', 'inline-block', 'important');
+                        // 检查是否处于编辑模式
+                        const isEditing = bubble.querySelector('textarea') ||
+                            bubble.querySelector('[contenteditable="true"]') ||
+                            bubble.querySelector('[role="textbox"]');
 
-                        // 强制修改父容器使其支持右对齐
-                        let parent = bubble.parentElement;
-                        let depth = 0;
-                        while (parent && depth < 5) {
-                            parent.style.setProperty('max-width', `${width}px`, 'important');
-                            parent.style.setProperty('width', '100%', 'important');
-                            parent.style.setProperty('display', 'flex', 'important');
-                            parent.style.setProperty('justify-content', 'flex-end', 'important');
-                            parent = parent.parentElement;
-                            depth++;
+                        if (isEditing) {
+                            // 编辑模式：使用全宽并居中
+                            bubble.style.setProperty('max-width', `${width}px`, 'important');
+                            bubble.style.setProperty('width', '100%', 'important');
+                            bubble.style.setProperty('margin-left', 'auto', 'important');
+                            bubble.style.setProperty('margin-right', 'auto', 'important');
+                            bubble.style.setProperty('display', 'block', 'important');
+                            bubble.style.setProperty('box-sizing', 'border-box', 'important');
+                            bubble.style.setProperty('overflow', 'visible', 'important');
+                            bubble.style.setProperty('padding-left', '0', 'important');
+                            bubble.style.setProperty('padding-right', '0', 'important');
+
+                            // 强制修改父容器使其居中对齐
+                            let parent = bubble.parentElement;
+                            let depth = 0;
+                            while (parent && depth < 5) {
+                                parent.style.setProperty('max-width', `${width}px`, 'important');
+                                parent.style.setProperty('width', '100%', 'important');
+                                parent.style.setProperty('display', 'flex', 'important');
+                                parent.style.setProperty('justify-content', 'center', 'important');
+                                parent = parent.parentElement;
+                                depth++;
+                            }
+
+                            // 确保编辑框内部的所有直接子元素也应用正确的样式
+                            const children = bubble.querySelectorAll(':scope > *');
+                            children.forEach(child => {
+                                child.style.setProperty('max-width', '100%', 'important');
+                                child.style.setProperty('width', '100%', 'important');
+                                child.style.setProperty('box-sizing', 'border-box', 'important');
+                            });
+                        } else {
+                            // 正常模式：右对齐，55%宽度
+                            const userQueryWidth = Math.round(width * 0.55);
+                            bubble.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
+                            bubble.style.setProperty('width', 'fit-content', 'important');
+                            bubble.style.setProperty('min-width', 'auto', 'important');
+                            bubble.style.setProperty('margin-left', 'auto', 'important');
+                            bubble.style.setProperty('margin-right', '0', 'important');
+                            bubble.style.setProperty('display', 'inline-block', 'important');
+
+                            // 强制修改父容器使其支持右对齐
+                            let parent = bubble.parentElement;
+                            let depth = 0;
+                            while (parent && depth < 5) {
+                                parent.style.setProperty('max-width', `${width}px`, 'important');
+                                parent.style.setProperty('width', '100%', 'important');
+                                parent.style.setProperty('display', 'flex', 'important');
+                                parent.style.setProperty('justify-content', 'flex-end', 'important');
+                                parent = parent.parentElement;
+                                depth++;
+                            }
                         }
                     });
                 });

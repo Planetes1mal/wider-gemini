@@ -46,6 +46,48 @@ chat-window .model-response-text {
 
 /* ========== 用户提问区域样式 ========== */
 
+/* 编辑模式：包含编辑框的气泡需要全宽 */
+chat-window .user-query-bubble-with-background:has(textarea),
+chat-window .user-query-bubble-with-background:has([contenteditable="true"]),
+chat-window .user-query-bubble-with-background:has([role="textbox"]) {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* 编辑框内部的输入元素也需要全宽 */
+chat-window .user-query-bubble-with-background textarea,
+chat-window .user-query-bubble-with-background [contenteditable="true"],
+chat-window .user-query-bubble-with-background [role="textbox"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 编辑框的所有内部容器 - 更强力的规则 */
+chat-window .user-query-bubble-with-background:has(textarea),
+chat-window .user-query-bubble-with-background:has(textarea) *,
+chat-window .user-query-bubble-with-background:has([contenteditable="true"]),
+chat-window .user-query-bubble-with-background:has([contenteditable="true"]) *,
+chat-window .user-query-bubble-with-background:has([role="textbox"]),
+chat-window .user-query-bubble-with-background:has([role="textbox"]) * {
+    box-sizing: border-box !important;
+}
+
+/* 编辑框内部容器不应该有固定宽度 */
+chat-window .user-query-bubble-with-background:has(textarea)>*,
+chat-window .user-query-bubble-with-background:has([contenteditable="true"])>*,
+chat-window .user-query-bubble-with-background:has([role="textbox"])>* {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
 /* 覆盖Gemini原生的476px限制 - 使用Angular的属性选择器 */
 chat-window .user-query-bubble-with-background[class*="ngcontent"]:not(.edit-mode) {
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
@@ -53,8 +95,8 @@ chat-window .user-query-bubble-with-background[class*="ngcontent"]:not(.edit-mod
     min-width: auto !important;
 }
 
-/* 针对用户提问气泡容器 - 右对齐贴边，宽度为AI回答的55% */
-chat-window .user-query-bubble-with-background {
+/* 针对用户提问气泡容器 - 右对齐贴边，宽度为AI回答的55% - 排除编辑模式 */
+chat-window .user-query-bubble-with-background:not(:has(textarea)):not(:has([contenteditable="true"])):not(:has([role="textbox"])) {
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
@@ -63,8 +105,8 @@ chat-window .user-query-bubble-with-background {
     display: inline-block !important;
 }
 
-/* 使用属性选择器增加优先级 */
-chat-window [class~="user-query-bubble-with-background"] {
+/* 使用属性选择器增加优先级 - 排除编辑模式 */
+chat-window [class~="user-query-bubble-with-background"]:not(:has(textarea)):not(:has([contenteditable="true"])):not(:has([role="textbox"])) {
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
@@ -72,8 +114,8 @@ chat-window [class~="user-query-bubble-with-background"] {
     margin-right: 0 !important;
 }
 
-/* 针对ng-star-inserted类的组合 */
-chat-window .ng-star-inserted.user-query-bubble-with-background {
+/* 针对ng-star-inserted类的组合 - 排除编辑模式 */
+chat-window .ng-star-inserted.user-query-bubble-with-background:not(:has(textarea)):not(:has([contenteditable="true"])):not(:has([role="textbox"])) {
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
@@ -104,6 +146,13 @@ chat-window *:has(> .user-query-bubble-with-background) {
     margin-right: auto !important;
     display: flex !important;
     justify-content: flex-end !important;
+}
+
+/* 编辑模式：包含编辑框的父容器需要居中对齐，而不是右对齐 */
+chat-window *:has(> .user-query-bubble-with-background:has(textarea)),
+chat-window *:has(> .user-query-bubble-with-background:has([contenteditable="true"])),
+chat-window *:has(> .user-query-bubble-with-background:has([role="textbox"])) {
+    justify-content: center !important;
 }
 
 /* 针对消息容器确保宽度一致 - 排除 Deep Research 元素 */

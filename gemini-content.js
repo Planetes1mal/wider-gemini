@@ -69,9 +69,7 @@ function applyWidthStyle(width) {
     // 应用到所有相关容器（只在 chat-window 内查找）
     const selectors = [
         '.conversation-container',
-        '.user-query-content',
         '.user-query-bubble-with-background',
-        '[class*="user-query"]',
         '.message-container',
         '[class*="message-content"]',
         // 输入框相关选择器
@@ -92,9 +90,15 @@ function applyWidthStyle(width) {
         // 只在 chat-window 内查找元素
         const elements = chatWindow.querySelectorAll(selector);
         elements.forEach(element => {
+            // 排除包含图片的用户查询容器（.user-query-container.right-align-content）
+            if (element.classList.contains('user-query-container') &&
+                element.classList.contains('right-align-content')) {
+                // 这是包含图片的容器，不应用样式，让它自然对齐
+                return;
+            }
+
             // 使用setProperty with 'important'来确保优先级最高
-            if (element.classList.contains('user-query-bubble-with-background') ||
-                selector.includes('user-query')) {
+            if (element.classList.contains('user-query-bubble-with-background')) {
 
                 // 检查是否处于编辑模式（包含编辑框）
                 const isEditing = element.querySelector('textarea') ||

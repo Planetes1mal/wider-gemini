@@ -124,11 +124,46 @@ chat-window .ng-star-inserted.user-query-bubble-with-background:not(:has(textare
 }
 
 /* 针对用户提问的父容器 - 使其右对齐 */
-chat-window [class*="user-query"] {
+/* 排除 .user-query-container.right-align-content（这是包含图片的容器，不应该被强制右对齐） */
+chat-window [class*="user-query"]:not(.user-query-container):not(.right-align-content) {
     max-width: var(--gemini-chat-width) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* 特别处理包含图片的用户查询容器 - 让它自然对齐 */
+chat-window .user-query-container.right-align-content {
+    max-width: none !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* USER-QUERY-CONTENT 元素包含图片时不应该被限制宽度 */
+/* 使用更高优先级的选择器来覆盖之前的规则 */
+chat-window user-query-content.user-query-container:has(img),
+chat-window user-query-content.user-query-container:has(.right-align-content),
+chat-window user-query-content:has(img),
+chat-window user-query-content[class*="user-query"]:has(img) {
+    max-width: none !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* 针对 USER-QUERY 元素（父元素）包含图片时也不限制宽度 */
+chat-window user-query:has(img) {
+    max-width: none !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     display: flex !important;
     justify-content: flex-end !important;
 }
@@ -140,6 +175,16 @@ chat-window .user-query-bubble-with-background * {
 
 /* 针对包含用户提问气泡的所有父元素 - 右对齐 */
 chat-window *:has(> .user-query-bubble-with-background) {
+    max-width: var(--gemini-chat-width) !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* 针对包含图片的用户查询容器的父元素 - 让它们也自然对齐 */
+chat-window *:has(> .user-query-container.right-align-content) {
     max-width: var(--gemini-chat-width) !important;
     width: 100% !important;
     margin-left: auto !important;

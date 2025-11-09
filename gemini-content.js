@@ -69,7 +69,9 @@ function applyWidthStyle(width) {
     // 应用到所有相关容器（只在 chat-window 内查找）
     const selectors = [
         '.conversation-container',
+        '.user-query-content',
         '.user-query-bubble-with-background',
+        '[class*="user-query"]',
         '.message-container',
         '[class*="message-content"]',
         // 输入框相关选择器
@@ -90,15 +92,9 @@ function applyWidthStyle(width) {
         // 只在 chat-window 内查找元素
         const elements = chatWindow.querySelectorAll(selector);
         elements.forEach(element => {
-            // 排除包含图片的用户查询容器（.user-query-container.right-align-content）
-            if (element.classList.contains('user-query-container') &&
-                element.classList.contains('right-align-content')) {
-                // 这是包含图片的容器，不应用样式，让它自然对齐
-                return;
-            }
-
             // 使用setProperty with 'important'来确保优先级最高
-            if (element.classList.contains('user-query-bubble-with-background')) {
+            if (element.classList.contains('user-query-bubble-with-background') ||
+                selector.includes('user-query')) {
 
                 // 检查是否处于编辑模式（包含编辑框）
                 const isEditing = element.querySelector('textarea') ||
@@ -112,10 +108,6 @@ function applyWidthStyle(width) {
                     element.style.setProperty('margin-left', 'auto', 'important');
                     element.style.setProperty('margin-right', 'auto', 'important');
                     element.style.setProperty('display', 'block', 'important');
-                    element.style.setProperty('box-sizing', 'border-box', 'important');
-                    element.style.setProperty('overflow', 'visible', 'important');
-                    element.style.setProperty('padding-left', '0', 'important');
-                    element.style.setProperty('padding-right', '0', 'important');
 
                     // 修改父元素为居中对齐
                     if (element.classList.contains('user-query-bubble-with-background')) {
@@ -129,14 +121,6 @@ function applyWidthStyle(width) {
                             parent = parent.parentElement;
                             depth++;
                         }
-
-                        // 确保编辑框内部的所有直接子元素也应用正确的样式
-                        const children = element.querySelectorAll(':scope > *');
-                        children.forEach(child => {
-                            child.style.setProperty('max-width', '100%', 'important');
-                            child.style.setProperty('width', '100%', 'important');
-                            child.style.setProperty('box-sizing', 'border-box', 'important');
-                        });
                     }
                 } else {
                     // 正常模式：用户提问区域右对齐贴边，宽度为AI回答的55%
@@ -144,7 +128,7 @@ function applyWidthStyle(width) {
                     element.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
                     element.style.setProperty('width', 'fit-content', 'important');
                     element.style.setProperty('min-width', 'auto', 'important');
-                    element.style.setProperty('margin-left', 'auto', 'important');
+                    // 移除 margin-left: auto，由父容器的 justify-content: flex-end 来实现右对齐
                     element.style.setProperty('margin-right', '0', 'important');
 
                     if (element.classList.contains('user-query-bubble-with-background')) {
@@ -160,6 +144,11 @@ function applyWidthStyle(width) {
                             parent.style.setProperty('width', '100%', 'important');
                             parent.style.setProperty('display', 'flex', 'important');
                             parent.style.setProperty('justify-content', 'flex-end', 'important');
+                            // 如果父容器包含按钮，则设置 gap 为 0
+                            if (parent.querySelector('button') || parent.querySelector('[role="button"]')) {
+                                parent.style.setProperty('gap', '0', 'important');
+                                parent.style.setProperty('column-gap', '0', 'important');
+                            }
                             parent = parent.parentElement;
                             depth++;
                         }
@@ -371,10 +360,6 @@ function init() {
                             bubble.style.setProperty('margin-left', 'auto', 'important');
                             bubble.style.setProperty('margin-right', 'auto', 'important');
                             bubble.style.setProperty('display', 'block', 'important');
-                            bubble.style.setProperty('box-sizing', 'border-box', 'important');
-                            bubble.style.setProperty('overflow', 'visible', 'important');
-                            bubble.style.setProperty('padding-left', '0', 'important');
-                            bubble.style.setProperty('padding-right', '0', 'important');
 
                             // 强制修改父容器使其居中对齐
                             let parent = bubble.parentElement;
@@ -387,21 +372,13 @@ function init() {
                                 parent = parent.parentElement;
                                 depth++;
                             }
-
-                            // 确保编辑框内部的所有直接子元素也应用正确的样式
-                            const children = bubble.querySelectorAll(':scope > *');
-                            children.forEach(child => {
-                                child.style.setProperty('max-width', '100%', 'important');
-                                child.style.setProperty('width', '100%', 'important');
-                                child.style.setProperty('box-sizing', 'border-box', 'important');
-                            });
                         } else {
                             // 正常模式：右对齐，55%宽度
                             const userQueryWidth = Math.round(width * 0.55);
                             bubble.style.setProperty('max-width', `${userQueryWidth}px`, 'important');
                             bubble.style.setProperty('width', 'fit-content', 'important');
                             bubble.style.setProperty('min-width', 'auto', 'important');
-                            bubble.style.setProperty('margin-left', 'auto', 'important');
+                            // 移除 margin-left: auto，由父容器的 justify-content: flex-end 来实现右对齐
                             bubble.style.setProperty('margin-right', '0', 'important');
                             bubble.style.setProperty('display', 'inline-block', 'important');
 
@@ -413,6 +390,11 @@ function init() {
                                 parent.style.setProperty('width', '100%', 'important');
                                 parent.style.setProperty('display', 'flex', 'important');
                                 parent.style.setProperty('justify-content', 'flex-end', 'important');
+                                // 如果父容器包含按钮，则设置 gap 为 0
+                                if (parent.querySelector('button') || parent.querySelector('[role="button"]')) {
+                                    parent.style.setProperty('gap', '0', 'important');
+                                    parent.style.setProperty('column-gap', '0', 'important');
+                                }
                                 parent = parent.parentElement;
                                 depth++;
                             }

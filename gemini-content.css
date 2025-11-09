@@ -55,10 +55,6 @@ chat-window .user-query-bubble-with-background:has([role="textbox"]) {
     margin-left: auto !important;
     margin-right: auto !important;
     display: block !important;
-    box-sizing: border-box !important;
-    overflow: visible !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
 }
 
 /* 编辑框内部的输入元素也需要全宽 */
@@ -70,22 +66,12 @@ chat-window .user-query-bubble-with-background [role="textbox"] {
     box-sizing: border-box !important;
 }
 
-/* 编辑框的所有内部容器 - 更强力的规则 */
-chat-window .user-query-bubble-with-background:has(textarea),
+/* 编辑框的所有内部容器 */
 chat-window .user-query-bubble-with-background:has(textarea) *,
-chat-window .user-query-bubble-with-background:has([contenteditable="true"]),
 chat-window .user-query-bubble-with-background:has([contenteditable="true"]) *,
-chat-window .user-query-bubble-with-background:has([role="textbox"]),
 chat-window .user-query-bubble-with-background:has([role="textbox"]) * {
-    box-sizing: border-box !important;
-}
-
-/* 编辑框内部容器不应该有固定宽度 */
-chat-window .user-query-bubble-with-background:has(textarea)>*,
-chat-window .user-query-bubble-with-background:has([contenteditable="true"])>*,
-chat-window .user-query-bubble-with-background:has([role="textbox"])>* {
     max-width: 100% !important;
-    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* 覆盖Gemini原生的476px限制 - 使用Angular的属性选择器 */
@@ -100,7 +86,6 @@ chat-window .user-query-bubble-with-background:not(:has(textarea)):not(:has([con
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
-    margin-left: auto !important;
     margin-right: 0 !important;
     display: inline-block !important;
 }
@@ -110,7 +95,6 @@ chat-window [class~="user-query-bubble-with-background"]:not(:has(textarea)):not
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
-    margin-left: auto !important;
     margin-right: 0 !important;
 }
 
@@ -119,51 +103,15 @@ chat-window .ng-star-inserted.user-query-bubble-with-background:not(:has(textare
     max-width: calc(var(--gemini-chat-width) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
-    margin-left: auto !important;
     margin-right: 0 !important;
 }
 
 /* 针对用户提问的父容器 - 使其右对齐 */
-/* 排除 .user-query-container.right-align-content（这是包含图片的容器，不应该被强制右对齐） */
-chat-window [class*="user-query"]:not(.user-query-container):not(.right-align-content) {
+chat-window [class*="user-query"] {
     max-width: var(--gemini-chat-width) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-}
-
-/* 特别处理包含图片的用户查询容器 - 让它自然对齐 */
-chat-window .user-query-container.right-align-content {
-    max-width: none !important;
-    width: auto !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-}
-
-/* USER-QUERY-CONTENT 元素包含图片时不应该被限制宽度 */
-/* 使用更高优先级的选择器来覆盖之前的规则 */
-chat-window user-query-content.user-query-container:has(img),
-chat-window user-query-content.user-query-container:has(.right-align-content),
-chat-window user-query-content:has(img),
-chat-window user-query-content[class*="user-query"]:has(img) {
-    max-width: none !important;
-    width: auto !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-}
-
-/* 针对 USER-QUERY 元素（父元素）包含图片时也不限制宽度 */
-chat-window user-query:has(img) {
-    max-width: none !important;
-    width: auto !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
     display: flex !important;
     justify-content: flex-end !important;
 }
@@ -173,18 +121,37 @@ chat-window .user-query-bubble-with-background * {
     max-width: none !important;
 }
 
-/* 针对包含用户提问气泡的所有父元素 - 右对齐 */
-chat-window *:has(> .user-query-bubble-with-background) {
-    max-width: var(--gemini-chat-width) !important;
-    width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    display: flex !important;
-    justify-content: flex-end !important;
+/* 确保包含按钮和提问框的容器没有间距 - 只针对直接包含两者的容器 */
+chat-window *:has(> .user-query-bubble-with-background):has(button),
+chat-window *:has(> .user-query-bubble-with-background):has([role="button"]) {
+    gap: 0 !important;
+    column-gap: 0 !important;
 }
 
-/* 针对包含图片的用户查询容器的父元素 - 让它们也自然对齐 */
-chat-window *:has(> .user-query-container.right-align-content) {
+/* 确保按钮和提问框之间没有间距 - 只针对按钮本身 */
+chat-window *:has(> .user-query-bubble-with-background)>button,
+chat-window *:has(> .user-query-bubble-with-background)>[role="button"],
+chat-window *:has(> .user-query-bubble-with-background)>*:has(button),
+chat-window *:has(> .user-query-bubble-with-background)>*:has([role="button"]) {
+    margin-right: 0 !important;
+}
+
+/* 确保按钮容器和提问框之间没有间距 */
+chat-window *:has(> .user-query-bubble-with-background)>*:has(button)+.user-query-bubble-with-background,
+chat-window *:has(> .user-query-bubble-with-background)>*:has([role="button"])+.user-query-bubble-with-background {
+    margin-left: 0 !important;
+}
+
+/* 确保提问框紧贴按钮 - 只针对提问框本身 */
+chat-window *:has(> .user-query-bubble-with-background):has(> button)>.user-query-bubble-with-background,
+chat-window *:has(> .user-query-bubble-with-background):has(> [role="button"])>.user-query-bubble-with-background,
+chat-window *:has(> .user-query-bubble-with-background):has(> *:has(button))>.user-query-bubble-with-background,
+chat-window *:has(> .user-query-bubble-with-background):has(> *:has([role="button"]))>.user-query-bubble-with-background {
+    margin-left: 0 !important;
+}
+
+/* 针对包含用户提问气泡的所有父元素 - 右对齐 */
+chat-window *:has(> .user-query-bubble-with-background) {
     max-width: var(--gemini-chat-width) !important;
     width: 100% !important;
     margin-left: auto !important;

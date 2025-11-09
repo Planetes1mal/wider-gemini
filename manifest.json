@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Wider Gemini",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "调节Gemini对话区域的宽度",
     "permissions": [
         "storage"

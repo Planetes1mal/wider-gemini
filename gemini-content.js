@@ -47,14 +47,15 @@ function applyWidthStyle(width) {
     const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
     if (isDeepResearch) {
         console.log('[Wider Gemini] 检测到 Deep Research 页面，应用专用宽度设置');
-        // Deep Research 页面：设置 chat-window 为 1600px
+        // Deep Research 页面：设置 chat-window 为 1600px（响应式）
         const chatWindow = document.querySelector('chat-window');
         if (chatWindow) {
-            chatWindow.style.setProperty('max-width', '1600px', 'important');
+            const maxWidth = Math.min(1600, window.innerWidth - 120);
+            chatWindow.style.setProperty('max-width', `${maxWidth}px`, 'important');
             chatWindow.style.setProperty('width', '100%', 'important');
             chatWindow.style.setProperty('margin-left', 'auto', 'important');
             chatWindow.style.setProperty('margin-right', 'auto', 'important');
-            console.log('[Wider Gemini] Deep Research chat-window 宽度已设置为 1600px');
+            console.log(`[Wider Gemini] Deep Research chat-window 宽度已设置为 ${maxWidth}px`);
         }
         return;
     }
@@ -320,10 +321,11 @@ function init() {
         // 检查是否是 Deep Research 页面
         const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
         if (isDeepResearch) {
-            // Deep Research 页面：持续应用 1600px 宽度
+            // Deep Research 页面：持续应用响应式宽度
             const chatWindow = document.querySelector('chat-window');
             if (chatWindow) {
-                chatWindow.style.setProperty('max-width', '1600px', 'important');
+                const maxWidth = Math.min(1600, window.innerWidth - 120);
+                chatWindow.style.setProperty('max-width', `${maxWidth}px`, 'important');
                 chatWindow.style.setProperty('width', '100%', 'important');
                 chatWindow.style.setProperty('margin-left', 'auto', 'important');
                 chatWindow.style.setProperty('margin-right', 'auto', 'important');
@@ -431,3 +433,19 @@ if (isExtensionContextValid()) {
         }
     });
 }
+// 监听窗口大小变化，更新响应式宽度
+let resizeTimer;
+window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+        if (!isExtensionContextValid()) return;
+
+        // 重新应用当前宽度设置（会触发响应式计算）
+        chrome.storage.sync.get(['chatWidth'], function (result) {
+            if (!isExtensionContextValid()) return;
+            const width = result.chatWidth || 1000;
+            applyWidthStyle(width);
+        });
+    }, 250); // 防抖：250ms 后执行
+});
+

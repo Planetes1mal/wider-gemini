@@ -1,6 +1,8 @@
 /* 调整Gemini对话区域的最大宽度 */
 :root {
     --gemini-chat-width: 1000px;
+    /* 响应式：确保宽度不超过视口宽度减去左侧边栏和边距 */
+    --gemini-chat-width-responsive: min(var(--gemini-chat-width), calc(100vw - 120px));
 }
 
 /* 修复滚动条位置 - 确保滚动条显示在浏览器窗口最右侧 */
@@ -15,11 +17,15 @@ body {
 }
 
 /* 确保主容器不会创建独立的滚动上下文 */
-mat-sidenav-content,
-.mat-drawer-content {
-    overflow: visible !important;
-    height: auto !important;
-    min-height: 100vh !important;
+/* 只在窗口宽度足够大时应用，避免在小窗口下破坏布局 */
+@media screen and (min-width: 960px) {
+
+    mat-sidenav-content,
+    .mat-drawer-content {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
 }
 
 /* 
@@ -30,7 +36,7 @@ mat-sidenav-content,
 
 /* Deep Research 页面：设置 chat-window 为更大的宽度 */
 chat-window:has(#extended-response-message-content) {
-    max-width: 1600px !important;
+    max-width: min(1600px, calc(100vw - 120px)) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -39,7 +45,7 @@ chat-window:has(#extended-response-message-content) {
 /* AI 回答区域 - 排除 Deep Research 的 message-content */
 chat-window message-content:not(#extended-response-message-content),
 chat-window .model-response-text {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
@@ -50,7 +56,7 @@ chat-window .model-response-text {
 chat-window .user-query-bubble-with-background:has(textarea),
 chat-window .user-query-bubble-with-background:has([contenteditable="true"]),
 chat-window .user-query-bubble-with-background:has([role="textbox"]) {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -76,14 +82,14 @@ chat-window .user-query-bubble-with-background:has([role="textbox"]) * {
 
 /* 覆盖Gemini原生的476px限制 - 使用Angular的属性选择器 */
 chat-window .user-query-bubble-with-background[class*="ngcontent"]:not(.edit-mode) {
-    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    max-width: calc(var(--gemini-chat-width-responsive) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
 }
 
 /* 针对用户提问气泡容器 - 右对齐贴边，宽度为AI回答的55% - 排除编辑模式 */
 chat-window .user-query-bubble-with-background:not(:has(textarea)):not(:has([contenteditable="true"])):not(:has([role="textbox"])) {
-    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    max-width: calc(var(--gemini-chat-width-responsive) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
     margin-right: 0 !important;
@@ -92,7 +98,7 @@ chat-window .user-query-bubble-with-background:not(:has(textarea)):not(:has([con
 
 /* 使用属性选择器增加优先级 - 排除编辑模式 */
 chat-window [class~="user-query-bubble-with-background"]:not(:has(textarea)):not(:has([contenteditable="true"])):not(:has([role="textbox"])) {
-    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    max-width: calc(var(--gemini-chat-width-responsive) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
     margin-right: 0 !important;
@@ -100,7 +106,7 @@ chat-window [class~="user-query-bubble-with-background"]:not(:has(textarea)):not
 
 /* 针对ng-star-inserted类的组合 - 排除编辑模式 */
 chat-window .ng-star-inserted.user-query-bubble-with-background:not(:has(textarea)):not(:has([contenteditable="true"])):not(:has([role="textbox"])) {
-    max-width: calc(var(--gemini-chat-width) * 0.55) !important;
+    max-width: calc(var(--gemini-chat-width-responsive) * 0.55) !important;
     width: fit-content !important;
     min-width: auto !important;
     margin-right: 0 !important;
@@ -108,7 +114,7 @@ chat-window .ng-star-inserted.user-query-bubble-with-background:not(:has(textare
 
 /* 针对用户提问的父容器 - 使其右对齐 */
 chat-window [class*="user-query"] {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -152,7 +158,7 @@ chat-window *:has(> .user-query-bubble-with-background):has(> *:has([role="butto
 
 /* 针对包含用户提问气泡的所有父元素 - 右对齐 */
 chat-window *:has(> .user-query-bubble-with-background) {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -171,7 +177,7 @@ chat-window *:has(> .user-query-bubble-with-background:has([role="textbox"])) {
 /* 注意：不使用 [class*="content"] 以避免匹配 response-container-content */
 chat-window .message-container:not(:has(#extended-response-message-content)),
 chat-window .message-content:not(#extended-response-message-content):not(.message-content-readonly) {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
@@ -186,7 +192,7 @@ chat-window [class*="input-area"],
 chat-window [class*="composer"],
 chat-window .ql-container,
 chat-window .input-container {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
@@ -215,7 +221,7 @@ chat-window [class*="text-input"] {
 chat-window [class*="bottom-container"],
 chat-window [class*="input-container-wrapper"],
 chat-window [class*="prompt-input"] {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
@@ -224,7 +230,7 @@ chat-window [class*="prompt-input"] {
 /* 确保底部输入区域的直接父容器宽度正确 */
 chat-window form[class*="input"],
 chat-window form[class*="prompt"] {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -258,7 +264,7 @@ chat-window [role="textbox"] {
 /* 确保包含输入框的form元素正确处理宽度 */
 chat-window form:has(rich-textarea),
 chat-window form:has([role="textbox"]) {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -270,7 +276,7 @@ chat-window form:has([role="textbox"]) {
 /* 针对输入框的直接父容器 */
 chat-window *:has(> rich-textarea),
 chat-window *:has(> [role="textbox"]) {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: var(--gemini-chat-width-responsive) !important;
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;

@@ -44,7 +44,68 @@ body {
 }
 
 input-container {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     margin-bottom: 10px !important;
+}
+
+/* 聊天容器宽度限制 */
+.chat-container {
+    max-width: var(--gemini-chat-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* 拖拽状态下的容器 */
+.chat-container.xap-drag-in-progress {
+    max-width: var(--gemini-chat-width) !important;
+}
+
+.chat-container.xap-drag-in-progress>* {
+    max-width: 100% !important;
+}
+
+/* 文件拖放区域宽度限制 */
+upload-card,
+.upload-card {
+    max-width: var(--gemini-chat-width) !important;
+}
+
+file-drop-area,
+.file-drop-area {
+    max-width: 100% !important;
+}
+
+/* 拖放区域通用选择器 - 覆盖所有可能的拖放元素 */
+[class*="drop"],
+[class*="drag"],
+[class*="upload"],
+[class*="file"],
+[class*="drop-zone"],
+[class*="drag-over"],
+[class*="drop-area"],
+[class*="drag-area"] {
+    max-width: var(--gemini-chat-width) !important;
+}
+
+/* 覆盖层和对话框 */
+.cdk-overlay-pane,
+.mat-menu-panel,
+[role="dialog"] {
+    max-width: var(--gemini-chat-width) !important;
+}
+
+/* 拖拽状态下的所有子元素 */
+.xap-drag-in-progress [class*="drop"],
+.xap-drag-in-progress [class*="drag"],
+.xap-drag-in-progress [class*="upload"] {
+    max-width: 100% !important;
+}
+
+/* 文件上传菜单面板宽度限制 */
+.mat-menu-panel {
+    max-width: var(--gemini-chat-width) !important;
 }
 
 /* 隐藏幻觉免责声明 */

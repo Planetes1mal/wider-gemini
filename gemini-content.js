@@ -71,7 +71,7 @@
                     });
                 }
             } catch (e) {
-                console.error(`[Wider Gemini] CSS 查询错误：${css.key}`, e);
+                console.error(`[Wider Gemini] CSS query error: ${css.key}`, e);
             }
         }
     }
@@ -80,10 +80,10 @@
     function applyCodeWrap(enabled) {
         if (enabled) {
             document.body.classList.add('code-wrap-enabled');
-            console.log('[Wider Gemini] 代码自动换行已开启');
+            console.log('[Wider Gemini] Code auto wrap enabled');
         } else {
             document.body.classList.remove('code-wrap-enabled');
-            console.log('[Wider Gemini] 代码自动换行已关闭');
+            console.log('[Wider Gemini] Code auto wrap disabled');
         }
     }
 
@@ -96,7 +96,7 @@
         // 检查是否是 Deep Research 页面
         const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
         if (isDeepResearch) {
-            console.log('[Wider Gemini] 检测到 Deep Research 页面，使用 1600px 宽度');
+            console.log('[Wider Gemini] Deep Research page detected, using 1600px width');
             root.style.setProperty('--gemini-chat-width', '1600px');
             width = 1600;
         }
@@ -107,7 +107,7 @@
         // 动态检测并应用拖放窗口样式
         applyDragDropStyles(width);
 
-        console.log(`[Wider Gemini] 已应用宽度 ${width}px`);
+        console.log(`[Wider Gemini] Applied width ${width}px`);
     }
 
     // 动态检测并应用拖放窗口样式
@@ -205,7 +205,7 @@
     // 从存储中获取设置并应用
     function applySettings() {
         if (!isExtensionContextValid()) {
-            console.log('[Wider Gemini] 扩展上下文已失效，停止运行');
+            console.log('[Wider Gemini] Extension context invalid, stopping');
             return;
         }
 
@@ -218,7 +218,7 @@
                 applyCodeWrap(codeWrap);
             });
         } catch (e) {
-            console.log('[Wider Gemini] 获取存储失败:', e.message);
+            console.log('[Wider Gemini] Failed to get storage:', e.message);
         }
     }
 
@@ -403,7 +403,7 @@
             }, 200);
         }, true);
 
-        console.log('[Wider Gemini] MutationObserver 和拖拽监听已启动');
+        console.log('[Wider Gemini] MutationObserver and drag listeners started');
     }
 
     // 页面加载时执行
@@ -476,7 +476,7 @@
                 });
 
                 console.table(results);
-                console.log('找到', results.length, '个可能的拖放元素');
+                console.log('Found', results.length, 'possible drag elements');
                 return results;
             },
 
@@ -484,17 +484,17 @@
             applyDragStyles: function () {
                 const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
                 applyDragDropStyles(width);
-                console.log('已应用拖放样式，宽度:', width + 'px');
+                console.log('Applied drag styles, width:', width + 'px');
             },
 
             // 获取当前宽度设置
             getCurrentWidth: function () {
                 const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
-                console.log('当前宽度设置:', width + 'px');
+                console.log('Current width setting:', width + 'px');
                 return width;
             }
         };
 
-        console.log('[Wider Gemini] 调试工具已加载，使用 window.widerGeminiDebug 访问');
+        console.log('[Wider Gemini] Debug tools loaded, use window.widerGeminiDebug to access');
     }
 })();

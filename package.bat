@@ -30,6 +30,13 @@ echo 复制图标...
 mkdir "%TEMP_DIR%\icons" >nul
 copy icons\*.png "%TEMP_DIR%\icons\" >nul
 
+REM 复制国际化语言包目录
+echo 复制语言包...
+mkdir "%TEMP_DIR%\_locales\en" >nul
+mkdir "%TEMP_DIR%\_locales\zh_CN" >nul
+copy _locales\en\messages.json "%TEMP_DIR%\_locales\en\" >nul
+copy _locales\zh_CN\messages.json "%TEMP_DIR%\_locales\zh_CN\" >nul
+
 REM 创建 ZIP 文件（需要 PowerShell）
 echo 创建 ZIP 文件...
 powershell -Command "Compress-Archive -Path '%TEMP_DIR%\*' -DestinationPath '%CD%\%PACKAGE_NAME%' -Force"

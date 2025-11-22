@@ -1,81 +1,83 @@
+English | [中文](./README.zh-CN.md)
+
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.0.2-blue.svg)](#)
 [![JavaScript](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](#)
-[![License：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-让 Google Gemini 的对话界面更宽。
+Make Google Gemini's conversation interface wider.
 
-## 功能
+## Features
 
-- **自定义宽度**：用滑块或预设按钮调整对话区域宽度（700px - 1350px）
-- **代码自动换行**：开关代码块换行，长代码不用横向滚动
-- **自动刷新**：调整设置后自动刷新 Gemini 页面
-- **自动保存**：设置保存在本地，下次打开直接生效
-- **响应式设计**：小窗口下自动适应，不会出现空白或截断
+- **Custom Width**: Adjust chat width with slider or preset buttons (700px - 1350px)
+- **Code Auto Wrap**: Toggle code block wrapping, no horizontal scrolling for long code
+- **Auto Refresh**: Automatically refresh Gemini pages after adjusting settings
+- **Auto Save**: Settings saved locally, take effect immediately on next open
+- **Responsive Design**: Automatically adapts to small windows, no blank spaces or truncation
 
-## 安装
+## Installation
 
-1. 下载或克隆这个项目
-2. 打开 Chrome，访问 `chrome://extensions/`
-3. 打开右上角的「开发者模式」
-4. 点击「加载已解压的扩展程序」
-5. 选择项目文件夹
+1. Download or clone this repository
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode" in the top right corner
+4. Click "Load unpacked"
+5. Select the project folder
 
-## 使用
+## Usage
 
-### 调整宽度
+### Adjust Width
 
-打开 [Google Gemini](https://gemini.google.com/)，点击浏览器工具栏的插件图标。
+Open [Google Gemini](https://gemini.google.com/), click the extension icon in the browser toolbar.
 
-用滑块调整宽度，或点击预设按钮：
-- **窄**：800px
-- **默认**：1000px
-- **更宽**：1200px
-- **超宽**：1350px
+Adjust width with the slider or click preset buttons:
+- **Narrow**: 800px
+- **Default**: 1000px
+- **Wider**: 1200px
+- **Ultra**: 1350px
 
-### 代码换行
+### Code Wrapping
 
-在插件弹窗中打开「代码区域自动换行」开关，代码块就会自动换行。关闭后恢复横向滚动条。
+Toggle "Code Auto Wrap" in the extension popup to enable automatic code wrapping. Disable it to restore horizontal scrolling.
 
-### 自动刷新
+### Auto Refresh
 
-调整设置后，所有 Gemini 页面会自动刷新。拖动滑块时有 0.5 秒防抖，避免频繁刷新。
+After adjusting settings, all Gemini pages will automatically refresh. There's a 0.5 second debounce when dragging the slider to avoid frequent refreshes.
 
-## 开发
+## Development
 
-### 本地调试
+### Local Debugging
 
-修改代码后，在 `chrome://extensions/` 点击刷新按钮，然后刷新 Gemini 页面。
+After modifying code, click the refresh button in `chrome://extensions/`, then refresh the Gemini page.
 
-### 实现原理
+### Implementation Details
 
-**宽度调整**：通过 CSS 变量 `--gemini-chat-width` 控制对话容器的 `max-width`。JavaScript 监听 DOM 变化，动态应用样式到新增元素。
+**Width Adjustment**: Controls the `max-width` of conversation containers via CSS variable `--gemini-chat-width`. JavaScript listens for DOM changes and dynamically applies styles to new elements.
 
-**代码换行**：给 `<body>` 添加 `code-wrap-enabled` 类，CSS 将代码块的 `white-space` 从 `pre` 改为 `pre-wrap`。
+**Code Wrapping**: Adds `code-wrap-enabled` class to `<body>`, CSS changes code block `white-space` from `pre` to `pre-wrap`.
 
-**自动刷新**：用 `chrome.tabs.query` 找到所有 Gemini 页面，调用 `chrome.tabs.reload` 刷新。滑块拖动时用防抖机制避免频繁刷新。
+**Auto Refresh**: Uses `chrome.tabs.query` to find all Gemini pages, calls `chrome.tabs.reload` to refresh. Debounce mechanism prevents frequent refreshes when dragging the slider.
 
-### 修改配置
+### Configuration
 
-修改默认宽度（`gemini-content.js`）：
+Change default width (`gemini-content.js`):
 ```javascript
-const width = result.chatWidth || 1000; // 改这里
+const width = result.chatWidth || 1000; // Change here
 ```
 
-修改宽度范围（`popup.html`）：
+Change width range (`popup.html`):
 ```html
 <input type="range" id="widthSlider" min="700" max="1350" step="50">
 ```
 
-## 许可证
+## License
 
 [MIT License](./LICENSE)
 
-## 贡献
+## Contributing
 
-欢迎提交 Issue 和 Pull Request。
+Issues and Pull Requests are welcome.
 
 ---
 
-这个插件只修改页面样式，不收集任何数据，不影响 Gemini 功能。
+This extension only modifies page styles, collects no data, and does not affect Gemini functionality.

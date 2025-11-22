@@ -1,8 +1,9 @@
 {
     "manifest_version": 3,
     "name": "Wider Gemini",
-    "version": "2.0.1",
-    "description": "让 Gemini 对话界面更宽",
+    "version": "2.0.2",
+    "description": "让 Google Gemini 的对话界面更宽，支持自定义宽度和代码自动换行",
+    "author": "Wider Gemini",
     "permissions": [
         "storage"
     ],

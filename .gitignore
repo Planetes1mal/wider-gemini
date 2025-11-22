@@ -1,3 +1,13 @@
 archive/
 archive/**
 .cursor/
+*.zip
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.env
+.env.local
+*.swp
+*.swo
+*~

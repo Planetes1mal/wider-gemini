@@ -10,40 +10,76 @@
 
 <body>
     <div class="container">
-        <h1>Wider Gemini</h1>
-        <div class="control-group">
-            <label for="widthSlider">对话区域宽度:</label>
-            <div class="slider-container">
-                <input type="range" id="widthSlider" min="700" max="1350" step="50" value="1000">
-                <span id="widthValue">1000</span>
-                <span class="unit">px</span>
+        <!-- 标题区域 -->
+        <header class="header">
+            <div class="header-icon">⚡</div>
+            <h1>Wider Gemini</h1>
+            <p class="header-subtitle">让对话界面更宽更舒适</p>
+        </header>
+
+        <!-- 宽度控制卡片 -->
+        <section class="card width-card">
+            <div class="card-header">
+                <span class="card-icon">📐</span>
+                <label for="widthSlider" class="card-title">对话区域宽度</label>
             </div>
-        </div>
-        <div class="preset-buttons">
-            <button class="preset-btn" data-width="800">窄</button>
-            <button class="preset-btn" data-width="1000">默认</button>
-            <button class="preset-btn" data-width="1200">更宽</button>
-            <button class="preset-btn" data-width="1350">超宽</button>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="control-group">
-            <label for="codeWrapToggle">代码区域自动换行：</label>
-            <div class="toggle-container">
-                <label class="switch">
-                    <input type="checkbox" id="codeWrapToggle">
-                    <span class="slider-toggle"></span>
-                </label>
-                <span id="codeWrapStatus" class="status-text">关闭</span>
+            <div class="slider-wrapper">
+                <div class="slider-container">
+                    <input type="range" id="widthSlider" min="700" max="1350" step="50" value="1000">
+                    <div class="slider-track"></div>
+                </div>
+                <div class="slider-value">
+                    <span id="widthValue">1000</span>
+                    <span class="unit">px</span>
+                </div>
             </div>
-            <p class="toggle-hint">开启后代码将自动换行，关闭则显示横向滚动条</p>
-        </div>
-        <div class="info">
-            <p>💡 拖动滑块或点击预设按钮调整宽度</p>
-            <p>设置会自动保存并应用到所有 Gemini 标签页</p>
-        </div>
+            <div class="preset-buttons">
+                <button class="preset-btn" data-width="800">
+                    <span class="btn-icon">📱</span>
+                    <span class="btn-text">窄</span>
+                </button>
+                <button class="preset-btn" data-width="1000">
+                    <span class="btn-icon">💻</span>
+                    <span class="btn-text">默认</span>
+                </button>
+                <button class="preset-btn" data-width="1200">
+                    <span class="btn-icon">🖥️</span>
+                    <span class="btn-text">更宽</span>
+                </button>
+                <button class="preset-btn" data-width="1350">
+                    <span class="btn-icon">📺</span>
+                    <span class="btn-text">超宽</span>
+                </button>
+            </div>
+        </section>
 
+        <!-- 代码换行控制卡片 -->
+        <section class="card code-card">
+            <div class="card-header">
+                <span class="card-icon">💻</span>
+                <label for="codeWrapToggle" class="card-title">代码区域自动换行</label>
+            </div>
+            <div class="toggle-wrapper">
+                <div class="toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="codeWrapToggle">
+                        <span class="slider-toggle"></span>
+                    </label>
+                    <span id="codeWrapStatus" class="status-text">关闭</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 信息提示卡片 -->
+        <section class="info-card">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <p class="info-text">拖动滑块或点击预设按钮调整宽度</p>
+                <p class="info-text">设置会自动保存并应用到所有 Gemini 标签页</p>
+            </div>
+        </section>
+
+        <!-- 刷新提示 -->
         <div id="refreshNotice" class="refresh-notice">
             <span class="refresh-icon">🔄</span>
             <span class="refresh-text">正在刷新页面...</span>

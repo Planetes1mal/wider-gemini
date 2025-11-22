@@ -13,15 +13,15 @@
         <!-- 标题区域 -->
         <header class="header">
             <div class="header-icon">⚡</div>
-            <h1>Wider Gemini</h1>
-            <p class="header-subtitle">让对话界面更宽更舒适</p>
+            <h1 id="i18n-appName">Wider Gemini</h1>
+            <p class="header-subtitle" id="i18n-headerSubtitle">让对话界面更宽更舒适</p>
         </header>
 
         <!-- 宽度控制卡片 -->
         <section class="card width-card">
             <div class="card-header">
                 <span class="card-icon">📐</span>
-                <label for="widthSlider" class="card-title">对话区域宽度</label>
+                <label for="widthSlider" class="card-title" id="i18n-widthLabel">对话区域宽度</label>
             </div>
             <div class="slider-wrapper">
                 <div class="slider-container">
@@ -36,19 +36,19 @@
             <div class="preset-buttons">
                 <button class="preset-btn" data-width="800">
                     <span class="btn-icon">📱</span>
-                    <span class="btn-text">窄</span>
+                    <span class="btn-text" id="i18n-btnNarrow">窄</span>
                 </button>
                 <button class="preset-btn" data-width="1000">
                     <span class="btn-icon">💻</span>
-                    <span class="btn-text">默认</span>
+                    <span class="btn-text" id="i18n-btnDefault">默认</span>
                 </button>
                 <button class="preset-btn" data-width="1200">
                     <span class="btn-icon">🖥️</span>
-                    <span class="btn-text">更宽</span>
+                    <span class="btn-text" id="i18n-btnWider">更宽</span>
                 </button>
                 <button class="preset-btn" data-width="1350">
                     <span class="btn-icon">📺</span>
-                    <span class="btn-text">超宽</span>
+                    <span class="btn-text" id="i18n-btnUltra">超宽</span>
                 </button>
             </div>
         </section>
@@ -57,7 +57,7 @@
         <section class="card code-card">
             <div class="card-header">
                 <span class="card-icon">💻</span>
-                <label for="codeWrapToggle" class="card-title">代码区域自动换行</label>
+                <label for="codeWrapToggle" class="card-title" id="i18n-codeWrapLabel">代码区域自动换行</label>
             </div>
             <div class="toggle-wrapper">
                 <div class="toggle-container">
@@ -74,15 +74,15 @@
         <section class="info-card">
             <div class="info-icon">💡</div>
             <div class="info-content">
-                <p class="info-text">拖动滑块或点击预设按钮调整宽度</p>
-                <p class="info-text">设置会自动保存并应用到所有 Gemini 标签页</p>
+                <p class="info-text" id="i18n-infoText1">拖动滑块或点击预设按钮调整宽度</p>
+                <p class="info-text" id="i18n-infoText2">设置会自动保存并应用到所有 Gemini 标签页</p>
             </div>
         </section>
 
         <!-- 刷新提示 -->
         <div id="refreshNotice" class="refresh-notice">
             <span class="refresh-icon">🔄</span>
-            <span class="refresh-text">正在刷新页面...</span>
+            <span class="refresh-text" id="i18n-refreshing">正在刷新页面...</span>
         </div>
     </div>
     <script src="popup.js"></script>

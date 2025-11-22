@@ -1,0 +1,45 @@
+{
+  "appName": {
+    "message": "Wider Gemini"
+  },
+  "appDesc": {
+    "message": "让 Google Gemini 的对话界面更宽，支持自定义宽度和代码自动换行"
+  },
+  "headerSubtitle": {
+    "message": "让对话界面更宽更舒适"
+  },
+  "widthLabel": {
+    "message": "对话区域宽度"
+  },
+  "btnNarrow": {
+    "message": "窄"
+  },
+  "btnDefault": {
+    "message": "默认"
+  },
+  "btnWider": {
+    "message": "更宽"
+  },
+  "btnUltra": {
+    "message": "超宽"
+  },
+  "codeWrapLabel": {
+    "message": "代码区域自动换行"
+  },
+  "statusOn": {
+    "message": "开启"
+  },
+  "statusOff": {
+    "message": "关闭"
+  },
+  "infoText1": {
+    "message": "拖动滑块或点击预设按钮调整宽度"
+  },
+  "infoText2": {
+    "message": "设置会自动保存并应用到所有 Gemini 标签页"
+  },
+  "refreshing": {
+    "message": "正在刷新页面..."
+  }
+}
+

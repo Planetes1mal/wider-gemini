@@ -1,0 +1,44 @@
+{
+    "appName": {
+        "message": "Wider Gemini"
+    },
+    "appDesc": {
+        "message": "Make Google Gemini wider and easier to read. Customize width and code wrap settings."
+    },
+    "headerSubtitle": {
+        "message": "Make the conversation interface wider and more comfortable"
+    },
+    "widthLabel": {
+        "message": "Chat Width"
+    },
+    "btnNarrow": {
+        "message": "Narrow"
+    },
+    "btnDefault": {
+        "message": "Default"
+    },
+    "btnWider": {
+        "message": "Wider"
+    },
+    "btnUltra": {
+        "message": "Ultra"
+    },
+    "codeWrapLabel": {
+        "message": "Code Auto Wrap"
+    },
+    "statusOn": {
+        "message": "On"
+    },
+    "statusOff": {
+        "message": "Off"
+    },
+    "infoText1": {
+        "message": "Drag the slider or click preset buttons to adjust width"
+    },
+    "infoText2": {
+        "message": "Settings are automatically saved and applied to all Gemini tabs"
+    },
+    "refreshing": {
+        "message": "Refreshing page..."
+    }
+}

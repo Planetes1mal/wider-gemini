@@ -1,3 +1,22 @@
+// 国际化加载函数
+function localizeHtmlPage() {
+    // 替换所有带有 i18n- 前缀 ID 的元素文本
+    const ids = [
+        "appName", "headerSubtitle", "widthLabel", "btnNarrow", "btnDefault", 
+        "btnWider", "btnUltra", "codeWrapLabel", "infoText1", "infoText2", "refreshing"
+    ];
+    
+    ids.forEach(id => {
+        const element = document.getElementById("i18n-" + id);
+        if (element) {
+            element.textContent = chrome.i18n.getMessage(id);
+        }
+    });
+}
+
+// 页面加载时调用国际化函数
+localizeHtmlPage();
+
 const widthSlider = document.getElementById('widthSlider');
 const widthValue = document.getElementById('widthValue');
 const presetButtons = document.querySelectorAll('.preset-btn');
@@ -69,7 +88,9 @@ codeWrapToggle.addEventListener('change', function () {
 
 // 更新代码换行状态显示
 function updateCodeWrapStatus(enabled) {
-    codeWrapStatus.textContent = enabled ? '开启' : '关闭';
+    const statusOn = chrome.i18n.getMessage("statusOn");
+    const statusOff = chrome.i18n.getMessage("statusOff");
+    codeWrapStatus.textContent = enabled ? statusOn : statusOff;
 }
 
 // 更新宽度

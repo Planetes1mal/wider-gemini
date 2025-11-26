@@ -6,6 +6,9 @@
 [![JavaScript](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](#)
 [![License：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> **🎉 现已上架 Chrome 应用商店！**
+> 直接从 [Chrome 应用商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb) 获取
+
 让 Google Gemini 的对话界面更宽。
 
 ## 功能
@@ -17,6 +20,14 @@
 - **响应式设计**：小窗口下自动适应，不会出现空白或截断
 
 ## 安装
+
+### 推荐：从 Chrome 应用商店安装（最简单）
+
+1. 访问 [Chrome 应用商店页面](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
+2. 点击「添加到 Chrome」
+3. 确认安装
+
+### 备选：手动安装（开发者模式）
 
 1. 下载或克隆这个项目
 2. 打开 Chrome，访问 `chrome://extensions/`

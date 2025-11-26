@@ -6,6 +6,9 @@ English | [中文](./README.zh-CN.md)
 [![JavaScript](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> **🎉 Now Available on Chrome Web Store!** 
+> Get it directly from [Chrome Web Store](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
+
 Make Google Gemini's conversation interface wider.
 
 ## Features
@@ -17,6 +20,14 @@ Make Google Gemini's conversation interface wider.
 - **Responsive Design**: Automatically adapts to small windows, no blank spaces or truncation
 
 ## Installation
+
+### Recommended: Install from Chrome Web Store (Easiest)
+
+1. Visit the [Chrome Web Store page](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
+2. Click "Add to Chrome"
+3. Confirm the installation
+
+### Alternative: Manual Installation (For Developers)
 
 1. Download or clone this repository
 2. Open Chrome and navigate to `chrome://extensions/`

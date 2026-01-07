@@ -23,6 +23,9 @@
     "btnUltra": {
         "message": "Ultra"
     },
+    "btnInsane": {
+        "message": "Insane"
+    },
     "codeWrapLabel": {
         "message": "Code Auto Wrap"
     },

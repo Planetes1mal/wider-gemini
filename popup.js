@@ -2,8 +2,8 @@
 function localizeHtmlPage() {
     // 替换所有带有 i18n- 前缀 ID 的元素文本
     const ids = [
-        "appName", "headerSubtitle", "widthLabel", "btnNarrow", "btnDefault", 
-        "btnWider", "btnUltra", "codeWrapLabel", "infoText1", "infoText2", "refreshing"
+        "appName", "headerSubtitle", "widthLabel", "btnNarrow", "btnDefault",
+        "btnWider", "btnUltra", "btnInsane", "codeWrapLabel", "infoText1", "infoText2", "refreshing"
     ];
     
     ids.forEach(id => {

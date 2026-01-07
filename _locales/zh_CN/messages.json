@@ -23,6 +23,9 @@
   "btnUltra": {
     "message": "超宽"
   },
+  "btnInsane": {
+    "message": "你真的需要这么宽吗？"
+  },
   "codeWrapLabel": {
     "message": "代码区域自动换行"
   },

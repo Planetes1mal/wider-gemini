@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.0.3-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.0.4-blue.svg)](#)
 [![JavaScript](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

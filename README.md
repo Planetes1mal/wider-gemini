@@ -2,93 +2,114 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.0.4-blue.svg)](#)
-[![JavaScript](https://img.shields.io/badge/logo-javascript-blue?logo=javascript)](#)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](#)
+[![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **🎉 Now Available on Chrome Web Store!** 
-> Get it directly from [Chrome Web Store](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
+> **🎉 Now Available on Chrome Web Store!**  
+> Get it from [Chrome Web Store](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed)
 
-Make Google Gemini's conversation interface wider.
+Make Google Gemini's conversation interface wider with a custom width slider and presets.
+
+---
 
 ## Features
 
-- **Custom Width**: Adjust chat width with slider or preset buttons (700px - 1350px)
-- **Code Auto Wrap**: Toggle code block wrapping, no horizontal scrolling for long code
-- **Auto Refresh**: Automatically refresh Gemini pages after adjusting settings
-- **Auto Save**: Settings saved locally, take effect immediately on next open
-- **Responsive Design**: Automatically adapts to small windows, no blank spaces or truncation
+| Feature | Description |
+|---------|-------------|
+| **Custom Width** | Adjust chat width from 700px to 2000px using slider or presets |
+| **Code Auto Wrap** | Toggle code block wrapping, no more horizontal scrolling |
+| **Auto Refresh** | Automatically refresh all Gemini pages after settings change |
+| **Auto Save** | Settings persist locally, take effect on next page load |
+| **Responsive** | Adapts to small windows without blank spaces or truncation |
+
+---
 
 ## Installation
 
-### Recommended: Install from Chrome Web Store
+### Chrome Web Store (Recommended)
 
-1. Visit the [Chrome Web Store page](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
-2. Click "Add to Chrome"
-3. Confirm the installation
+1. Visit the [Chrome Web Store page](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed)
+2. Click **Add to Chrome**
+3. Click **Add extension** to confirm
 
-### Alternative: Manual Installation (For Developers)
+### Manual Installation
 
-1. Download or clone this repository
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" in the top right corner
-4. Click "Load unpacked"
+1. Download this repository as a ZIP
+2. Open Chrome, navigate to `chrome://extensions/`
+3. Enable **Developer mode** (top-right corner)
+4. Click **Load unpacked**
 5. Select the project folder
+
+---
 
 ## Usage
 
 ### Adjust Width
 
-Open [Google Gemini](https://gemini.google.com/), click the extension icon in the browser toolbar.
+1. Open [Google Gemini](https://gemini.google.com/)
+2. Click the extension icon in the browser toolbar
+3. Use the slider or click preset buttons:
 
-Adjust width with the slider or click preset buttons:
-- **Narrow**: 800px
-- **Default**: 1000px
-- **Wider**: 1200px
-- **Ultra**: 1350px
+| Preset | Width |
+|--------|-------|
+| Narrow | 800px |
+| Default | 1000px |
+| Wider | 1200px |
+| Ultra | 1350px |
+| Max | 2000px |
 
 ### Code Wrapping
 
-Toggle "Code Auto Wrap" in the extension popup to enable automatic code wrapping. Disable it to restore horizontal scrolling.
+Toggle **Code Auto Wrap** in the popup to enable/disable automatic code wrapping.
 
-### Auto Refresh
+### Custom Range
 
-After adjusting settings, all Gemini pages will automatically refresh. There's a 0.5 second debounce when dragging the slider to avoid frequent refreshes.
+You can set custom min/max width values in the range inputs. The slider will adapt accordingly.
 
-## Development
+---
 
-### Local Debugging
+## Technical Details
 
-After modifying code, click the refresh button in `chrome://extensions/`, then refresh the Gemini page.
+### Architecture
 
-### Implementation Details
+- **Content Script** (`gemini-content.js` + `gemini-content.css`): Injected into Gemini pages to apply width styles
+- **Popup** (`popup.js` + `popup.html` + `popup.css`): UI for user settings
+- **Manifest** (`manifest.json`): Extension configuration (MV3)
 
-**Width Adjustment**: Controls the `max-width` of conversation containers via CSS variable `--gemini-chat-width`. JavaScript listens for DOM changes and dynamically applies styles to new elements.
+### How It Works
 
-**Code Wrapping**: Adds `code-wrap-enabled` class to `<body>`, CSS changes code block `white-space` from `pre` to `pre-wrap`.
+1. **Width Control**: Sets CSS variable `--gemini-chat-width` and applies `max-width` to conversation containers
+2. **Code Wrapping**: Toggles `code-wrap-enabled` class on `<body>`, CSS changes `white-space` from `pre` to `pre-wrap`
+3. **Auto Refresh**: Uses `chrome.tabs.query` to find all Gemini pages and `chrome.tabs.reload` to refresh
 
-**Auto Refresh**: Uses `chrome.tabs.query` to find all Gemini pages, calls `chrome.tabs.reload` to refresh. Debounce mechanism prevents frequent refreshes when dragging the slider.
+### Debugging
 
-### Configuration
+Access debug tools in browser console on Gemini page:
 
-Change default width (`gemini-content.js`):
 ```javascript
-const width = result.chatWidth || 1000; // Change here
+window.widerGeminiDebug.findDragElements()  // Find possible drag elements
+window.widerGeminiDebug.applyDragStyles()    // Manually apply drag styles
+window.widerGeminiDebug.getCurrentWidth()     // Get current width setting
 ```
 
-Change width range (`popup.html`):
-```html
-<input type="range" id="widthSlider" min="700" max="1350" step="50">
-```
+---
+
+## Privacy
+
+This extension:
+- ✅ Only modifies page styles, no data collection
+- ✅ Does not access or store any personal information
+- ✅ Does not affect Gemini's core functionality
+
+---
 
 ## License
 
 [MIT License](./LICENSE)
 
-## Contributing
-
-Issues and Pull Requests are welcome.
-
 ---
 
-This extension only modifies page styles, collects no data, and does not affect Gemini functionality.
+## Contributing
+
+Issues and Pull Requests are welcome!

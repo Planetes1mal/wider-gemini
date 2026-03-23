@@ -26,70 +26,114 @@ body {
     }
 }
 
-/* ========== 对话容器宽度设置 ========== */
+/* ========== 移除外层容器的宽度约束 ========== */
+/* 这是关键步骤：先让外层容器解除 Gemini 默认的宽度限制 */
+.content-wrapper:has(chat-window),
+.main-content:has(chat-window),
+.content-container:has(chat-window),
+.content-container:has(.conversation-container) {
+    max-width: none !important;
+}
+
+[role="main"]:has(chat-window),
+[role="main"]:has(.conversation-container) {
+    max-width: none !important;
+}
+
+/* 解除核心容器的宽度限制 */
+chat-window,
+.chat-container,
+chat-window-content,
+.chat-history-scroll-container,
+.chat-history,
 .conversation-container {
-    max-width: var(--gemini-chat-width) !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
 }
 
-/* 用户提问区域 - fit-content 自适应内容 */
-.conversation-container user-query {
-    max-width: 100% !important;
-}
-
-/* ========== Markdown 内容容器宽度修复 ========== */
-/* 确保 Markdown 内容容器填满父容器宽度 */
-.table-content,
-[class*="markdown"],
-[class*="response"] {
+/* 解除父级 div 的约束 */
+main > div:has(user-query),
+main > div:has(model-response),
+main > div:has(.conversation-container) {
+    max-width: none !important;
     width: 100% !important;
-    min-width: 0 !important;
 }
 
-/* ========== 表格宽度修复 ========== */
-/* 让表格宽度跟随容器 */
-.table-content table,
-[class*="markdown"] table,
-[class*="response"] table,
-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-}
-
-/* ========== 输入区域 ========== */
-.input-area-container {
+/* ========== 设置目标宽度 - 用户提问区域 ========== */
+.user-query-bubble-container,
+.user-query-container,
+user-query-content,
+user-query,
+div[aria-label="User message"],
+article[data-author="user"] {
     max-width: var(--gemini-chat-width) !important;
+    width: min(100%, var(--gemini-chat-width)) !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
 
-input-container {
+/* ========== 设置目标宽度 - 回复区域 ========== */
+model-response,
+.response-container,
+.presented-response-container,
+[aria-label="Gemini response"],
+[data-message-author-role="assistant"],
+[data-message-author-role="model"] {
     max-width: var(--gemini-chat-width) !important;
+    width: min(100%, var(--gemini-chat-width)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* ========== 设置目标宽度 - 表格区域 ========== */
+table-block,
+.table-block,
+.table-block.new-table-style,
+.table-block.has-scrollbar,
+.table-block .table-content {
+    max-width: var(--gemini-chat-width) !important;
+    width: min(100%, var(--gemini-chat-width)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* 表格内部容器的溢出处理 */
+table-block .table-block,
+.table-block.has-scrollbar,
+.table-block.new-table-style {
+    overflow-x: hidden !important;
+}
+
+/* 表格内容区域填满父容器 */
+table-block .table-content,
+.table-block .table-content {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* ========== 设置目标宽度 - 输入区域 ========== */
+input-container {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+.input-area-container,
+input-area-v2 {
+    max-width: var(--gemini-chat-width) !important;
+    width: min(100%, var(--gemini-chat-width)) !important;
     margin-left: auto !important;
     margin-right: auto !important;
     margin-bottom: 10px !important;
 }
 
-/* 聊天容器宽度限制 */
-.chat-container {
-    max-width: var(--gemini-chat-width) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-}
-
-/* 拖拽状态下的容器 */
-.chat-container.xap-drag-in-progress {
-    max-width: var(--gemini-chat-width) !important;
-}
-
-.chat-container.xap-drag-in-progress>* {
-    max-width: 100% !important;
-}
-
-/* 文件拖放区域宽度限制 */
+/* ========== 设置目标宽度 - 文件上传区域 ========== */
 upload-card,
 .upload-card {
     max-width: var(--gemini-chat-width) !important;
+    width: min(100%, var(--gemini-chat-width)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 file-drop-area,
@@ -97,38 +141,32 @@ file-drop-area,
     max-width: 100% !important;
 }
 
-/* 拖放区域通用选择器 - 覆盖所有可能的拖放元素 */
-[class*="drop"],
-[class*="drag"],
-[class*="upload"],
-[class*="file"],
-[class*="drop-zone"],
-[class*="drag-over"],
-[class*="drop-area"],
-[class*="drag-area"] {
+/* ========== 深层嵌套元素的宽度限制 ========== */
+user-query,
+user-query > *,
+user-query > * > *,
+model-response,
+model-response > *,
+model-response > * > *,
+response-container,
+response-container > *,
+response-container > * > * {
     max-width: var(--gemini-chat-width) !important;
 }
 
-/* 覆盖层和对话框 */
+.presented-response-container,
+[data-message-author-role] {
+    max-width: var(--gemini-chat-width) !important;
+}
+
+/* ========== 覆盖层和对话框 ========== */
 .cdk-overlay-pane,
 .mat-menu-panel,
 [role="dialog"] {
     max-width: var(--gemini-chat-width) !important;
 }
 
-/* 拖拽状态下的所有子元素 */
-.xap-drag-in-progress [class*="drop"],
-.xap-drag-in-progress [class*="drag"],
-.xap-drag-in-progress [class*="upload"] {
-    max-width: 100% !important;
-}
-
-/* 文件上传菜单面板宽度限制 */
-.mat-menu-panel {
-    max-width: var(--gemini-chat-width) !important;
-}
-
-/* 隐藏幻觉免责声明 */
+/* ========== 隐藏幻觉免责声明 ========== */
 hallucination-disclaimer {
     display: none !important;
 }

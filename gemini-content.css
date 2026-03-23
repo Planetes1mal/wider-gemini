@@ -36,6 +36,26 @@ body {
     max-width: 100% !important;
 }
 
+/* ========== Markdown 内容容器宽度修复 ========== */
+/* 确保 Markdown 内容容器填满父容器宽度 */
+.table-content,
+[class*="markdown"],
+[class*="response"] {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* ========== 表格宽度修复 ========== */
+/* 让表格宽度跟随容器 */
+.table-content table,
+[class*="markdown"] table,
+[class*="response"] table,
+table {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
 /* ========== 输入区域 ========== */
 .input-area-container {
     max-width: var(--gemini-chat-width) !important;

@@ -1,37 +1,69 @@
-# Privacy Policy / 隐私权政策
+# Privacy Policy
 
-**Last Updated / 更新日期:** 2025-11-22
+**Effective date:** March 23, 2026
+
+This policy describes how the **Wider Gemini** browser extension (“Extension”, “we”, “us”) handles information when you use it. It is provided in English and Chinese; both sections have the same meaning.
+
+---
 
 ## English
 
-**1. Introduction**
-Wider Gemini ("we", "us", or "our") is a browser extension designed to customize the interface width of Google Gemini. We are committed to protecting your privacy.
+### 1. Who we are
 
-**2. Data Collection**
-We **DO NOT** collect, store, transmit, or sell any of your personal data, chat history, or browsing activity.
-* **Storage Permission:** We use the local browser storage (`chrome.storage`) solely to save your interface preferences (e.g., width settings, code wrap toggle). This data stays on your device.
-* **Host Permission:** We access `gemini.google.com` strictly to inject CSS styles to modify the layout. We do not read or analyze your conversation content.
+Wider Gemini is an open-source Chrome extension that adjusts layout and styling on [Google Gemini](https://gemini.google.com/). It is distributed through the Chrome Web Store and other channels chosen by the publisher.
 
-**3. Third-Party Services**
-This extension operates locally on your browser. It does not communicate with any external servers or third-party analytics tools.
+### 2. Information the Extension processes
 
-**4. Contact**
-If you have questions, please file an issue on our GitHub repository.
+The Extension **does not** collect, sell, or transmit your personal data, chat content, or browsing history to us or to analytics services for the Extension’s own purposes.
+
+**Local settings.** The Extension uses the browser’s extension storage API (`chrome.storage`, including sync where your browser profile supports it) only to save **your preferences**, such as chat width, code-wrap options, and preset buttons. That data is managed by your browser and remains under your control.
+
+**Site access.** The Extension runs on `https://gemini.google.com/*` to apply CSS and related UI adjustments. It does **not** read, log, or upload your prompts, replies, or other page content to external servers operated by the Extension.
+
+### 3. Third parties
+
+Google operates Gemini and Chrome. Their handling of data is governed by [Google’s policies](https://policies.google.com/) and your browser settings. The Extension does not add its own remote tracking or advertising SDKs.
+
+### 4. Children’s privacy
+
+The Extension is not directed at children under 13 (or the age required in your jurisdiction). We do not knowingly collect personal information from children through the Extension.
+
+### 5. Changes
+
+We may update this policy when the Extension’s behavior or legal requirements change. The effective date at the top will be revised when we do.
+
+### 6. Contact
+
+Questions about this policy or the Extension may be reported via the GitHub repository’s issue tracker maintained by the project.
 
 ---
 
 ## 中文
 
-**1. 简介**
-Wider Gemini（以下简称“我们”）是一款用于自定义 Google Gemini 界面宽度的浏览器扩展。我们非常重视您的隐私保护。
+### 1. 主体说明
 
-**2. 数据收集**
-我们**不会**收集、存储、传输或出售您的任何个人信息、聊天记录或浏览活动。
-* **存储权限：** 我们仅使用浏览器本地存储（`chrome.storage`）来保存您的界面偏好设置（如：宽度数值、代码换行开关）。这些数据仅保存在您的设备上。
-* **主机权限：** 我们访问 `gemini.google.com` 仅为了注入 CSS 样式以调整界面布局。我们不会读取或分析您的对话内容。
+**Wider Gemini** 是一款开源 Chrome 扩展，用于调整 [Google Gemini](https://gemini.google.com/) 网页上的版式与样式。扩展通过 Chrome 应用商店及发布者选择的其他渠道分发。
 
-**3. 第三方服务**
-本扩展程序完全在您的浏览器本地运行，不会与任何外部服务器或第三方统计工具进行通信。
+### 2. 扩展处理的信息
 
-**4. 联系方式**
-如果您有任何疑问，请在我们的 GitHub 仓库提交 Issue。
+本扩展**不会**出于自身功能目的，向开发者或第三方分析服务收集、出售或传输您的个人数据、对话内容或浏览记录。
+
+**本地设置。** 扩展仅通过浏览器提供的扩展存储接口（`chrome.storage`，在您的浏览器配置支持时含同步）保存**您的偏好设置**，例如对话宽度、代码换行选项与预设按钮等。数据由浏览器管理，并由您本人控制。
+
+**网站访问范围。** 扩展仅在 `https://gemini.google.com/*` 上运行，以注入 CSS 等方式调整界面。扩展**不会**读取、记录或将您的提问、回答或其他页面内容上传至由本扩展运营的远程服务器。
+
+### 3. 第三方
+
+Gemini 与 Chrome 由 Google 运营；相关数据处理受 [Google 政策](https://policies.google.com/) 及您的浏览器设置约束。本扩展不内置额外的远程追踪或广告 SDK。
+
+### 4. 儿童隐私
+
+本扩展不面向未满 13 周岁（或您所在地法律规定的最低年龄）的儿童。我们不会通过本扩展故意收集儿童的个人信息。
+
+### 5. 变更
+
+当扩展行为或适用法律要求变化时，我们可能更新本政策；更新时会修改文首的生效日期。
+
+### 6. 联系方式
+
+如对本政策或扩展有疑问，可通过项目在 GitHub 上维护的 Issue 渠道反馈。

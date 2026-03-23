@@ -1,22 +1,21 @@
 @echo off
-REM Wider Gemini 打包脚本 (Windows)
-REM 用于创建 Chrome Web Store 发布包
+REM Builds a Chrome Web Store ZIP on Windows
 
-echo 正在读取版本号...
+echo Reading version...
 for /f "tokens=2 delims=:," %%a in ('findstr /c:"version" manifest.json') do set VERSION=%%a
 set VERSION=%VERSION:"=%
 set VERSION=%VERSION: =%
 set PACKAGE_NAME=wider-gemini-%VERSION%.zip
 
-echo 正在打包 Wider Gemini v%VERSION%...
+echo Packaging Wider Gemini v%VERSION%...
 
-REM 创建临时目录
+REM Create temp directory
 set TEMP_DIR=%TEMP%\wider-gemini-package-%RANDOM%
 mkdir "%TEMP_DIR%"
-echo 临时目录: %TEMP_DIR%
+echo Temp directory: %TEMP_DIR%
 
-REM 复制需要的文件
-echo 复制文件...
+REM Copy required files
+echo Copying files...
 copy manifest.json "%TEMP_DIR%\" >nul
 copy popup.html "%TEMP_DIR%\" >nul
 copy popup.js "%TEMP_DIR%\" >nul
@@ -25,28 +24,27 @@ copy gemini-content.js "%TEMP_DIR%\" >nul
 copy gemini-content.css "%TEMP_DIR%\" >nul
 copy LICENSE "%TEMP_DIR%\" >nul
 
-REM 复制图标目录
-echo 复制图标...
+REM Copy icon directory
+echo Copying icon directory...
 mkdir "%TEMP_DIR%\icons" >nul
 copy icons\*.png "%TEMP_DIR%\icons\" >nul
 
-REM 复制国际化语言包目录
-echo 复制语言包...
+REM Copy localization files
+echo Copying localization files...
 mkdir "%TEMP_DIR%\_locales\en" >nul
 mkdir "%TEMP_DIR%\_locales\zh_CN" >nul
 copy _locales\en\messages.json "%TEMP_DIR%\_locales\en\" >nul
 copy _locales\zh_CN\messages.json "%TEMP_DIR%\_locales\zh_CN\" >nul
 
-REM 创建 ZIP 文件（需要 PowerShell）
-echo 创建 ZIP 文件...
+REM Create ZIP file (requires PowerShell)
+echo Creating ZIP file...
 powershell -Command "Compress-Archive -Path '%TEMP_DIR%\*' -DestinationPath '%CD%\%PACKAGE_NAME%' -Force"
 
-REM 清理临时目录
+REM Clean up temp directory
 rmdir /s /q "%TEMP_DIR%"
 
 echo.
-echo ✅ 打包完成: %PACKAGE_NAME%
-for %%A in (%PACKAGE_NAME%) do echo 文件大小: %%~zA 字节
+echo Done: %PACKAGE_NAME%
+for %%A in (%PACKAGE_NAME%) do echo Size: %%~zA bytes
 echo.
 pause
-

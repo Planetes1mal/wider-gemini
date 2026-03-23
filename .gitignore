@@ -1,6 +1,7 @@
 archive/
 archive/**
 .cursor/
+.opencode/
 *.zip
 .DS_Store
 Thumbs.db
@@ -11,3 +12,4 @@ node_modules/
 *.swp
 *.swo
 *~
+AGENTS.md

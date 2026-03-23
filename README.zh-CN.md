@@ -21,7 +21,7 @@
 
 ## 安装
 
-### 推荐：从 Chrome 应用商店安装（最简单）
+### 推荐：从 Chrome 应用商店安装
 
 1. 访问 [Chrome 应用商店页面](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
 2. 点击「添加到 Chrome」

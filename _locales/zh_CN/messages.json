@@ -11,6 +11,12 @@
   "widthLabel": {
     "message": "对话区域宽度"
   },
+  "widthMin": {
+    "message": "最小宽度"
+  },
+  "widthMax": {
+    "message": "最大宽度"
+  },
   "btnNarrow": {
     "message": "窄"
   },
@@ -25,6 +31,27 @@
   },
   "btnInsane": {
     "message": "你真的需要这么宽吗？"
+  },
+  "editPresets": {
+    "message": "编辑预设"
+  },
+  "donePresets": {
+    "message": "完成"
+  },
+  "cancelPresets": {
+    "message": "取消"
+  },
+  "managePresets": {
+    "message": "管理预设"
+  },
+  "managePresetsSummary": {
+    "message": "已自定义 5 个预设"
+  },
+  "resetToDefault": {
+    "message": "重置为默认"
+  },
+  "clampedHint": {
+    "message": "已限制在范围内"
   },
   "codeWrapLabel": {
     "message": "代码区域自动换行"
@@ -45,4 +72,3 @@
     "message": "正在刷新页面..."
   }
 }
-

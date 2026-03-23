@@ -10,18 +10,24 @@
 
 <body>
     <div class="container">
-        <!-- 标题区域 -->
         <header class="header">
             <div class="header-icon">⚡</div>
             <h1 id="i18n-appName">Wider Gemini</h1>
             <p class="header-subtitle" id="i18n-headerSubtitle">让对话界面更宽更舒适</p>
         </header>
 
-        <!-- 宽度控制卡片 -->
         <section class="card width-card">
             <div class="card-header">
                 <span class="card-icon">📐</span>
                 <label for="widthSlider" class="card-title" id="i18n-widthLabel">对话区域宽度</label>
+            </div>
+            <div class="range-inputs">
+                <label class="range-label"><span id="i18n-widthMin">最小宽度</span>
+                    <input type="number" id="widthMinInput" min="300" max="5000" step="50" value="700">
+                </label>
+                <label class="range-label"><span id="i18n-widthMax">最大宽度</span>
+                    <input type="number" id="widthMaxInput" min="300" max="5000" step="50" value="2000">
+                </label>
             </div>
             <div class="slider-wrapper">
                 <div class="slider-container">
@@ -33,31 +39,26 @@
                     <span class="unit">px</span>
                 </div>
             </div>
-            <div class="preset-buttons">
-                <button class="preset-btn" data-width="800">
-                    <span class="btn-icon">📱</span>
-                    <span class="btn-text" id="i18n-btnNarrow">窄</span>
-                </button>
-                <button class="preset-btn" data-width="1000">
-                    <span class="btn-icon">💻</span>
-                    <span class="btn-text" id="i18n-btnDefault">默认</span>
-                </button>
-                <button class="preset-btn" data-width="1200">
-                    <span class="btn-icon">🖥️</span>
-                    <span class="btn-text" id="i18n-btnWider">更宽</span>
-                </button>
-                <button class="preset-btn" data-width="1350">
-                    <span class="btn-icon">📺</span>
-                    <span class="btn-text" id="i18n-btnUltra">超宽</span>
-                </button>
-                <button class="preset-btn" data-width="2000">
-                    <span class="btn-icon">⚠️</span>
-                    <span class="btn-text" id="i18n-btnInsane">你真的需要这么宽吗？</span>
-                </button>
+            <div class="preset-toolbar">
+                <button type="button" id="editPresetsBtn" class="secondary-btn"><span
+                        id="i18n-editPresets">编辑预设</span></button>
+                <button type="button" id="donePresetsBtn" class="secondary-btn" style="display:none;"><span
+                        id="i18n-donePresets">完成</span></button>
+            </div>
+            <div class="preset-buttons" id="presetButtonsContainer"></div>
+        </section>
+
+        <section class="card manage-card">
+            <button type="button" class="collapse-header" id="managePresetsToggle" aria-expanded="false">
+                <span class="card-icon">📋</span>
+                <span class="card-title" id="i18n-managePresets">管理预设</span>
+                <span class="collapse-summary" id="managePresetsSummary"></span>
+            </button>
+            <div class="collapse-body" id="managePresetsBody" hidden>
+                <div id="managePresetsRows"></div>
             </div>
         </section>
 
-        <!-- 代码换行控制卡片 -->
         <section class="card code-card">
             <div class="card-header">
                 <span class="card-icon">💻</span>
@@ -74,7 +75,6 @@
             </div>
         </section>
 
-        <!-- 信息提示卡片 -->
         <section class="info-card">
             <div class="info-icon">💡</div>
             <div class="info-content">
@@ -83,7 +83,6 @@
             </div>
         </section>
 
-        <!-- 刷新提示 -->
         <div id="refreshNotice" class="refresh-notice">
             <span class="refresh-icon">🔄</span>
             <span class="refresh-text" id="i18n-refreshing">正在刷新页面...</span>

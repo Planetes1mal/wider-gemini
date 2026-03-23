@@ -21,7 +21,7 @@ Make Google Gemini's conversation interface wider.
 
 ## Installation
 
-### Recommended: Install from Chrome Web Store (Easiest)
+### Recommended: Install from Chrome Web Store
 
 1. Visit the [Chrome Web Store page](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=item-share-cb)
 2. Click "Add to Chrome"

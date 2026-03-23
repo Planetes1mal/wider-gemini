@@ -1,9 +1,7 @@
-/* ========== CSS 变量定义 ========== */
 :root {
     --gemini-chat-width: 1000px;
 }
 
-/* ========== 滚动条位置修复 ========== */
 html {
     overflow: auto !important;
     overflow-x: hidden !important;
@@ -14,8 +12,6 @@ body {
     overflow: visible !important;
 }
 
-/* 确保主容器不会创建独立的滚动上下文 */
-/* 只在窗口宽度足够大时应用，避免在小窗口下破坏布局 */
 @media screen and (min-width: 960px) {
 
     mat-sidenav-content,
@@ -26,8 +22,7 @@ body {
     }
 }
 
-/* ========== 移除外层容器的宽度约束 ========== */
-/* 这是关键步骤：先让外层容器解除 Gemini 默认的宽度限制 */
+/* Remove outer container width constraints */
 .content-wrapper:has(chat-window),
 .main-content:has(chat-window),
 .content-container:has(chat-window),
@@ -40,7 +35,6 @@ body {
     max-width: none !important;
 }
 
-/* 解除核心容器的宽度限制 */
 chat-window,
 .chat-container,
 chat-window-content,
@@ -51,7 +45,6 @@ chat-window-content,
     box-sizing: border-box !important;
 }
 
-/* 解除父级 div 的约束 */
 main > div:has(user-query),
 main > div:has(model-response),
 main > div:has(.conversation-container) {
@@ -59,7 +52,7 @@ main > div:has(.conversation-container) {
     width: 100% !important;
 }
 
-/* ========== 设置目标宽度 - 用户提问区域 ========== */
+/* User query containers */
 .user-query-bubble-container,
 .user-query-container,
 user-query-content,
@@ -72,7 +65,7 @@ article[data-author="user"] {
     margin-right: auto !important;
 }
 
-/* ========== 设置目标宽度 - 回复区域 ========== */
+/* Model response containers */
 model-response,
 .response-container,
 .presented-response-container,
@@ -85,7 +78,7 @@ model-response,
     margin-right: auto !important;
 }
 
-/* ========== 设置目标宽度 - 表格区域 ========== */
+/* Table containers */
 table-block,
 .table-block,
 .table-block.new-table-style,
@@ -98,21 +91,19 @@ table-block,
     box-sizing: border-box !important;
 }
 
-/* 表格内部容器的溢出处理 */
 table-block .table-block,
 .table-block.has-scrollbar,
 .table-block.new-table-style {
     overflow-x: hidden !important;
 }
 
-/* 表格内容区域填满父容器 */
 table-block .table-content,
 .table-block .table-content {
     width: 100% !important;
     overflow-x: auto !important;
 }
 
-/* ========== 设置目标宽度 - 输入区域 ========== */
+/* Input area */
 input-container {
     max-width: none !important;
     width: 100% !important;
@@ -127,7 +118,7 @@ input-area-v2 {
     margin-bottom: 10px !important;
 }
 
-/* ========== 设置目标宽度 - 文件上传区域 ========== */
+/* File upload area */
 upload-card,
 .upload-card {
     max-width: var(--gemini-chat-width) !important;
@@ -141,7 +132,7 @@ file-drop-area,
     max-width: 100% !important;
 }
 
-/* ========== 深层嵌套元素的宽度限制 ========== */
+/* Nested element width limits */
 user-query,
 user-query > *,
 user-query > * > *,
@@ -159,20 +150,18 @@ response-container > * > * {
     max-width: var(--gemini-chat-width) !important;
 }
 
-/* ========== 覆盖层和对话框 ========== */
+/* Overlays and dialogs */
 .cdk-overlay-pane,
 .mat-menu-panel,
 [role="dialog"] {
     max-width: var(--gemini-chat-width) !important;
 }
 
-/* ========== 隐藏幻觉免责声明 ========== */
 hallucination-disclaimer {
     display: none !important;
 }
 
-/* ========== 代码区域自动换行 ========== */
-/* 代码换行开启时的样式 */
+/* Code wrap enabled */
 body.code-wrap-enabled pre,
 body.code-wrap-enabled pre code {
     white-space: pre-wrap !important;
@@ -181,7 +170,6 @@ body.code-wrap-enabled pre code {
     overflow-wrap: break-word !important;
 }
 
-/* 针对Gemini的代码容器 */
 body.code-wrap-enabled .code-container,
 body.code-wrap-enabled .code-container.formatted {
     white-space: pre-wrap !important;
@@ -191,20 +179,18 @@ body.code-wrap-enabled .code-container.formatted {
     overflow-x: visible !important;
 }
 
-/* 代码块容器 */
 body.code-wrap-enabled .code-block pre,
 body.code-wrap-enabled .code-block code {
     white-space: pre-wrap !important;
     overflow-x: visible !important;
 }
 
-/* 确保代码块内部容器也支持换行 */
 body.code-wrap-enabled .formatted-code-block-internal-container pre,
 body.code-wrap-enabled .formatted-code-block-internal-container code {
     white-space: pre-wrap !important;
 }
 
-/* 代码换行关闭时保持原样（默认） */
+/* Code wrap disabled (default) */
 body:not(.code-wrap-enabled) pre,
 body:not(.code-wrap-enabled) pre code {
     white-space: pre !important;

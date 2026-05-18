@@ -2,7 +2,7 @@
 
 # Wider Gemini
 
-[![版本](https://img.shields.io/badge/version-2.1.0-blue.svg)](#)
+[![版本](https://img.shields.io/badge/version-2.1.1-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![平台](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![许可证：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

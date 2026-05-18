@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.1.1-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -110,4 +110,4 @@ On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug`
 
 ## Contributing
 
-Issues and pull requests are welcome. 
+Issues and pull requests are welcome.

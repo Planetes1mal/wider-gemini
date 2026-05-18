@@ -150,13 +150,6 @@ response-container > * > * {
     max-width: var(--gemini-chat-width) !important;
 }
 
-/* Overlays and dialogs */
-.cdk-overlay-pane,
-.mat-menu-panel,
-[role="dialog"] {
-    max-width: var(--gemini-chat-width) !important;
-}
-
 hallucination-disclaimer {
     display: none !important;
 }

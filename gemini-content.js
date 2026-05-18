@@ -23,7 +23,6 @@
         { key: '.file-drop-area', value: 'max-width: 100%', sleep: 0 },
         { key: '[class*="drop-zone"]', value: 'max-width: {width}px', sleep: 0 },
         { key: '[class*="drag-over"]', value: 'max-width: {width}px', sleep: 0 },
-        { key: '.mat-menu-panel', value: 'max-width: {width}px', sleep: 0 },
         { key: 'hallucination-disclaimer', value: 'display: none', sleep: 0 }
     ];
 
@@ -95,12 +94,7 @@
             '[class*="drop"]',
             '[class*="drag"]',
             '[class*="upload"]',
-            '[class*="file"]',
             '[class*="zone"]',
-            '[class*="area"]',
-            '.cdk-overlay-pane',
-            '.mat-menu-panel',
-            '[role="dialog"]',
             '.xap-drag-in-progress',
             '.xap-drag-in-progress *'
         ];
@@ -116,28 +110,20 @@
                     const style = window.getComputedStyle(element);
                     const classes = Array.from(element.classList || []).join(' ').toLowerCase();
 
-                    const isLikelyDropZone = (
+                    const inputArea = element.closest('.input-area-container, input-container, .chat-container');
+                    const isLikelyDropZone = inputArea && (
                         (classes.includes('drop') ||
                             classes.includes('drag') ||
                             classes.includes('upload') ||
-                            classes.includes('file') ||
                             classes.includes('zone')) &&
                         style.display !== 'none' &&
                         style.visibility !== 'hidden' &&
                         (parseInt(style.width) > 100 || style.position === 'fixed' || style.position === 'absolute')
                     );
 
-                    if (isLikelyDropZone ||
-                        element.classList.contains('cdk-overlay-pane') ||
-                        element.classList.contains('mat-menu-panel') ||
-                        element.getAttribute('role') === 'dialog') {
-
-                        const inputArea = element.closest('.input-area-container, input-container, .chat-container');
-                        if (inputArea || isLikelyDropZone) {
-                            const maxWidth = inputArea ? '100%' : `${currentWidth}px`;
-                            element.style.setProperty('max-width', maxWidth, 'important');
-                            processedElements.add(element);
-                        }
+                    if (isLikelyDropZone) {
+                        element.style.setProperty('max-width', '100%', 'important');
+                        processedElements.add(element);
                     }
                 });
             } catch (e) {
@@ -253,8 +239,7 @@
                                 node.querySelector?.('upload-card') ||
                                 node.querySelector?.('.upload-card') ||
                                 node.querySelector?.('file-drop-area') ||
-                                node.querySelector?.('.file-drop-area') ||
-                                node.querySelector?.('.mat-menu-panel')) {
+                                node.querySelector?.('.file-drop-area')) {
                                 shouldUpdate = true;
                             }
                         }
@@ -380,12 +365,7 @@
                     '[class*="drop"]',
                     '[class*="drag"]',
                     '[class*="upload"]',
-                    '[class*="file"]',
                     '[class*="zone"]',
-                    '[class*="area"]',
-                    '.cdk-overlay-pane',
-                    '.mat-menu-panel',
-                    '[role="dialog"]',
                     '.xap-drag-in-progress'
                 ];
 

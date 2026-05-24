@@ -14,8 +14,10 @@ body {
 
 @media screen and (min-width: 960px) {
 
-    mat-sidenav-content,
-    .mat-drawer-content {
+    mat-sidenav-content:has(chat-window),
+    .mat-drawer-content:has(chat-window),
+    mat-sidenav-content:has(.conversation-container),
+    .mat-drawer-content:has(.conversation-container) {
         overflow: visible !important;
         height: auto !important;
         min-height: 100vh !important;
@@ -103,14 +105,15 @@ table-block .table-content,
     overflow-x: auto !important;
 }
 
-/* Input area */
+/* Input area — keep input-container full width so notebook Sources chip keeps native spacing.
+   Do not constrain overlays/dialogs here (Drive picker fix: 9029e1c). */
 input-container {
     max-width: none !important;
     width: 100% !important;
 }
 
-.input-area-container,
-input-area-v2 {
+input-container .input-area-container,
+input-container input-area-v2 {
     max-width: var(--gemini-chat-width) !important;
     width: min(100%, var(--gemini-chat-width)) !important;
     margin-left: auto !important;
@@ -118,17 +121,16 @@ input-area-v2 {
     margin-bottom: 10px !important;
 }
 
-/* File upload area */
-upload-card,
-.upload-card {
-    max-width: var(--gemini-chat-width) !important;
-    width: min(100%, var(--gemini-chat-width)) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+/* File upload area — scope to input-container; width comes from input-area-v2 parent */
+input-container upload-card,
+input-container .upload-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
-file-drop-area,
-.file-drop-area {
+input-container file-drop-area,
+input-container .file-drop-area {
     max-width: 100% !important;
 }
 

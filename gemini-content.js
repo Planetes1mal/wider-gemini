@@ -12,17 +12,15 @@
     const css_config = [
         { key: '.conversation-container', value: 'max-width: {width}px', sleep: 0 },
         { key: '.conversation-container user-query', value: 'max-width: 100%', sleep: 0 },
-        { key: '.input-area-container', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
-        { key: 'input-container', value: 'max-width: {width}px; margin-left: auto; margin-right: auto; margin-bottom: 10px', sleep: 0 },
+        { key: 'input-container .input-area-container', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
+        { key: 'input-container input-area-v2', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
         { key: '.chat-container', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
         { key: '.chat-container.xap-drag-in-progress', value: 'max-width: {width}px', sleep: 0 },
         { key: '.chat-container.xap-drag-in-progress > *', value: 'max-width: 100%', sleep: 0 },
-        { key: 'upload-card', value: 'max-width: {width}px', sleep: 0 },
-        { key: '.upload-card', value: 'max-width: {width}px', sleep: 0 },
-        { key: 'file-drop-area', value: 'max-width: 100%', sleep: 0 },
-        { key: '.file-drop-area', value: 'max-width: 100%', sleep: 0 },
-        { key: '[class*="drop-zone"]', value: 'max-width: {width}px', sleep: 0 },
-        { key: '[class*="drag-over"]', value: 'max-width: {width}px', sleep: 0 },
+        { key: 'input-container upload-card', value: 'max-width: 100%', sleep: 0 },
+        { key: 'input-container .upload-card', value: 'max-width: 100%', sleep: 0 },
+        { key: 'input-container file-drop-area', value: 'max-width: 100%', sleep: 0 },
+        { key: 'input-container .file-drop-area', value: 'max-width: 100%', sleep: 0 },
         { key: 'hallucination-disclaimer', value: 'display: none', sleep: 0 }
     ];
 

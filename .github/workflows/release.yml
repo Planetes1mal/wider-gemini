@@ -1,36 +1,66 @@
 name: Release
 
-# When you publish a GitHub Release, build wider-gemini-<version>.zip
-# (same layout as package.bat) and attach it to that release.
+# Tag-triggered release (Option A: CHANGELOG.md)
 #
-# Workflow:
-#   1. Bump version in manifest.json, commit, push to main
-#   2. GitHub → Releases → Draft a new release
-#   3. Create tag e.g. v2.1.2 pointing at main
-#   4. Publish release
-#   5. This workflow uploads wider-gemini-2.1.2.zip under Assets
+# Maintainer workflow:
+#   1. Fix, test, bump manifest.json version
+#   2. Add a ## x.y.z section to CHANGELOG.md (AI can draft this)
+#   3. Commit and push to main
+#   4. git tag vX.Y.Z && git push origin vX.Y.Z
+#   5. This workflow creates the GitHub Release, uses CHANGELOG as the body,
+#      and uploads wider-gemini-X.Y.Z.zip
+#   6. Upload the same ZIP to Chrome Web Store manually
 #
-# GitHub still auto-generates Source code (zip/tar.gz). That is expected.
+# Tag must match manifest.json version (v2.1.2 ↔ 2.1.2).
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
 
 jobs:
-  package:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout release tag
+      - name: Checkout tag
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.release.tag_name }}
+
+      - name: Resolve version and validate manifest
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          MANIFEST_VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match manifest.json ($MANIFEST_VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$TAG_VERSION" >> "$GITHUB_ENV"
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          python3 <<'PY'
+          import re
+          import sys
+
+          version = "${{ env.VERSION }}"
+          with open("CHANGELOG.md", encoding="utf-8") as f:
+              text = f.read()
+
+          pattern = rf"^## {re.escape(version)}[^\n]*\n(.*?)(?=^## |\Z)"
+          match = re.search(pattern, text, re.M | re.S)
+          if not match:
+              print(f"No CHANGELOG section found for version {version}", file=sys.stderr)
+              sys.exit(1)
+
+          body = match.group(1).strip()
+          with open("release_body.md", "w", encoding="utf-8") as out:
+              out.write(body)
+          PY
 
       - name: Build extension ZIP
         run: |
-          VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
           STAGING=$(mktemp -d)
           cp manifest.json popup.html popup.js popup.css gemini-content.js gemini-content.css LICENSE "$STAGING/"
           mkdir -p "$STAGING/icons" "$STAGING/_locales/en" "$STAGING/_locales/zh_CN"
@@ -39,10 +69,11 @@ jobs:
           cp _locales/zh_CN/messages.json "$STAGING/_locales/zh_CN/"
           (cd "$STAGING" && zip -r "$GITHUB_WORKSPACE/wider-gemini-${VERSION}.zip" .)
           echo "Built wider-gemini-${VERSION}.zip"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Upload installable package to Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ github.ref_name }}
+          name: Wider Gemini ${{ github.ref_name }}
+          body_path: release_body.md
           files: wider-gemini-${{ env.VERSION }}.zip

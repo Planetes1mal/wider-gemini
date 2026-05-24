@@ -84,6 +84,7 @@
 项目为 **纯 HTML / CSS / JavaScript**，使用 Chrome **Manifest V3**，**无构建步骤**、无 npm 依赖。请与现有源码保持一致的结构、命名以及 `chrome.*` API 的用法。
 
 - **Windows 下打商店 / 发布包：** 在仓库根目录运行 `package.bat`，生成 `wider-gemini-<version>.zip`（与上架包及 GitHub **Assets** 内容一致）。
+- **GitHub Release：** 在 `CHANGELOG.md` 添加 `## x.y.z` 条目后，推送 tag `vX.Y.Z`（须与 `manifest.json` 版本一致），Actions 会自动创建 Release 并附带 ZIP。
 
 在 Gemini 页面，内容脚本会在 `window.widerGeminiDebug` 上暴露调试方法（例如 `getCurrentWidth()`、`findDragElements()`、`applyDragStyles()`），可在浏览器 **开发者工具** 控制台中使用。
 
@@ -97,6 +98,7 @@
 | `_locales/` | 国际化（`en`、`zh_CN`） |
 | `icons/` | 图标资源 |
 | `package.bat` | Windows 下打包商店用 ZIP |
+| `CHANGELOG.md` | 版本说明；GitHub Release 正文从此文件对应章节提取 |
 
 ## 隐私
 

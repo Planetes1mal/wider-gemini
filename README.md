@@ -84,6 +84,7 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 There is **no build step** or package manager: the project is vanilla HTML, CSS, and JavaScript (Chrome **Manifest V3**). Follow the patterns in the existing source files (structure, naming, and `chrome.*` usage).
 
 - **Windows store / release ZIP:** run `package.bat` in the repo root to generate `wider-gemini-<version>.zip` (same layout as the Chrome Web Store upload and GitHub **Assets**).
+- **GitHub Release:** add a `## x.y.z` entry to `CHANGELOG.md`, then push tag `vX.Y.Z` (must match `manifest.json`). Actions creates the release and attaches the ZIP.
 
 On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug` (for example `getCurrentWidth()`, `findDragElements()`, `applyDragStyles()`). Use the browser **Developer tools** console.
 
@@ -97,6 +98,7 @@ On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug`
 | `_locales/` | i18n (`en`, `zh_CN`) |
 | `icons/` | Toolbar and store icons |
 | `package.bat` | Packages a store-ready ZIP on Windows |
+| `CHANGELOG.md` | Release notes; GitHub Release body is extracted from here |
 
 ## Privacy
 

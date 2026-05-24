@@ -1,0 +1,48 @@
+name: Release
+
+# When you publish a GitHub Release, build wider-gemini-<version>.zip
+# (same layout as package.bat) and attach it to that release.
+#
+# Workflow:
+#   1. Bump version in manifest.json, commit, push to main
+#   2. GitHub → Releases → Draft a new release
+#   3. Create tag e.g. v2.1.2 pointing at main
+#   4. Publish release
+#   5. This workflow uploads wider-gemini-2.1.2.zip under Assets
+#
+# GitHub still auto-generates Source code (zip/tar.gz). That is expected.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Build extension ZIP
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+          STAGING=$(mktemp -d)
+          cp manifest.json popup.html popup.js popup.css gemini-content.js gemini-content.css LICENSE "$STAGING/"
+          mkdir -p "$STAGING/icons" "$STAGING/_locales/en" "$STAGING/_locales/zh_CN"
+          cp icons/*.png "$STAGING/icons/"
+          cp _locales/en/messages.json "$STAGING/_locales/en/"
+          cp _locales/zh_CN/messages.json "$STAGING/_locales/zh_CN/"
+          (cd "$STAGING" && zip -r "$GITHUB_WORKSPACE/wider-gemini-${VERSION}.zip" .)
+          echo "Built wider-gemini-${VERSION}.zip"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Upload installable package to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: wider-gemini-${{ env.VERSION }}.zip

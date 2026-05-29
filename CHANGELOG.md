@@ -4,6 +4,30 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## x.y.z` section when a `vX.Y.Z` tag is pushed.
 
+## 2.2.0 (2026-05-29)
+
+### Features
+
+- Added `px` / `%` width units so Gemini width can adapt to the current browser tab viewport.
+
+- Added reading density controls with compactness, line-height, and paragraph-spacing settings.
+
+### Fixes
+
+- Preserved table, Notebook input, Drive picker, upload, drag-and-drop, and Deep Research layout guardrails during the width settings refactor.
+
+- Fixed preset edit mode layout clipping rows inside the 4-column preset grid.
+
+- Split preset defaults by unit: `px` presets keep the original 800 / 1000 / 1200 / 1350 / 2000 values, while `%` presets default to 50 / 70 / 80 / 90 / 100.
+
+- Fixed reading density `0%` applying extra paragraph and list spacing; default density now leaves Gemini's native message spacing unchanged.
+
+- Fixed reading density compactness mapping so low positive values no longer become looser than Gemini's native spacing, and expanded density styling to Gemini's current message, markdown, user text, table, and code nodes.
+
+### Other
+
+- Updated release packaging so the GitHub Release ZIP includes the shared settings utility used by the extension manifest.
+
 ## 2.1.2 (2026-05-24)
 
 ### Fixes

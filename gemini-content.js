@@ -9,13 +9,17 @@
         }
     }
 
+    const settingsUtils = window.widerGeminiSettings;
+    const defaultNormalizedSettings = settingsUtils.normalizeStorage({});
+    let currentRangeSettings = defaultNormalizedSettings;
+
     const css_config = [
-        { key: '.conversation-container', value: 'max-width: {width}px', sleep: 0 },
+        { key: '.conversation-container', value: 'max-width: {width}', sleep: 0 },
         { key: '.conversation-container user-query', value: 'max-width: 100%', sleep: 0 },
-        { key: 'input-container .input-area-container', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
-        { key: 'input-container input-area-v2', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
-        { key: '.chat-container', value: 'max-width: {width}px; margin-left: auto; margin-right: auto', sleep: 0 },
-        { key: '.chat-container.xap-drag-in-progress', value: 'max-width: {width}px', sleep: 0 },
+        { key: 'input-container .input-area-container', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
+        { key: 'input-container input-area-v2', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
+        { key: '.chat-container', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
+        { key: '.chat-container.xap-drag-in-progress', value: 'max-width: {width}', sleep: 0 },
         { key: '.chat-container.xap-drag-in-progress > *', value: 'max-width: 100%', sleep: 0 },
         { key: 'input-container upload-card', value: 'max-width: 100%', sleep: 0 },
         { key: 'input-container .upload-card', value: 'max-width: 100%', sleep: 0 },
@@ -59,6 +63,30 @@
         }
     }
 
+    function normalizeAllSettings(result) {
+        return settingsUtils.normalizeStorage(result || {});
+    }
+
+    function getCurrentWidthCssValue() {
+        return getComputedStyle(document.documentElement)
+            .getPropertyValue('--gemini-chat-width')
+            .trim() || '1000px';
+    }
+
+    function applyDensitySettings(settings) {
+        const root = document.documentElement;
+        root.style.setProperty('--gemini-message-line-height', String(settings.messageLineHeight));
+        root.style.setProperty('--gemini-message-paragraph-spacing', `${settings.messageParagraphSpacing}px`);
+
+        if (settings.messageSpacingCustom || settings.messageCompactness > 0) {
+            document.body.classList.add('wider-gemini-density-enabled');
+            console.log('[Wider Gemini] Applied message density', settings.messageLineHeight, settings.messageParagraphSpacing);
+        } else {
+            document.body.classList.remove('wider-gemini-density-enabled');
+            console.log('[Wider Gemini] Message density disabled');
+        }
+    }
+
     function applyCodeWrap(enabled) {
         if (enabled) {
             document.body.classList.add('code-wrap-enabled');
@@ -69,24 +97,34 @@
         }
     }
 
-    function applyWidthStyle(width) {
+    function updateCurrentRangeSettings(ranges) {
+        if (!ranges || typeof ranges !== 'object') return;
+        currentRangeSettings = settingsUtils.normalizeStorage({
+            ...currentRangeSettings,
+            ...ranges
+        });
+    }
+
+    function applyWidthStyle(widthSetting, ranges) {
+        updateCurrentRangeSettings(ranges);
         const root = document.documentElement;
-        root.style.setProperty('--gemini-chat-width', `${width}px`);
+        const normalized = settingsUtils.normalizeWidthSetting(widthSetting, currentRangeSettings);
+        let widthCssValue = settingsUtils.getWidthCssValue(normalized);
 
         const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
         if (isDeepResearch) {
             console.log('[Wider Gemini] Deep Research page detected, using 1600px width');
-            root.style.setProperty('--gemini-chat-width', '1600px');
-            width = 1600;
+            widthCssValue = '1600px';
         }
 
-        modifyElementStyles(width);
-        applyDragDropStyles(width);
-        console.log(`[Wider Gemini] Applied width ${width}px`);
+        root.style.setProperty('--gemini-chat-width', widthCssValue);
+        modifyElementStyles(widthCssValue);
+        applyDragDropStyles(widthCssValue);
+        console.log(`[Wider Gemini] Applied width ${widthCssValue}`);
     }
 
     function applyDragDropStyles(width) {
-        const currentWidth = width || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
+        const currentWidth = width || getCurrentWidthCssValue();
 
         const possibleSelectors = [
             '[class*="drop"]',
@@ -131,7 +169,7 @@
 
         const chatContainer = document.querySelector('.chat-container.xap-drag-in-progress');
         if (chatContainer) {
-            chatContainer.style.setProperty('max-width', `${currentWidth}px`, 'important');
+            chatContainer.style.setProperty('max-width', currentWidth, 'important');
 
             const dragChildren = chatContainer.querySelectorAll('*');
             dragChildren.forEach(child => {
@@ -156,12 +194,25 @@
         }
 
         try {
-            chrome.storage.sync.get(['chatWidth', 'codeWrap'], function (result) {
+            chrome.storage.sync.get([
+                'chatWidth',
+                'chatWidthSetting',
+                'codeWrap',
+                'widthMin',
+                'widthMax',
+                'widthPercentMin',
+                'widthPercentMax',
+                'messageCompactness',
+                'messageLineHeight',
+                'messageParagraphSpacing',
+                'messageSpacingCustom'
+            ], function (result) {
                 if (!isExtensionContextValid()) return;
-                const width = result.chatWidth || 1000;
-                const codeWrap = result.codeWrap !== undefined ? result.codeWrap : false;
-                applyWidthStyle(width);
-                applyCodeWrap(codeWrap);
+                const settings = normalizeAllSettings(result);
+                currentRangeSettings = settings;
+                applyWidthStyle(settings.chatWidthSetting, settings);
+                applyCodeWrap(settings.codeWrap);
+                applyDensitySettings(settings);
             });
         } catch (e) {
             console.log('[Wider Gemini] Failed to get storage:', e.message);
@@ -172,11 +223,17 @@
         chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             if (!isExtensionContextValid()) return;
 
-            if (request.action === 'updateWidth') {
-                applyWidthStyle(request.width);
+            if (request.action === 'updateWidthSetting') {
+                applyWidthStyle(request.setting, request.ranges);
+                sendResponse({ success: true });
+            } else if (request.action === 'updateWidth') {
+                applyWidthStyle({ value: request.width, unit: 'px' });
                 sendResponse({ success: true });
             } else if (request.action === 'updateCodeWrap') {
                 applyCodeWrap(request.enabled);
+                sendResponse({ success: true });
+            } else if (request.action === 'updateDensity') {
+                applyDensitySettings(settingsUtils.normalizeStorage(request.settings || {}));
                 sendResponse({ success: true });
             }
         });
@@ -277,7 +334,7 @@
                     return;
                 }
 
-                const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
+                const width = getCurrentWidthCssValue();
                 applyDragDropStyles(width);
 
                 const chatContainer = document.querySelector('.chat-container');
@@ -301,7 +358,7 @@
 
         document.addEventListener('dragenter', function (e) {
             startDragCheck();
-            const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
+            const width = getCurrentWidthCssValue();
             applyDragDropStyles(width);
         }, true);
 
@@ -309,7 +366,7 @@
             if (!isDragging) {
                 startDragCheck();
             }
-            const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
+            const width = getCurrentWidthCssValue();
             applyDragDropStyles(width);
         }, true);
 
@@ -324,7 +381,7 @@
         document.addEventListener('drop', function (e) {
             setTimeout(() => {
                 stopDragCheck();
-                const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
+                const width = getCurrentWidthCssValue();
                 applyDragDropStyles(width);
                 applySettings();
             }, 200);
@@ -345,11 +402,33 @@
             if (!isExtensionContextValid()) return;
 
             if (namespace === 'sync') {
-                if (changes.chatWidth) {
-                    applyWidthStyle(changes.chatWidth.newValue);
+                if (
+                    changes.widthMin ||
+                    changes.widthMax ||
+                    changes.widthPercentMin ||
+                    changes.widthPercentMax
+                ) {
+                    applySettings();
+                    return;
                 }
+
+                if (changes.chatWidthSetting) {
+                    applyWidthStyle(changes.chatWidthSetting.newValue);
+                } else if (changes.chatWidth) {
+                    applyWidthStyle({ value: changes.chatWidth.newValue, unit: 'px' });
+                }
+
                 if (changes.codeWrap) {
                     applyCodeWrap(changes.codeWrap.newValue);
+                }
+
+                if (
+                    changes.messageCompactness ||
+                    changes.messageLineHeight ||
+                    changes.messageParagraphSpacing ||
+                    changes.messageSpacingCustom
+                ) {
+                    applySettings();
                 }
             }
         });
@@ -398,14 +477,14 @@
             },
 
             applyDragStyles: function () {
-                const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
+                const width = getCurrentWidthCssValue();
                 applyDragDropStyles(width);
-                console.log('Applied drag styles, width:', width + 'px');
+                console.log('Applied drag styles, width:', width);
             },
 
             getCurrentWidth: function () {
-                const width = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width')) || 1000;
-                console.log('Current width setting:', width + 'px');
+                const width = getCurrentWidthCssValue();
+                console.log('Current width setting:', width);
                 return width;
             }
         };

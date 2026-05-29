@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "__MSG_appName__",
-    "version": "2.1.2",
+    "version": "2.2.0",
     "description": "__MSG_appDesc__",
     "default_locale": "zh_CN",
     "author": "Wider Gemini",
@@ -27,6 +27,7 @@
                 "https://gemini.google.com/*"
             ],
             "js": [
+                "settings-utils.js",
                 "gemini-content.js"
             ],
             "css": [

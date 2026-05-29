@@ -20,6 +20,7 @@ copy manifest.json "%TEMP_DIR%\" >nul
 copy popup.html "%TEMP_DIR%\" >nul
 copy popup.js "%TEMP_DIR%\" >nul
 copy popup.css "%TEMP_DIR%\" >nul
+copy settings-utils.js "%TEMP_DIR%\" >nul
 copy gemini-content.js "%TEMP_DIR%\" >nul
 copy gemini-content.css "%TEMP_DIR%\" >nul
 copy LICENSE "%TEMP_DIR%\" >nul

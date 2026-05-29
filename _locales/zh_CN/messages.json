@@ -70,5 +70,32 @@
   },
   "refreshing": {
     "message": "正在刷新页面..."
+  },
+  "widthUnit": {
+    "message": "宽度单位"
+  },
+  "densityLabel": {
+    "message": "阅读密度"
+  },
+  "compactnessUnit": {
+    "message": "%"
+  },
+  "advancedDensity": {
+    "message": "高级间距"
+  },
+  "lineHeightLabel": {
+    "message": "行高"
+  },
+  "paragraphSpacingLabel": {
+    "message": "段落间距"
+  },
+  "resetDensity": {
+    "message": "重置间距"
+  },
+  "customSpacing": {
+    "message": "自定义"
+  },
+  "autoSpacing": {
+    "message": "自动"
   }
 }

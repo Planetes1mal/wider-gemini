@@ -70,5 +70,32 @@
   },
   "refreshing": {
     "message": "Refreshing page..."
+  },
+  "widthUnit": {
+    "message": "Width unit"
+  },
+  "densityLabel": {
+    "message": "Reading density"
+  },
+  "compactnessUnit": {
+    "message": "%"
+  },
+  "advancedDensity": {
+    "message": "Advanced spacing"
+  },
+  "lineHeightLabel": {
+    "message": "Line height"
+  },
+  "paragraphSpacingLabel": {
+    "message": "Paragraph spacing"
+  },
+  "resetDensity": {
+    "message": "Reset spacing"
+  },
+  "customSpacing": {
+    "message": "Custom"
+  },
+  "autoSpacing": {
+    "message": "Auto"
   }
 }

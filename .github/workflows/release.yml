@@ -62,7 +62,7 @@ jobs:
       - name: Build extension ZIP
         run: |
           STAGING=$(mktemp -d)
-          cp manifest.json popup.html popup.js popup.css gemini-content.js gemini-content.css LICENSE "$STAGING/"
+          cp manifest.json popup.html popup.js popup.css settings-utils.js gemini-content.js gemini-content.css LICENSE "$STAGING/"
           mkdir -p "$STAGING/icons" "$STAGING/_locales/en" "$STAGING/_locales/zh_CN"
           cp icons/*.png "$STAGING/icons/"
           cp _locales/en/messages.json "$STAGING/_locales/en/"

@@ -156,6 +156,142 @@ hallucination-disclaimer {
     display: none !important;
 }
 
+/* Message reading density */
+:root {
+    --gemini-message-line-height: 1.42;
+    --gemini-message-paragraph-spacing: 12px;
+}
+
+body.wider-gemini-density-enabled message-content,
+body.wider-gemini-density-enabled .response-content,
+body.wider-gemini-density-enabled model-response .markdown,
+body.wider-gemini-density-enabled model-response .markdown-main-panel,
+body.wider-gemini-density-enabled .model-response .markdown,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel,
+body.wider-gemini-density-enabled response-container .markdown,
+body.wider-gemini-density-enabled response-container .markdown-main-panel,
+body.wider-gemini-density-enabled .response-container .markdown,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel,
+body.wider-gemini-density-enabled .presented-response-container .markdown,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel,
+body.wider-gemini-density-enabled .query-text,
+body.wider-gemini-density-enabled .query-text-line,
+body.wider-gemini-density-enabled user-query-content .gds-body-l,
+body.wider-gemini-density-enabled user-query .gds-body-l,
+body.wider-gemini-density-enabled .user-query-bubble-with-background .gds-body-l,
+body.wider-gemini-density-enabled div[aria-label="User message"] .gds-body-l,
+body.wider-gemini-density-enabled [data-message-author-role="user"] .gds-body-l {
+    line-height: var(--gemini-message-line-height) !important;
+}
+
+body.wider-gemini-density-enabled model-response .markdown,
+body.wider-gemini-density-enabled model-response .markdown-main-panel,
+body.wider-gemini-density-enabled .model-response .markdown,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel,
+body.wider-gemini-density-enabled response-container .markdown,
+body.wider-gemini-density-enabled response-container .markdown-main-panel,
+body.wider-gemini-density-enabled .response-container .markdown,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel,
+body.wider-gemini-density-enabled .presented-response-container .markdown,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel {
+    gap: var(--gemini-message-paragraph-spacing) !important;
+    row-gap: var(--gemini-message-paragraph-spacing) !important;
+}
+
+body.wider-gemini-density-enabled model-response .markdown > *,
+body.wider-gemini-density-enabled model-response .markdown-main-panel > *,
+body.wider-gemini-density-enabled .model-response .markdown > *,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel > *,
+body.wider-gemini-density-enabled response-container .markdown > *,
+body.wider-gemini-density-enabled response-container .markdown-main-panel > *,
+body.wider-gemini-density-enabled .response-container .markdown > *,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel > *,
+body.wider-gemini-density-enabled .presented-response-container .markdown > *,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel > *,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown > *,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel > *,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown > *,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+body.wider-gemini-density-enabled model-response p,
+body.wider-gemini-density-enabled model-response .markdown p,
+body.wider-gemini-density-enabled message-content p,
+body.wider-gemini-density-enabled .response-container p,
+body.wider-gemini-density-enabled .presented-response-container p,
+body.wider-gemini-density-enabled user-query p,
+body.wider-gemini-density-enabled user-query-content p {
+    line-height: var(--gemini-message-line-height) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+body.wider-gemini-density-enabled model-response li,
+body.wider-gemini-density-enabled model-response .markdown li,
+body.wider-gemini-density-enabled message-content li,
+body.wider-gemini-density-enabled .response-container li,
+body.wider-gemini-density-enabled .presented-response-container li,
+body.wider-gemini-density-enabled user-query li,
+body.wider-gemini-density-enabled user-query-content li {
+    line-height: var(--gemini-message-line-height) !important;
+    margin-bottom: 0 !important;
+}
+
+body.wider-gemini-density-enabled model-response li > p,
+body.wider-gemini-density-enabled model-response .markdown li > p,
+body.wider-gemini-density-enabled message-content li > p,
+body.wider-gemini-density-enabled .response-container li > p,
+body.wider-gemini-density-enabled .presented-response-container li > p,
+body.wider-gemini-density-enabled user-query li > p,
+body.wider-gemini-density-enabled user-query-content li > p {
+    margin-bottom: 0 !important;
+}
+
+body.wider-gemini-density-enabled model-response ul,
+body.wider-gemini-density-enabled model-response ol,
+body.wider-gemini-density-enabled message-content ul,
+body.wider-gemini-density-enabled message-content ol,
+body.wider-gemini-density-enabled .response-container ul,
+body.wider-gemini-density-enabled .response-container ol,
+body.wider-gemini-density-enabled .presented-response-container ul,
+body.wider-gemini-density-enabled .presented-response-container ol {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    gap: var(--gemini-message-paragraph-spacing) !important;
+    row-gap: var(--gemini-message-paragraph-spacing) !important;
+}
+
+body.wider-gemini-density-enabled model-response td,
+body.wider-gemini-density-enabled model-response th,
+body.wider-gemini-density-enabled .model-response td,
+body.wider-gemini-density-enabled .model-response th,
+body.wider-gemini-density-enabled message-content td,
+body.wider-gemini-density-enabled message-content th {
+    line-height: var(--gemini-message-line-height) !important;
+}
+
+body.wider-gemini-density-enabled model-response code,
+body.wider-gemini-density-enabled model-response pre,
+body.wider-gemini-density-enabled .model-response code,
+body.wider-gemini-density-enabled .model-response pre,
+body.wider-gemini-density-enabled message-content code,
+body.wider-gemini-density-enabled message-content pre,
+body.wider-gemini-density-enabled .code-container,
+body.wider-gemini-density-enabled .formatted-code-block-internal-container pre,
+body.wider-gemini-density-enabled .formatted-code-block-internal-container code {
+    line-height: var(--gemini-message-line-height) !important;
+}
+
 /* Code wrap enabled */
 body.code-wrap-enabled pre,
 body.code-wrap-enabled pre code {

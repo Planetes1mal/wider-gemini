@@ -11,15 +11,19 @@
 <body>
     <div class="container">
         <header class="header">
-            <div class="header-icon">⚡</div>
+            <div class="header-icon">WG</div>
             <h1 id="i18n-appName">Wider Gemini</h1>
             <p class="header-subtitle" id="i18n-headerSubtitle">让对话界面更宽更舒适</p>
         </header>
 
         <section class="card width-card">
             <div class="card-header">
-                <span class="card-icon">📐</span>
+                <span class="card-icon">W</span>
                 <label for="widthSlider" class="card-title" id="i18n-widthLabel">对话区域宽度</label>
+            </div>
+            <div class="unit-segment" role="group" aria-label="Width unit">
+                <button type="button" id="unitPxBtn" class="segment-btn segment-active" data-unit="px">px</button>
+                <button type="button" id="unitPercentBtn" class="segment-btn" data-unit="percent">%</button>
             </div>
             <div class="range-inputs">
                 <label class="range-label"><span id="i18n-widthMin">最小宽度</span>
@@ -36,7 +40,7 @@
                 </div>
                 <div class="slider-value">
                     <span id="widthValue">1000</span>
-                    <span class="unit">px</span>
+                    <span id="widthUnitLabel" class="unit">px</span>
                 </div>
             </div>
             <div class="preset-toolbar">
@@ -50,7 +54,7 @@
 
         <section class="card manage-card">
             <button type="button" class="collapse-header" id="managePresetsToggle" aria-expanded="false">
-                <span class="card-icon">📋</span>
+                <span class="card-icon">P</span>
                 <span class="card-title" id="i18n-managePresets">管理预设</span>
                 <span class="collapse-summary" id="managePresetsSummary"></span>
             </button>
@@ -59,9 +63,41 @@
             </div>
         </section>
 
+        <section class="card density-card">
+            <div class="card-header">
+                <span class="card-icon">T</span>
+                <label for="compactnessSlider" class="card-title" id="i18n-densityLabel">阅读密度</label>
+            </div>
+            <div class="slider-wrapper">
+                <div class="slider-container">
+                    <input type="range" id="compactnessSlider" min="0" max="100" step="1" value="0">
+                    <div class="slider-track"></div>
+                </div>
+                <div class="slider-value">
+                    <span id="compactnessValue">0</span>
+                    <span class="unit" id="i18n-compactnessUnit">%</span>
+                </div>
+            </div>
+            <button type="button" class="collapse-header advanced-toggle" id="advancedDensityToggle" aria-expanded="false">
+                <span class="card-title" id="i18n-advancedDensity">高级间距</span>
+                <span class="collapse-summary" id="densitySummary"></span>
+            </button>
+            <div class="collapse-body" id="advancedDensityBody" hidden>
+                <label class="range-label density-row"><span id="i18n-lineHeightLabel">行高</span>
+                    <input type="range" id="lineHeightSlider" min="1.15" max="1.8" step="0.01" value="1.42">
+                    <span id="lineHeightValue">1.42</span>
+                </label>
+                <label class="range-label density-row"><span id="i18n-paragraphSpacingLabel">段落间距</span>
+                    <input type="range" id="paragraphSpacingSlider" min="0" max="24" step="1" value="12">
+                    <span><span id="paragraphSpacingValue">12</span> px</span>
+                </label>
+                <button type="button" id="resetDensityBtn" class="secondary-btn"><span id="i18n-resetDensity">重置间距</span></button>
+            </div>
+        </section>
+
         <section class="card code-card">
             <div class="card-header">
-                <span class="card-icon">💻</span>
+                <span class="card-icon">C</span>
                 <label for="codeWrapToggle" class="card-title" id="i18n-codeWrapLabel">代码区域自动换行</label>
             </div>
             <div class="toggle-wrapper">
@@ -76,7 +112,7 @@
         </section>
 
         <section class="info-card">
-            <div class="info-icon">💡</div>
+            <div class="info-icon">i</div>
             <div class="info-content">
                 <p class="info-text" id="i18n-infoText1">拖动滑块或点击预设按钮调整宽度</p>
                 <p class="info-text" id="i18n-infoText2">设置会自动保存并应用到所有 Gemini 标签页</p>
@@ -84,10 +120,11 @@
         </section>
 
         <div id="refreshNotice" class="refresh-notice">
-            <span class="refresh-icon">🔄</span>
+            <span class="refresh-spinner" aria-hidden="true"></span>
             <span class="refresh-text" id="i18n-refreshing">正在刷新页面...</span>
         </div>
     </div>
+    <script src="settings-utils.js"></script>
     <script src="popup.js"></script>
 </body>
 

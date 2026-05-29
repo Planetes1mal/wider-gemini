@@ -13,3 +13,4 @@ node_modules/
 *.swo
 *~
 AGENTS.md
+.superpowers/

@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.1.2-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -33,10 +33,12 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 ## Features
 
 - **Wider chat column** — Control the main conversation width with a slider (within a configurable range) or one-click presets.
-- **Editable presets** — Expand **Manage presets** in the popup to rename, reorder, add, or remove preset widths (stored with `chrome.storage.sync` when available).
+- **Responsive width units** — Use fixed pixels or viewport percentages so Gemini can adapt to the current tab width.
+- **Reading density controls** — Tune compactness, line height, and paragraph spacing for denser large-screen reading.
+- **Separate editable presets** — Keep separate preset values for `px` and `%`, edit preset labels and values, or reset them to defaults.
 - **Code block wrapping** — Optional wrapping so long code lines do not require horizontal scrolling.
 - **Auto-refresh** — Optionally reload open Gemini tabs after you change settings so they pick up new values immediately.
-- **Persistent settings** — Width, wrap preference, range, and presets are saved for the next session.
+- **Persistent settings** — Width unit, width value, reading density, wrap preference, range, and presets are saved for the next session.
 
 ## Requirements
 
@@ -65,26 +67,30 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 
 1. Open [Google Gemini](https://gemini.google.com/).
 2. Click the extension icon in the toolbar to open the popup.
-3. Adjust **width** with the slider or a **preset** button. Default preset widths:
+3. Choose **px** or **%**, then adjust **width** with the slider or a **preset** button. Default preset widths:
 
-| Preset   | Width |
-|----------|------:|
-| Narrow   | 800px |
-| Default  | 1000px |
-| Wider    | 1200px |
-| Ultra    | 1350px |
-| Max      | 2000px |
+| Preset   | px | % |
+|----------|---:|--:|
+| Narrow   | 800px | 50% |
+| Default  | 1000px | 70% |
+| Wider    | 1200px | 80% |
+| Ultra    | 1350px | 90% |
+| Max      | 2000px | 100% |
 
 4. Toggle **code auto wrap** if you want code blocks to wrap instead of scrolling horizontally.
+
+Use **Reading density** to adjust compactness, or expand **Advanced spacing** to tune line height and paragraph spacing.
+
 5. Set **min / max width** in the range fields to change the slider span (defaults align with the extension’s supported range).
-6. Expand **Manage presets** to customize preset labels, order, and pixel values.
+6. Expand **Manage presets** to customize preset labels and values for the currently selected unit. `px` and `%` presets are stored separately.
 
 ## Development
 
 There is **no build step** or package manager: the project is vanilla HTML, CSS, and JavaScript (Chrome **Manifest V3**). Follow the patterns in the existing source files (structure, naming, and `chrome.*` usage).
 
 - **Windows store / release ZIP:** run `package.bat` in the repo root to generate `wider-gemini-<version>.zip` (same layout as the Chrome Web Store upload and GitHub **Assets**).
-- **GitHub Release:** add a `## x.y.z` entry to `CHANGELOG.md`, then push tag `vX.Y.Z` (must match `manifest.json`). Actions creates the release and attaches the ZIP.
+- **GitHub Release:** bump `manifest.json`, update the README version badges, add a `## x.y.z` entry to `CHANGELOG.md`, commit and push `main`, then push tag `vX.Y.Z` (must match `manifest.json`). Actions creates the release from the matching changelog section and attaches `wider-gemini-X.Y.Z.zip`.
+- **Chrome Web Store:** upload the same ZIP from the GitHub Release assets to the Chrome Web Store manually.
 
 On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug` (for example `getCurrentWidth()`, `findDragElements()`, `applyDragStyles()`). Use the browser **Developer tools** console.
 
@@ -93,6 +99,7 @@ On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug`
 | Path | Purpose |
 |------|---------|
 | `manifest.json` | Extension manifest (MV3) |
+| `settings-utils.js` | Shared settings normalization for popup and content scripts |
 | `gemini-content.js`, `gemini-content.css` | Content script on `gemini.google.com` |
 | `popup.html`, `popup.js`, `popup.css` | Toolbar popup |
 | `_locales/` | i18n (`en`, `zh_CN`) |

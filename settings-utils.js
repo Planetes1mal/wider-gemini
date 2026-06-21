@@ -40,6 +40,7 @@
         presetsByUnit: DEFAULT_PRESETS_BY_UNIT,
         presets: DEFAULT_PRESETS_BY_UNIT[UNIT_PX],
         codeWrap: false,
+        userFullWidth: false,
         messageCompactness: 0,
         messageLineHeight: DENSITY_DEFAULT_LINE_HEIGHT,
         messageParagraphSpacing: DENSITY_DEFAULT_PARAGRAPH_SPACING,
@@ -247,6 +248,9 @@
         const presets = presetsByUnit[chatWidthSetting.unit];
         const density = normalizeDensity(source);
         const codeWrap = source.codeWrap !== undefined ? source.codeWrap === true : DEFAULTS.codeWrap;
+        const userFullWidth = source.userFullWidth !== undefined
+            ? source.userFullWidth === true
+            : DEFAULTS.userFullWidth;
 
         return {
             ...ranges,
@@ -255,6 +259,7 @@
             presetsByUnit,
             presets,
             codeWrap,
+            userFullWidth,
             ...density
         };
     }

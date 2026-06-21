@@ -4,6 +4,7 @@ function localizeHtmlPage() {
         "btnNarrow", "btnDefault", "btnWider", "btnUltra", "btnInsane",
         "editPresets", "donePresets", "cancelPresets", "managePresets", "managePresetsSummary", "resetToDefault",
         "codeWrapLabel", "infoText1", "infoText2", "refreshing",
+        "userFullWidthLabel",
         "widthUnit", "densityLabel", "compactnessUnit", "advancedDensity",
         "lineHeightLabel", "paragraphSpacingLabel", "resetDensity",
         "customSpacing", "autoSpacing"
@@ -278,6 +279,8 @@ const paragraphSpacingValue = document.getElementById('paragraphSpacingValue');
 const resetDensityBtn = document.getElementById('resetDensityBtn');
 const codeWrapToggle = document.getElementById('codeWrapToggle');
 const codeWrapStatus = document.getElementById('codeWrapStatus');
+const userFullWidthToggle = document.getElementById('userFullWidthToggle');
+const userFullWidthStatus = document.getElementById('userFullWidthStatus');
 const refreshNotice = document.getElementById('refreshNotice');
 
 let widthUpdateTimer = null;
@@ -372,6 +375,7 @@ chrome.storage.sync.get([
     'chatWidth',
     'chatWidthSetting',
     'codeWrap',
+    'userFullWidth',
     'widthMin',
     'widthMax',
     'widthPercentMin',
@@ -414,6 +418,8 @@ chrome.storage.sync.get([
     applyDensityUi(settings);
     codeWrapToggle.checked = settings.codeWrap;
     updateCodeWrapStatus(settings.codeWrap);
+    userFullWidthToggle.checked = settings.userFullWidth;
+    updateUserFullWidthStatus(settings.userFullWidth);
 });
 
 function onRangeInput(isMin) {
@@ -624,10 +630,22 @@ codeWrapToggle.addEventListener('change', function () {
     updateCodeWrap(enabled);
 });
 
+userFullWidthToggle.addEventListener('change', function () {
+    const enabled = this.checked;
+    updateUserFullWidthStatus(enabled);
+    updateUserFullWidth(enabled);
+});
+
 function updateCodeWrapStatus(enabled) {
     const statusOn = chrome.i18n.getMessage("statusOn");
     const statusOff = chrome.i18n.getMessage("statusOff");
     codeWrapStatus.textContent = enabled ? statusOn : statusOff;
+}
+
+function updateUserFullWidthStatus(enabled) {
+    const statusOn = chrome.i18n.getMessage("statusOn");
+    const statusOff = chrome.i18n.getMessage("statusOff");
+    userFullWidthStatus.textContent = enabled ? statusOn : statusOff;
 }
 
 function updateWidthSetting(setting) {
@@ -711,6 +729,31 @@ function updateCodeWrap(enabled) {
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
                 action: 'updateCodeWrap',
+                enabled: enabled
+            }).catch(err => {
+                // Ignore error
+            });
+
+            setTimeout(() => {
+                chrome.tabs.reload(tab.id);
+            }, 100);
+        });
+    });
+}
+
+function updateUserFullWidth(enabled) {
+    chrome.storage.sync.set({ userFullWidth: enabled });
+    showRefreshNotice();
+
+    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
+        if (tabs.length === 0) {
+            hideRefreshNotice();
+            return;
+        }
+
+        tabs.forEach(tab => {
+            chrome.tabs.sendMessage(tab.id, {
+                action: 'updateUserFullWidth',
                 enabled: enabled
             }).catch(err => {
                 // Ignore error

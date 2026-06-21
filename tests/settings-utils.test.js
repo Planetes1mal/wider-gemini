@@ -142,4 +142,10 @@ assert.ok(utils, 'settings utils are exposed');
     );
 }
 
+{
+    assert.strictEqual(utils.normalizeStorage({}).userFullWidth, false);
+    assert.strictEqual(utils.normalizeStorage({ userFullWidth: true }).userFullWidth, true);
+    assert.strictEqual(utils.normalizeStorage({ userFullWidth: 'yes' }).userFullWidth, false);
+}
+
 console.log('settings-utils tests passed');

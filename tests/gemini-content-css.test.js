@@ -25,4 +25,11 @@ assert.ok(
     'markdown container gap must use paragraph spacing'
 );
 
+[
+    'body.wider-gemini-user-full-width .conversation-container .user-query-bubble-with-background',
+    'body.wider-gemini-user-full-width .conversation-container .user-query-bubble-container'
+].forEach(selector => {
+    assert.ok(css.includes(selector), `missing user full-width selector: ${selector}`);
+});
+
 console.log('gemini-content CSS tests passed');

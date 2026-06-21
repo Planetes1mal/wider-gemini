@@ -4,6 +4,12 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## x.y.z` section when a `vX.Y.Z` tag is pushed.
 
+## 2.3.0 (2026-06-21)
+
+### Features
+
+- Added an optional **User Message Full Width** toggle so user messages fill the conversation width and left-align (keeping their bubble background) to match AI responses.
+
 ## 2.2.0 (2026-05-29)
 
 ### Features

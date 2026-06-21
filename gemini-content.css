@@ -156,6 +156,27 @@ hallucination-disclaimer {
     display: none !important;
 }
 
+/* User message full-width (optional) — bubble fills the row and left-aligns,
+   matching the AI response width while keeping its background.
+   Scoped to .conversation-container so the bottom input composer
+   (in input-container, outside the conversation) is never affected. */
+body.wider-gemini-user-full-width .conversation-container .user-query-bubble-container,
+body.wider-gemini-user-full-width .conversation-container .user-query-container,
+body.wider-gemini-user-full-width .conversation-container user-query-content {
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+}
+
+body.wider-gemini-user-full-width .conversation-container .user-query-bubble-with-background,
+body.wider-gemini-user-full-width .conversation-container div[aria-label="User message"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
+}
+
 /* Message reading density */
 :root {
     --gemini-message-line-height: 1.42;

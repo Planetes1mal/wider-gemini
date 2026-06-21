@@ -56,6 +56,9 @@
   "codeWrapLabel": {
     "message": "代码区域自动换行"
   },
+  "userFullWidthLabel": {
+    "message": "用户消息铺满宽度"
+  },
   "statusOn": {
     "message": "开启"
   },

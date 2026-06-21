@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -35,6 +35,7 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 - **Wider chat column** — Control the main conversation width with a slider (within a configurable range) or one-click presets.
 - **Responsive width units** — Use fixed pixels or viewport percentages so Gemini can adapt to the current tab width.
 - **Reading density controls** — Tune compactness, line height, and paragraph spacing for denser large-screen reading.
+- **User message full width** — Optional toggle to make user messages fill the conversation width and left-align (matching AI responses) instead of shrinking into a right-aligned bubble.
 - **Separate editable presets** — Keep separate preset values for `px` and `%`, edit preset labels and values, or reset them to defaults.
 - **Code block wrapping** — Optional wrapping so long code lines do not require horizontal scrolling.
 - **Auto-refresh** — Optionally reload open Gemini tabs after you change settings so they pick up new values immediately.
@@ -78,6 +79,8 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 | Max      | 2000px | 100% |
 
 4. Toggle **code auto wrap** if you want code blocks to wrap instead of scrolling horizontally.
+
+Toggle **user message full width** to make your messages fill the conversation width and left-align like the AI responses.
 
 Use **Reading density** to adjust compactness, or expand **Advanced spacing** to tune line height and paragraph spacing.
 

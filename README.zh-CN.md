@@ -2,7 +2,7 @@
 
 # Wider Gemini
 
-[![版本](https://img.shields.io/badge/version-2.2.0-blue.svg)](#)
+[![版本](https://img.shields.io/badge/version-2.3.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![平台](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![许可证：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -35,6 +35,7 @@
 - **加宽对话区域** — 用滑块（在可配置范围内）或一键预设调整主对话区宽度。
 - **响应式宽度单位** — 可使用固定像素或视口百分比，让 Gemini 根据当前标签页宽度自适应。
 - **阅读密度控制** — 可调紧凑度、行高和段落间距，提升大屏阅读的信息密度。
+- **用户消息铺满宽度** — 可选开关，让用户消息铺满对话区宽度并左对齐（与 AI 回答一致），而不是收缩成靠右的小气泡。
 - **分单位编辑预设** — `px` 与 `%` 使用独立预设，可编辑预设名称和数值，也可重置为默认值。
 - **代码块换行** — 可选开启，长代码行无需横向滚动。
 - **自动刷新** — 可选在修改设置后刷新已打开的 Gemini 标签页，使新设置立即生效。
@@ -78,6 +79,8 @@
 | 极宽 | 2000px | 100% |
 
 4. 按需开关 **代码区域自动换行**，控制代码块是否换行显示。
+
+按需开关 **用户消息铺满宽度**，让你的消息铺满对话区宽度并左对齐，与 AI 回答一致。
 
 使用 **阅读密度** 调整紧凑度，或展开 **高级间距** 分别调行高和段落间距。
 

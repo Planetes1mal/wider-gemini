@@ -97,6 +97,16 @@
         }
     }
 
+    function applyUserFullWidth(enabled) {
+        if (enabled) {
+            document.body.classList.add('wider-gemini-user-full-width');
+            console.log('[Wider Gemini] User message full width enabled');
+        } else {
+            document.body.classList.remove('wider-gemini-user-full-width');
+            console.log('[Wider Gemini] User message full width disabled');
+        }
+    }
+
     function updateCurrentRangeSettings(ranges) {
         if (!ranges || typeof ranges !== 'object') return;
         currentRangeSettings = settingsUtils.normalizeStorage({
@@ -198,6 +208,7 @@
                 'chatWidth',
                 'chatWidthSetting',
                 'codeWrap',
+                'userFullWidth',
                 'widthMin',
                 'widthMax',
                 'widthPercentMin',
@@ -212,6 +223,7 @@
                 currentRangeSettings = settings;
                 applyWidthStyle(settings.chatWidthSetting, settings);
                 applyCodeWrap(settings.codeWrap);
+                applyUserFullWidth(settings.userFullWidth);
                 applyDensitySettings(settings);
             });
         } catch (e) {
@@ -231,6 +243,9 @@
                 sendResponse({ success: true });
             } else if (request.action === 'updateCodeWrap') {
                 applyCodeWrap(request.enabled);
+                sendResponse({ success: true });
+            } else if (request.action === 'updateUserFullWidth') {
+                applyUserFullWidth(request.enabled);
                 sendResponse({ success: true });
             } else if (request.action === 'updateDensity') {
                 applyDensitySettings(settingsUtils.normalizeStorage(request.settings || {}));
@@ -420,6 +435,10 @@
 
                 if (changes.codeWrap) {
                     applyCodeWrap(changes.codeWrap.newValue);
+                }
+
+                if (changes.userFullWidth) {
+                    applyUserFullWidth(changes.userFullWidth.newValue);
                 }
 
                 if (

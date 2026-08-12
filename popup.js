@@ -320,7 +320,7 @@ function syncRangeProgress(input) {
 }
 
 function syncAllRangeProgress() {
-    [widthSlider, compactnessSlider, lineHeightSlider, paragraphSpacingSlider, fontSizeSlider].forEach(syncRangeProgress);
+    [widthSlider, compactnessSlider, lineHeightSlider, paragraphSpacingSlider].forEach(syncRangeProgress);
 }
 
 function applyWidthUi(settings) {
@@ -359,19 +359,23 @@ function applyWidthUi(settings) {
 
 function applyDensityUi(settings) {
     currentDensity = settingsUtils.normalizeDensity(settings);
-    if (typeof settings.messageFontSize === 'number') {
-        currentFontSize = settings.messageFontSize;
-    }
     compactnessSlider.value = currentDensity.messageCompactness;
     compactnessValue.textContent = currentDensity.messageCompactness;
     lineHeightSlider.value = currentDensity.messageLineHeight;
     lineHeightValue.textContent = currentDensity.messageLineHeight.toFixed(2);
     paragraphSpacingSlider.value = currentDensity.messageParagraphSpacing;
     paragraphSpacingValue.textContent = currentDensity.messageParagraphSpacing;
-    fontSizeSlider.value = currentFontSize;
-    fontSizeValue.textContent = currentFontSize;
     syncAllRangeProgress();
     updateDensitySummary();
+}
+
+function applyFontSizeUi(settings) {
+    if (typeof settings.messageFontSize === 'number') {
+        currentFontSize = settings.messageFontSize;
+    }
+    fontSizeSlider.value = currentFontSize;
+    fontSizeValue.textContent = currentFontSize;
+    syncRangeProgress(fontSizeSlider);
 }
 
 function updateDensitySummary() {
@@ -427,6 +431,7 @@ chrome.storage.sync.get([
     currentPresets = getPresetGroup(settings.chatWidthSetting.unit);
     applyWidthUi(settings);
     applyDensityUi(settings);
+    applyFontSizeUi(settings);
     codeWrapToggle.checked = settings.codeWrap;
     updateCodeWrapStatus(settings.codeWrap);
     userFullWidthToggle.checked = settings.userFullWidth;

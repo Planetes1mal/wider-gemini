@@ -91,11 +91,24 @@
                     <input type="range" id="paragraphSpacingSlider" min="0" max="24" step="1" value="12">
                     <span><span id="paragraphSpacingValue">12</span> px</span>
                 </label>
-                <label class="range-label density-row"><span id="i18n-fontSizeLabel">字号</span>
-                    <input type="range" id="fontSizeSlider" min="75" max="200" step="5" value="100">
-                    <span><span id="fontSizeValue">100</span>%</span>
-                </label>
                 <button type="button" id="resetDensityBtn" class="secondary-btn"><span id="i18n-resetDensity">重置间距</span></button>
+            </div>
+        </section>
+
+        <section class="card font-size-card">
+            <div class="card-header">
+                <span class="card-icon">A</span>
+                <label for="fontSizeSlider" class="card-title" id="i18n-fontSizeLabel">字号</label>
+            </div>
+            <div class="slider-wrapper">
+                <div class="slider-container">
+                    <input type="range" id="fontSizeSlider" min="75" max="200" step="5" value="100">
+                    <div class="slider-track"></div>
+                </div>
+                <div class="slider-value">
+                    <span id="fontSizeValue">100</span>
+                    <span class="unit">%</span>
+                </div>
             </div>
         </section>
 

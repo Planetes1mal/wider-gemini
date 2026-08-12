@@ -13,6 +13,7 @@
     const DENSITY_APPLIED_MIN_LINE_HEIGHT = 1.24;
     const DENSITY_APPLIED_MAX_PARAGRAPH_SPACING = 11;
     const DENSITY_APPLIED_MIN_PARAGRAPH_SPACING = 2;
+    const FONT_SIZE_RANGE = { min: 75, max: 200, step: 5 };
 
     const DEFAULT_PRESETS_BY_UNIT = {
         [UNIT_PX]: [
@@ -44,7 +45,8 @@
         messageCompactness: 0,
         messageLineHeight: DENSITY_DEFAULT_LINE_HEIGHT,
         messageParagraphSpacing: DENSITY_DEFAULT_PARAGRAPH_SPACING,
-        messageSpacingCustom: false
+        messageSpacingCustom: false,
+        messageFontSize: 100
     };
 
     function clampNumber(value, min, max) {
@@ -221,6 +223,11 @@
         };
     }
 
+    function normalizeFontSize(value) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) return DEFAULTS.messageFontSize;
+        return Math.round(clampNumber(value, FONT_SIZE_RANGE.min, FONT_SIZE_RANGE.max));
+    }
+
     function getWidthCssValue(setting) {
         const normalizedUnit = normalizeUnit(setting && setting.unit);
         const value = setting && typeof setting.value === 'number'
@@ -260,6 +267,7 @@
             presets,
             codeWrap,
             userFullWidth,
+            messageFontSize: normalizeFontSize(source.messageFontSize),
             ...density
         };
     }
@@ -280,6 +288,7 @@
         getDefaultPresetsForUnit,
         deriveDensityFromCompactness,
         normalizeDensity,
+        normalizeFontSize,
         getRangeForUnit,
         getWidthCssValue,
         getLegacyChatWidth

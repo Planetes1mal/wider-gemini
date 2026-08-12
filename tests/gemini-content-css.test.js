@@ -32,4 +32,36 @@ assert.ok(
     assert.ok(css.includes(selector), `missing user full-width selector: ${selector}`);
 });
 
+// 字号：原生基准变量 + 文本/标题/代码的缩放声明
+[
+    '--gemini-message-font-size: 17px',
+    '--gemini-message-inline-code-font-size: 15px',
+    '--gemini-message-code-font-size: 14px',
+    '--gemini-message-h1-font-size: 28px',
+    '--gemini-message-h2-font-size: 24px',
+    '--gemini-message-h3-font-size: 20px'
+].forEach(decl => {
+    assert.ok(css.includes(decl), `missing font size var default: ${decl}`);
+});
+
+assert.ok(
+    css.includes('font-size: var(--gemini-message-font-size) !important;'),
+    'density font-size must use the base font size var'
+);
+
+assert.ok(
+    css.includes('font-size: var(--gemini-message-h2-font-size) !important;'),
+    'h2 font-size must use the h2 var'
+);
+
+assert.ok(
+    css.includes('font-size: var(--gemini-message-code-font-size) !important;'),
+    'block code font-size must use the code var'
+);
+
+assert.ok(
+    css.includes('font-size: var(--gemini-message-inline-code-font-size) !important;'),
+    'inline code font-size must use the inline code var'
+);
+
 console.log('gemini-content CSS tests passed');

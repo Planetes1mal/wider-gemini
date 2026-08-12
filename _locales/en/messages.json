@@ -92,6 +92,9 @@
   "paragraphSpacingLabel": {
     "message": "Paragraph spacing"
   },
+  "fontSizeLabel": {
+    "message": "Font size"
+  },
   "resetDensity": {
     "message": "Reset spacing"
   },

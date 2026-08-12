@@ -148,4 +148,16 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(utils.normalizeStorage({ userFullWidth: 'yes' }).userFullWidth, false);
 }
 
+{
+    assert.strictEqual(utils.normalizeFontSize(undefined), 100);
+    assert.strictEqual(utils.normalizeFontSize('abc'), 100);
+    assert.strictEqual(utils.normalizeFontSize(50), 75);
+    assert.strictEqual(utils.normalizeFontSize(250), 200);
+    assert.strictEqual(utils.normalizeFontSize(150), 150);
+    assert.strictEqual(utils.normalizeStorage({}).messageFontSize, 100);
+    assert.strictEqual(utils.normalizeStorage({ messageFontSize: 130 }).messageFontSize, 130);
+    assert.strictEqual(utils.normalizeStorage({ messageFontSize: 30 }).messageFontSize, 75);
+    assert.strictEqual(utils.normalizeStorage({ messageFontSize: 999 }).messageFontSize, 200);
+}
+
 console.log('settings-utils tests passed');

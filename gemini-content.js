@@ -13,6 +13,16 @@
     const defaultNormalizedSettings = settingsUtils.normalizeStorage({});
     let currentRangeSettings = defaultNormalizedSettings;
 
+    // Gemini 原生字号（2026-08 实测，正文基准 17px）；按字号比例缩放为像素值
+    const NATIVE_FONT_SIZES = {
+        '--gemini-message-font-size': 17,
+        '--gemini-message-inline-code-font-size': 15,
+        '--gemini-message-code-font-size': 14,
+        '--gemini-message-h1-font-size': 28,
+        '--gemini-message-h2-font-size': 24,
+        '--gemini-message-h3-font-size': 20
+    };
+
     const css_config = [
         { key: '.conversation-container', value: 'max-width: {width}', sleep: 0 },
         { key: '.conversation-container user-query', value: 'max-width: 100%', sleep: 0 },
@@ -78,9 +88,14 @@
         root.style.setProperty('--gemini-message-line-height', String(settings.messageLineHeight));
         root.style.setProperty('--gemini-message-paragraph-spacing', `${settings.messageParagraphSpacing}px`);
 
-        if (settings.messageSpacingCustom || settings.messageCompactness > 0) {
+        const factor = settings.messageFontSize / 100;
+        for (const [prop, nativePx] of Object.entries(NATIVE_FONT_SIZES)) {
+            root.style.setProperty(prop, `${(nativePx * factor).toFixed(2)}px`);
+        }
+
+        if (settings.messageSpacingCustom || settings.messageCompactness > 0 || settings.messageFontSize !== 100) {
             document.body.classList.add('wider-gemini-density-enabled');
-            console.log('[Wider Gemini] Applied message density', settings.messageLineHeight, settings.messageParagraphSpacing);
+            console.log('[Wider Gemini] Applied message density', settings.messageLineHeight, settings.messageParagraphSpacing, settings.messageFontSize);
         } else {
             document.body.classList.remove('wider-gemini-density-enabled');
             console.log('[Wider Gemini] Message density disabled');
@@ -216,7 +231,8 @@
                 'messageCompactness',
                 'messageLineHeight',
                 'messageParagraphSpacing',
-                'messageSpacingCustom'
+                'messageSpacingCustom',
+                'messageFontSize'
             ], function (result) {
                 if (!isExtensionContextValid()) return;
                 const settings = normalizeAllSettings(result);
@@ -445,7 +461,8 @@
                     changes.messageCompactness ||
                     changes.messageLineHeight ||
                     changes.messageParagraphSpacing ||
-                    changes.messageSpacingCustom
+                    changes.messageSpacingCustom ||
+                    changes.messageFontSize
                 ) {
                     applySettings();
                 }

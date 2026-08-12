@@ -7,6 +7,7 @@ function localizeHtmlPage() {
         "userFullWidthLabel",
         "widthUnit", "densityLabel", "compactnessUnit", "advancedDensity",
         "lineHeightLabel", "paragraphSpacingLabel", "resetDensity",
+        "fontSizeLabel",
         "customSpacing", "autoSpacing"
     ];
 
@@ -276,6 +277,8 @@ const lineHeightSlider = document.getElementById('lineHeightSlider');
 const lineHeightValue = document.getElementById('lineHeightValue');
 const paragraphSpacingSlider = document.getElementById('paragraphSpacingSlider');
 const paragraphSpacingValue = document.getElementById('paragraphSpacingValue');
+const fontSizeSlider = document.getElementById('fontSizeSlider');
+const fontSizeValue = document.getElementById('fontSizeValue');
 const resetDensityBtn = document.getElementById('resetDensityBtn');
 const codeWrapToggle = document.getElementById('codeWrapToggle');
 const codeWrapStatus = document.getElementById('codeWrapStatus');
@@ -292,6 +295,7 @@ let currentWidthMax = DEFAULTS.widthMax;
 let currentWidthPercentMin = settingsUtils.DEFAULTS.widthPercentMin;
 let currentWidthPercentMax = settingsUtils.DEFAULTS.widthPercentMax;
 let currentDensity = settingsUtils.normalizeDensity({});
+let currentFontSize = settingsUtils.DEFAULTS.messageFontSize;
 let currentPresetsByUnit = settingsUtils.normalizePresetGroups({}, DEFAULTS);
 let currentPresets = currentPresetsByUnit[settingsUtils.UNIT_PX];
 
@@ -316,7 +320,7 @@ function syncRangeProgress(input) {
 }
 
 function syncAllRangeProgress() {
-    [widthSlider, compactnessSlider, lineHeightSlider, paragraphSpacingSlider].forEach(syncRangeProgress);
+    [widthSlider, compactnessSlider, lineHeightSlider, paragraphSpacingSlider, fontSizeSlider].forEach(syncRangeProgress);
 }
 
 function applyWidthUi(settings) {
@@ -355,12 +359,17 @@ function applyWidthUi(settings) {
 
 function applyDensityUi(settings) {
     currentDensity = settingsUtils.normalizeDensity(settings);
+    if (typeof settings.messageFontSize === 'number') {
+        currentFontSize = settings.messageFontSize;
+    }
     compactnessSlider.value = currentDensity.messageCompactness;
     compactnessValue.textContent = currentDensity.messageCompactness;
     lineHeightSlider.value = currentDensity.messageLineHeight;
     lineHeightValue.textContent = currentDensity.messageLineHeight.toFixed(2);
     paragraphSpacingSlider.value = currentDensity.messageParagraphSpacing;
     paragraphSpacingValue.textContent = currentDensity.messageParagraphSpacing;
+    fontSizeSlider.value = currentFontSize;
+    fontSizeValue.textContent = currentFontSize;
     syncAllRangeProgress();
     updateDensitySummary();
 }
@@ -385,7 +394,8 @@ chrome.storage.sync.get([
     'messageCompactness',
     'messageLineHeight',
     'messageParagraphSpacing',
-    'messageSpacingCustom'
+    'messageSpacingCustom',
+    'messageFontSize'
 ], function (result) {
     const settings = normalizeStorage(result);
     const needsWrite = (
@@ -408,7 +418,8 @@ chrome.storage.sync.get([
             messageCompactness: settings.messageCompactness,
             messageLineHeight: settings.messageLineHeight,
             messageParagraphSpacing: settings.messageParagraphSpacing,
-            messageSpacingCustom: settings.messageSpacingCustom
+            messageSpacingCustom: settings.messageSpacingCustom,
+            messageFontSize: settings.messageFontSize
         });
     }
 
@@ -590,7 +601,7 @@ compactnessSlider.addEventListener('input', function () {
 
     if (densityUpdateTimer) clearTimeout(densityUpdateTimer);
     densityUpdateTimer = setTimeout(() => {
-        updateDensity(currentDensity);
+        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
     }, 500);
 });
 
@@ -610,8 +621,19 @@ advancedDensityToggle.addEventListener('click', function () {
             messageSpacingCustom: true
         });
         applyDensityUi(currentDensity);
-        updateDensity(currentDensity);
+        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
     });
+});
+
+fontSizeSlider.addEventListener('input', function () {
+    syncRangeProgress(this);
+    currentFontSize = parseInt(this.value, 10);
+    fontSizeValue.textContent = currentFontSize;
+
+    if (densityUpdateTimer) clearTimeout(densityUpdateTimer);
+    densityUpdateTimer = setTimeout(() => {
+        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
+    }, 500);
 });
 
 resetDensityBtn.addEventListener('click', function () {
@@ -621,7 +643,7 @@ resetDensityBtn.addEventListener('click', function () {
         messageSpacingCustom: false
     };
     applyDensityUi(currentDensity);
-    updateDensity(currentDensity);
+    updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
 });
 
 codeWrapToggle.addEventListener('change', function () {
@@ -692,7 +714,9 @@ function updateWidthSetting(setting) {
 
 function updateDensity(settings) {
     const normalized = settingsUtils.normalizeDensity(settings);
-    chrome.storage.sync.set(normalized);
+    const fontSize = settingsUtils.normalizeFontSize(settings.messageFontSize);
+    const payload = { ...normalized, messageFontSize: fontSize };
+    chrome.storage.sync.set(payload);
     showRefreshNotice();
 
     chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
@@ -704,7 +728,7 @@ function updateDensity(settings) {
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
                 action: 'updateDensity',
-                settings: normalized
+                settings: payload
             }).catch(err => {
                 // Ignore error
             });

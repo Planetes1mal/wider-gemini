@@ -92,6 +92,9 @@
   "paragraphSpacingLabel": {
     "message": "段落间距"
   },
+  "fontSizeLabel": {
+    "message": "字号"
+  },
   "resetDensity": {
     "message": "重置间距"
   },

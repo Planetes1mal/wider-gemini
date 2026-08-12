@@ -181,6 +181,13 @@ body.wider-gemini-user-full-width .conversation-container div[aria-label="User m
 :root {
     --gemini-message-line-height: 1.42;
     --gemini-message-paragraph-spacing: 12px;
+    /* 原生字号基准（2026-08 实测，正文 17px）；由内容脚本按字号比例换算为像素值 */
+    --gemini-message-font-size: 17px;
+    --gemini-message-inline-code-font-size: 15px;
+    --gemini-message-code-font-size: 14px;
+    --gemini-message-h1-font-size: 28px;
+    --gemini-message-h2-font-size: 24px;
+    --gemini-message-h3-font-size: 20px;
 }
 
 body.wider-gemini-density-enabled message-content,
@@ -207,6 +214,113 @@ body.wider-gemini-density-enabled .user-query-bubble-with-background .gds-body-l
 body.wider-gemini-density-enabled div[aria-label="User message"] .gds-body-l,
 body.wider-gemini-density-enabled [data-message-author-role="user"] .gds-body-l {
     line-height: var(--gemini-message-line-height) !important;
+    font-size: var(--gemini-message-font-size) !important;
+}
+
+/* 标题字号：仅限聊天消息容器，避免影响 Notebook 等页面 */
+body.wider-gemini-density-enabled model-response .markdown h1,
+body.wider-gemini-density-enabled model-response .markdown-main-panel h1,
+body.wider-gemini-density-enabled .model-response .markdown h1,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel h1,
+body.wider-gemini-density-enabled response-container .markdown h1,
+body.wider-gemini-density-enabled response-container .markdown-main-panel h1,
+body.wider-gemini-density-enabled .response-container .markdown h1,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel h1,
+body.wider-gemini-density-enabled .presented-response-container .markdown h1,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel h1,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown h1,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel h1,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown h1,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel h1,
+body.wider-gemini-density-enabled message-content .markdown h1,
+body.wider-gemini-density-enabled message-content .markdown-main-panel h1 {
+    font-size: var(--gemini-message-h1-font-size) !important;
+}
+
+body.wider-gemini-density-enabled model-response .markdown h2,
+body.wider-gemini-density-enabled model-response .markdown-main-panel h2,
+body.wider-gemini-density-enabled .model-response .markdown h2,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel h2,
+body.wider-gemini-density-enabled response-container .markdown h2,
+body.wider-gemini-density-enabled response-container .markdown-main-panel h2,
+body.wider-gemini-density-enabled .response-container .markdown h2,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel h2,
+body.wider-gemini-density-enabled .presented-response-container .markdown h2,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel h2,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown h2,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel h2,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown h2,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel h2,
+body.wider-gemini-density-enabled message-content .markdown h2,
+body.wider-gemini-density-enabled message-content .markdown-main-panel h2 {
+    font-size: var(--gemini-message-h2-font-size) !important;
+}
+
+body.wider-gemini-density-enabled model-response .markdown h3,
+body.wider-gemini-density-enabled model-response .markdown h4,
+body.wider-gemini-density-enabled model-response .markdown h5,
+body.wider-gemini-density-enabled model-response .markdown h6,
+body.wider-gemini-density-enabled model-response .markdown-main-panel h3,
+body.wider-gemini-density-enabled model-response .markdown-main-panel h4,
+body.wider-gemini-density-enabled model-response .markdown-main-panel h5,
+body.wider-gemini-density-enabled model-response .markdown-main-panel h6,
+body.wider-gemini-density-enabled .model-response .markdown h3,
+body.wider-gemini-density-enabled .model-response .markdown h4,
+body.wider-gemini-density-enabled .model-response .markdown h5,
+body.wider-gemini-density-enabled .model-response .markdown h6,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel h3,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel h4,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel h5,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel h6,
+body.wider-gemini-density-enabled response-container .markdown h3,
+body.wider-gemini-density-enabled response-container .markdown h4,
+body.wider-gemini-density-enabled response-container .markdown h5,
+body.wider-gemini-density-enabled response-container .markdown h6,
+body.wider-gemini-density-enabled response-container .markdown-main-panel h3,
+body.wider-gemini-density-enabled response-container .markdown-main-panel h4,
+body.wider-gemini-density-enabled response-container .markdown-main-panel h5,
+body.wider-gemini-density-enabled response-container .markdown-main-panel h6,
+body.wider-gemini-density-enabled .response-container .markdown h3,
+body.wider-gemini-density-enabled .response-container .markdown h4,
+body.wider-gemini-density-enabled .response-container .markdown h5,
+body.wider-gemini-density-enabled .response-container .markdown h6,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel h3,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel h4,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel h5,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel h6,
+body.wider-gemini-density-enabled .presented-response-container .markdown h3,
+body.wider-gemini-density-enabled .presented-response-container .markdown h4,
+body.wider-gemini-density-enabled .presented-response-container .markdown h5,
+body.wider-gemini-density-enabled .presented-response-container .markdown h6,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel h3,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel h4,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel h5,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel h6,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown h3,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown h4,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown h5,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown h6,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel h3,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel h4,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel h5,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel h6,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown h3,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown h4,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown h5,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown h6,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel h3,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel h4,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel h5,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel h6,
+body.wider-gemini-density-enabled message-content .markdown h3,
+body.wider-gemini-density-enabled message-content .markdown h4,
+body.wider-gemini-density-enabled message-content .markdown h5,
+body.wider-gemini-density-enabled message-content .markdown h6,
+body.wider-gemini-density-enabled message-content .markdown-main-panel h3,
+body.wider-gemini-density-enabled message-content .markdown-main-panel h4,
+body.wider-gemini-density-enabled message-content .markdown-main-panel h5,
+body.wider-gemini-density-enabled message-content .markdown-main-panel h6 {
+    font-size: var(--gemini-message-h3-font-size) !important;
 }
 
 body.wider-gemini-density-enabled model-response .markdown,
@@ -311,6 +425,21 @@ body.wider-gemini-density-enabled .code-container,
 body.wider-gemini-density-enabled .formatted-code-block-internal-container pre,
 body.wider-gemini-density-enabled .formatted-code-block-internal-container code {
     line-height: var(--gemini-message-line-height) !important;
+}
+
+/* 代码字号：块级代码与行内代码原生字号不同，分别缩放 */
+body.wider-gemini-density-enabled model-response pre code,
+body.wider-gemini-density-enabled .model-response pre code,
+body.wider-gemini-density-enabled message-content pre code,
+body.wider-gemini-density-enabled .code-container,
+body.wider-gemini-density-enabled .formatted-code-block-internal-container code {
+    font-size: var(--gemini-message-code-font-size) !important;
+}
+
+body.wider-gemini-density-enabled model-response code:not(pre code),
+body.wider-gemini-density-enabled .model-response code:not(pre code),
+body.wider-gemini-density-enabled message-content code:not(pre code) {
+    font-size: var(--gemini-message-inline-code-font-size) !important;
 }
 
 /* Code wrap enabled */

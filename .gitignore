@@ -2,6 +2,8 @@ archive/
 archive/**
 .cursor/
 .opencode/
+.zcode/
+.claude/
 *.zip
 .DS_Store
 Thumbs.db
@@ -13,4 +15,7 @@ node_modules/
 *.swo
 *~
 AGENTS.md
+CONTEXT.md
 .superpowers/
+icons/宣传图/
+icons/宣传图/**

@@ -106,5 +106,11 @@
   },
   "autoSpacing": {
     "message": "自动"
+  },
+  "uiLanguageLabel": {
+    "message": "界面语言"
+  },
+  "uiLanguageAuto": {
+    "message": "跟随系统"
   }
 }

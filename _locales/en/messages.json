@@ -106,5 +106,11 @@
   },
   "autoSpacing": {
     "message": "Auto"
+  },
+  "uiLanguageLabel": {
+    "message": "Language"
+  },
+  "uiLanguageAuto": {
+    "message": "Follow system"
   }
 }

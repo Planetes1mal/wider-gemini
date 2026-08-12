@@ -14,6 +14,7 @@
     const DENSITY_APPLIED_MAX_PARAGRAPH_SPACING = 11;
     const DENSITY_APPLIED_MIN_PARAGRAPH_SPACING = 2;
     const FONT_SIZE_RANGE = { min: 75, max: 200, step: 5 };
+    const UI_LANGUAGES = ['auto', 'en', 'zh_CN'];
 
     const DEFAULT_PRESETS_BY_UNIT = {
         [UNIT_PX]: [
@@ -46,7 +47,8 @@
         messageLineHeight: DENSITY_DEFAULT_LINE_HEIGHT,
         messageParagraphSpacing: DENSITY_DEFAULT_PARAGRAPH_SPACING,
         messageSpacingCustom: false,
-        messageFontSize: 100
+        messageFontSize: 100,
+        uiLanguage: 'auto'
     };
 
     function clampNumber(value, min, max) {
@@ -228,6 +230,10 @@
         return Math.round(clampNumber(value, FONT_SIZE_RANGE.min, FONT_SIZE_RANGE.max));
     }
 
+    function normalizeUiLanguage(value) {
+        return UI_LANGUAGES.indexOf(value) !== -1 ? value : DEFAULTS.uiLanguage;
+    }
+
     function getWidthCssValue(setting) {
         const normalizedUnit = normalizeUnit(setting && setting.unit);
         const value = setting && typeof setting.value === 'number'
@@ -268,6 +274,7 @@
             codeWrap,
             userFullWidth,
             messageFontSize: normalizeFontSize(source.messageFontSize),
+            uiLanguage: normalizeUiLanguage(source.uiLanguage),
             ...density
         };
     }
@@ -289,6 +296,7 @@
         deriveDensityFromCompactness,
         normalizeDensity,
         normalizeFontSize,
+        normalizeUiLanguage,
         getRangeForUnit,
         getWidthCssValue,
         getLegacyChatWidth

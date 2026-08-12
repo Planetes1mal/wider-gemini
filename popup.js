@@ -1,3 +1,34 @@
+let i18nDictionary = null;
+
+// 三级回退：手动语言字典 → chrome.i18n（浏览器语言）→ 硬编码兜底
+function t(id, fallback) {
+    if (i18nDictionary && typeof i18nDictionary[id] === 'string') {
+        return i18nDictionary[id];
+    }
+    const msg = chrome.i18n.getMessage(id);
+    return (msg || fallback || '');
+}
+
+// 手动覆盖语言时预加载对应 messages.json；auto 模式清空字典
+function loadLanguageDictionary(language) {
+    if (language === 'auto') {
+        i18nDictionary = null;
+        return Promise.resolve();
+    }
+    return fetch(chrome.runtime.getURL(`_locales/${language}/messages.json`))
+        .then(res => res.json())
+        .then(data => {
+            i18nDictionary = {};
+            Object.keys(data).forEach(key => {
+                i18nDictionary[key] = data[key].message;
+            });
+        })
+        .catch(err => {
+            console.error('[Wider Gemini] Failed to load language dictionary:', language, err);
+            i18nDictionary = null;
+        });
+}
+
 function localizeHtmlPage() {
     const ids = [
         "appName", "headerSubtitle", "widthLabel", "widthMin", "widthMax",
@@ -8,13 +39,14 @@ function localizeHtmlPage() {
         "widthUnit", "densityLabel", "compactnessUnit", "advancedDensity",
         "lineHeightLabel", "paragraphSpacingLabel", "resetDensity",
         "fontSizeLabel", "resetFontSize",
-        "customSpacing", "autoSpacing"
+        "customSpacing", "autoSpacing",
+        "uiLanguageLabel", "uiLanguageAuto"
     ];
 
     ids.forEach(id => {
         const element = document.getElementById("i18n-" + id);
         if (element) {
-            element.textContent = chrome.i18n.getMessage(id);
+            element.textContent = t(id);
         }
     });
 }
@@ -31,7 +63,7 @@ const PERCENT_RANGE_MAX = settingsUtils.PERCENT_RANGE.max;
 const PRESET_ICONS = ['S', 'D', 'W', 'U', 'M'];
 
 function getPresetName(preset) {
-    return preset.name || (preset.nameKey ? chrome.i18n.getMessage(preset.nameKey) : '');
+    return preset.name || (preset.nameKey ? t(preset.nameKey) : '');
 }
 
 function formatWidthValue(setting) {
@@ -162,7 +194,7 @@ function showClampedHint() {
         el.className = 'clamped-hint';
         document.getElementById('presetButtonsContainer').appendChild(el);
     }
-    el.textContent = chrome.i18n.getMessage('clampedHint') || '已限制在范围内';
+    el.textContent = t('clampedHint', '已限制在范围内');
     el.classList.add('show');
     clearTimeout(showClampedHint._tid);
     showClampedHint._tid = setTimeout(() => el.classList.remove('show'), 2500);
@@ -188,7 +220,7 @@ function saveManagePresetsFromRows() {
     setPresetGroup(currentWidthSetting.unit, nextPresets);
     chrome.storage.sync.set(getPresetStoragePayload());
     renderPresetsForMode(nextPresets);
-    document.getElementById('managePresetsSummary').textContent = chrome.i18n.getMessage('managePresetsSummary') || '已自定义 5 个预设';
+    document.getElementById('managePresetsSummary').textContent = t('managePresetsSummary', '已自定义 5 个预设');
 }
 
 function renderManagePresetsRows(presets) {
@@ -198,7 +230,7 @@ function renderManagePresetsRows(presets) {
     (presets || currentPresets).forEach((preset, i) => {
         const row = document.createElement('div');
         row.className = 'manage-row';
-        const defaultName = chrome.i18n.getMessage(preset.nameKey || DEFAULTS.presets[i].nameKey) || '';
+        const defaultName = t(preset.nameKey || DEFAULTS.presets[i].nameKey, '');
         const displayName = preset.name != null && preset.name !== '' ? preset.name : defaultName;
         const range = settingsUtils.getRangeForUnit({
             widthMin: currentWidthMin,
@@ -210,7 +242,7 @@ function renderManagePresetsRows(presets) {
             <input type="text" class="manage-name" value="${displayName.replace(/"/g, '&quot;')}" placeholder="${defaultName}" data-index="${i}">
             <input type="number" class="manage-width" value="${preset.value}" min="${range.min}" max="${range.max}" step="${range.step}" data-index="${i}">
             <span class="manage-unit" data-index="${i}">${getUnitLabel(currentWidthSetting.unit)}</span>
-            <button type="button" class="secondary-btn reset-preset-btn" data-index="${i}">${chrome.i18n.getMessage('resetToDefault') || '重置为默认'}</button>
+            <button type="button" class="secondary-btn reset-preset-btn" data-index="${i}">${t('resetToDefault', '重置为默认')}</button>
         `;
         const nameInput = row.querySelector('.manage-name');
         const widthInput = row.querySelector('.manage-width');
@@ -233,13 +265,13 @@ function renderManagePresetsRows(presets) {
         row.querySelector('.reset-preset-btn').addEventListener('click', function () {
             const def = DEFAULTS.presets[i];
             const unitDefault = settingsUtils.getDefaultPresetsForUnit(currentWidthSetting.unit)[i] || def;
-            nameInput.value = chrome.i18n.getMessage(def.nameKey) || '';
+            nameInput.value = t(def.nameKey, '');
             widthInput.value = unitDefault.value;
             save();
         });
         container.appendChild(row);
     });
-    document.getElementById('managePresetsSummary').textContent = chrome.i18n.getMessage('managePresetsSummary') || '已自定义 5 个预设';
+    document.getElementById('managePresetsSummary').textContent = t('managePresetsSummary', '已自定义 5 个预设');
 }
 
 const managePresetsToggle = document.getElementById('managePresetsToggle');
@@ -285,6 +317,7 @@ const codeWrapToggle = document.getElementById('codeWrapToggle');
 const codeWrapStatus = document.getElementById('codeWrapStatus');
 const userFullWidthToggle = document.getElementById('userFullWidthToggle');
 const userFullWidthStatus = document.getElementById('userFullWidthStatus');
+const uiLanguageSelect = document.getElementById('uiLanguageSelect');
 const refreshNotice = document.getElementById('refreshNotice');
 
 let widthUpdateTimer = null;
@@ -380,8 +413,8 @@ function applyFontSizeUi(settings) {
 }
 
 function updateDensitySummary() {
-    const custom = chrome.i18n.getMessage('customSpacing') || 'Custom';
-    const auto = chrome.i18n.getMessage('autoSpacing') || 'Auto';
+    const custom = t('customSpacing', 'Custom');
+    const auto = t('autoSpacing', 'Auto');
     densitySummary.textContent = currentDensity.messageSpacingCustom ? custom : auto;
 }
 
@@ -400,7 +433,8 @@ chrome.storage.sync.get([
     'messageLineHeight',
     'messageParagraphSpacing',
     'messageSpacingCustom',
-    'messageFontSize'
+    'messageFontSize',
+    'uiLanguage'
 ], function (result) {
     const settings = normalizeStorage(result);
     const needsWrite = (
@@ -424,19 +458,26 @@ chrome.storage.sync.get([
             messageLineHeight: settings.messageLineHeight,
             messageParagraphSpacing: settings.messageParagraphSpacing,
             messageSpacingCustom: settings.messageSpacingCustom,
-            messageFontSize: settings.messageFontSize
+            messageFontSize: settings.messageFontSize,
+            uiLanguage: settings.uiLanguage
         });
     }
 
-    currentPresetsByUnit = settings.presetsByUnit;
-    currentPresets = getPresetGroup(settings.chatWidthSetting.unit);
-    applyWidthUi(settings);
-    applyDensityUi(settings);
-    applyFontSizeUi(settings);
-    codeWrapToggle.checked = settings.codeWrap;
-    updateCodeWrapStatus(settings.codeWrap);
-    userFullWidthToggle.checked = settings.userFullWidth;
-    updateUserFullWidthStatus(settings.userFullWidth);
+    uiLanguageSelect.value = settings.uiLanguage;
+
+    // 手动语言覆盖时预加载字典，随后重新本地化静态文案与动态文案
+    loadLanguageDictionary(settings.uiLanguage).then(function () {
+        localizeHtmlPage();
+        currentPresetsByUnit = settings.presetsByUnit;
+        currentPresets = getPresetGroup(settings.chatWidthSetting.unit);
+        applyWidthUi(settings);
+        applyDensityUi(settings);
+        applyFontSizeUi(settings);
+        codeWrapToggle.checked = settings.codeWrap;
+        updateCodeWrapStatus(settings.codeWrap);
+        userFullWidthToggle.checked = settings.userFullWidth;
+        updateUserFullWidthStatus(settings.userFullWidth);
+    });
 });
 
 function onRangeInput(isMin) {
@@ -672,15 +713,23 @@ userFullWidthToggle.addEventListener('change', function () {
     updateUserFullWidth(enabled);
 });
 
+uiLanguageSelect.addEventListener('change', function () {
+    const language = settingsUtils.normalizeUiLanguage(this.value);
+    chrome.storage.sync.set({ uiLanguage: language }, function () {
+        // 重新加载 popup 以全量重渲染新语言
+        window.location.reload();
+    });
+});
+
 function updateCodeWrapStatus(enabled) {
-    const statusOn = chrome.i18n.getMessage("statusOn");
-    const statusOff = chrome.i18n.getMessage("statusOff");
+    const statusOn = t("statusOn", "On");
+    const statusOff = t("statusOff", "Off");
     codeWrapStatus.textContent = enabled ? statusOn : statusOff;
 }
 
 function updateUserFullWidthStatus(enabled) {
-    const statusOn = chrome.i18n.getMessage("statusOn");
-    const statusOff = chrome.i18n.getMessage("statusOff");
+    const statusOn = t("statusOn", "On");
+    const statusOff = t("statusOff", "Off");
     userFullWidthStatus.textContent = enabled ? statusOn : statusOff;
 }
 

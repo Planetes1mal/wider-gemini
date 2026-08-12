@@ -3,7 +3,7 @@
     "name": "__MSG_appName__",
     "version": "2.3.0",
     "description": "__MSG_appDesc__",
-    "default_locale": "zh_CN",
+    "default_locale": "en",
     "author": "Wider Gemini",
     "permissions": [
         "storage"

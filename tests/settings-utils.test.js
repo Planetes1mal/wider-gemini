@@ -160,4 +160,15 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(utils.normalizeStorage({ messageFontSize: 999 }).messageFontSize, 200);
 }
 
+{
+    assert.strictEqual(utils.normalizeUiLanguage(undefined), 'auto');
+    assert.strictEqual(utils.normalizeUiLanguage('auto'), 'auto');
+    assert.strictEqual(utils.normalizeUiLanguage('en'), 'en');
+    assert.strictEqual(utils.normalizeUiLanguage('zh_CN'), 'zh_CN');
+    assert.strictEqual(utils.normalizeUiLanguage('fr'), 'auto');
+    assert.strictEqual(utils.normalizeStorage({}).uiLanguage, 'auto');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'en' }).uiLanguage, 'en');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'ja' }).uiLanguage, 'auto');
+}
+
 console.log('settings-utils tests passed');

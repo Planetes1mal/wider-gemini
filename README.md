@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -35,11 +35,13 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 - **Wider chat column** — Control the main conversation width with a slider (within a configurable range) or one-click presets.
 - **Responsive width units** — Use fixed pixels or viewport percentages so Gemini can adapt to the current tab width.
 - **Reading density controls** — Tune compactness, line height, and paragraph spacing for denser large-screen reading.
+- **Font size control** — Scale message text, headings, and code from 75% to 200% without zooming the whole page.
+- **UI language** — Follow your browser language (English fallback for other locales) or manually switch the popup between English and Chinese.
 - **User message full width** — Optional toggle to make user messages fill the conversation width and left-align (matching AI responses) instead of shrinking into a right-aligned bubble.
 - **Separate editable presets** — Keep separate preset values for `px` and `%`, edit preset labels and values, or reset them to defaults.
 - **Code block wrapping** — Optional wrapping so long code lines do not require horizontal scrolling.
 - **Auto-refresh** — Optionally reload open Gemini tabs after you change settings so they pick up new values immediately.
-- **Persistent settings** — Width unit, width value, reading density, wrap preference, range, and presets are saved for the next session.
+- **Persistent settings** — Width unit, width value, reading density, font size, language, wrap preference, range, and presets are saved for the next session.
 
 ## Requirements
 
@@ -83,6 +85,10 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 Toggle **user message full width** to make your messages fill the conversation width and left-align like the AI responses.
 
 Use **Reading density** to adjust compactness, or expand **Advanced spacing** to tune line height and paragraph spacing.
+
+Use **Font size** to scale message text between 75% and 200% (100% keeps Gemini's native size).
+
+Use the **Language** section at the bottom to switch the popup between following your system language, English, and Chinese.
 
 5. Set **min / max width** in the range fields to change the slider span (defaults align with the extension’s supported range).
 6. Expand **Manage presets** to customize preset labels and values for the currently selected unit. `px` and `%` presets are stored separately.

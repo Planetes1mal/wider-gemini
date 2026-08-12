@@ -4,6 +4,14 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## x.y.z` section when a `vX.Y.Z` tag is pushed.
 
+## 2.4.0 (2026-08-12)
+
+### Features
+
+- Added a **Font size** control (75–200%) that scales message text, user messages, headings, and code proportionally without zooming the whole page.
+
+- Added a **UI language** setting — the popup follows your browser language with an English fallback for non-Chinese and non-English locales, and you can manually switch between English and Chinese (or back to follow-system).
+
 ## 2.3.0 (2026-06-21)
 
 ### Features

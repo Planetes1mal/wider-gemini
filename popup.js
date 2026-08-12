@@ -7,7 +7,7 @@ function localizeHtmlPage() {
         "userFullWidthLabel",
         "widthUnit", "densityLabel", "compactnessUnit", "advancedDensity",
         "lineHeightLabel", "paragraphSpacingLabel", "resetDensity",
-        "fontSizeLabel",
+        "fontSizeLabel", "resetFontSize",
         "customSpacing", "autoSpacing"
     ];
 
@@ -279,6 +279,7 @@ const paragraphSpacingSlider = document.getElementById('paragraphSpacingSlider')
 const paragraphSpacingValue = document.getElementById('paragraphSpacingValue');
 const fontSizeSlider = document.getElementById('fontSizeSlider');
 const fontSizeValue = document.getElementById('fontSizeValue');
+const resetFontSizeBtn = document.getElementById('resetFontSizeBtn');
 const resetDensityBtn = document.getElementById('resetDensityBtn');
 const codeWrapToggle = document.getElementById('codeWrapToggle');
 const codeWrapStatus = document.getElementById('codeWrapStatus');
@@ -639,6 +640,14 @@ fontSizeSlider.addEventListener('input', function () {
     densityUpdateTimer = setTimeout(() => {
         updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
     }, 500);
+});
+
+resetFontSizeBtn.addEventListener('click', function () {
+    currentFontSize = settingsUtils.DEFAULTS.messageFontSize;
+    fontSizeSlider.value = currentFontSize;
+    fontSizeValue.textContent = currentFontSize;
+    syncRangeProgress(fontSizeSlider);
+    updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
 });
 
 resetDensityBtn.addEventListener('click', function () {

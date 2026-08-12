@@ -95,6 +95,9 @@
   "fontSizeLabel": {
     "message": "Font size"
   },
+  "resetFontSize": {
+    "message": "Reset font size"
+  },
   "resetDensity": {
     "message": "Reset spacing"
   },

@@ -95,6 +95,9 @@
   "fontSizeLabel": {
     "message": "字号"
   },
+  "resetFontSize": {
+    "message": "重置字号"
+  },
   "resetDensity": {
     "message": "重置间距"
   },

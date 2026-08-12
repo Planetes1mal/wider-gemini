@@ -16,13 +16,13 @@ const css = fs.readFileSync(cssPath, 'utf8');
 });
 
 assert.ok(
-    css.includes('row-gap: var(--gemini-message-paragraph-spacing) !important;'),
-    'markdown container row-gap must use paragraph spacing'
+    css.includes('margin-top: var(--gemini-message-paragraph-spacing) !important;'),
+    'paragraph spacing must use adjacent-sibling margins (gap is inert on block containers)'
 );
 
 assert.ok(
-    css.includes('gap: var(--gemini-message-paragraph-spacing) !important;'),
-    'markdown container gap must use paragraph spacing'
+    css.includes('margin-bottom: 0 !important;'),
+    'markdown block children margins must be reset'
 );
 
 [
@@ -62,6 +62,26 @@ assert.ok(
 assert.ok(
     css.includes('font-size: var(--gemini-message-inline-code-font-size) !important;'),
     'inline code font-size must use the inline code var'
+);
+
+// 标题/引用块行高：Gemini 原生行高为 rem 固定值，字号放大后会挤压，
+// 必须覆盖为固定比例（实测 36/28、28/24、24/20）或跟随正文变量
+[
+    'line-height: 1.2857 !important;',
+    'line-height: 1.1667 !important;',
+    'line-height: 1.2 !important;'
+].forEach(decl => {
+    assert.ok(css.includes(decl), `missing heading line-height ratio: ${decl}`);
+});
+
+assert.ok(
+    css.includes('body.wider-gemini-density-enabled model-response .markdown blockquote'),
+    'blockquote line-height selector must exist'
+);
+
+assert.ok(
+    css.includes('body.wider-gemini-density-enabled model-response .markdown > * + *'),
+    'adjacent-sibling margin selector must exist'
 );
 
 console.log('gemini-content CSS tests passed');

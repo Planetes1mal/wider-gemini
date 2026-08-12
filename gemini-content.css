@@ -217,7 +217,9 @@ body.wider-gemini-density-enabled [data-message-author-role="user"] .gds-body-l 
     font-size: var(--gemini-message-font-size) !important;
 }
 
-/* 标题字号：仅限聊天消息容器，避免影响 Notebook 等页面 */
+/* 标题字号：仅限聊天消息容器，避免影响 Notebook 等页面。
+   行高为固定比例（原生 36/28px、28/24px、24/20px，2026-08 实测），
+   Gemini 原生行高是 rem 固定值，字号放大后若不覆盖会挤压重叠 */
 body.wider-gemini-density-enabled model-response .markdown h1,
 body.wider-gemini-density-enabled model-response .markdown-main-panel h1,
 body.wider-gemini-density-enabled .model-response .markdown h1,
@@ -235,6 +237,7 @@ body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-m
 body.wider-gemini-density-enabled message-content .markdown h1,
 body.wider-gemini-density-enabled message-content .markdown-main-panel h1 {
     font-size: var(--gemini-message-h1-font-size) !important;
+    line-height: 1.2857 !important;
 }
 
 body.wider-gemini-density-enabled model-response .markdown h2,
@@ -254,6 +257,7 @@ body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-m
 body.wider-gemini-density-enabled message-content .markdown h2,
 body.wider-gemini-density-enabled message-content .markdown-main-panel h2 {
     font-size: var(--gemini-message-h2-font-size) !important;
+    line-height: 1.1667 !important;
 }
 
 body.wider-gemini-density-enabled model-response .markdown h3,
@@ -321,24 +325,27 @@ body.wider-gemini-density-enabled message-content .markdown-main-panel h4,
 body.wider-gemini-density-enabled message-content .markdown-main-panel h5,
 body.wider-gemini-density-enabled message-content .markdown-main-panel h6 {
     font-size: var(--gemini-message-h3-font-size) !important;
+    line-height: 1.2 !important;
 }
 
-body.wider-gemini-density-enabled model-response .markdown,
-body.wider-gemini-density-enabled model-response .markdown-main-panel,
-body.wider-gemini-density-enabled .model-response .markdown,
-body.wider-gemini-density-enabled .model-response .markdown-main-panel,
-body.wider-gemini-density-enabled response-container .markdown,
-body.wider-gemini-density-enabled response-container .markdown-main-panel,
-body.wider-gemini-density-enabled .response-container .markdown,
-body.wider-gemini-density-enabled .response-container .markdown-main-panel,
-body.wider-gemini-density-enabled .presented-response-container .markdown,
-body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel,
-body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown,
-body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel,
-body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown,
-body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel {
-    gap: var(--gemini-message-paragraph-spacing) !important;
-    row-gap: var(--gemini-message-paragraph-spacing) !important;
+/* 引用块行高跟随正文设置（原生 24px/17px ≈ 1.41） */
+body.wider-gemini-density-enabled model-response .markdown blockquote,
+body.wider-gemini-density-enabled model-response .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled .model-response .markdown blockquote,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled response-container .markdown blockquote,
+body.wider-gemini-density-enabled response-container .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled .response-container .markdown blockquote,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled .presented-response-container .markdown blockquote,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown blockquote,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown blockquote,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel blockquote,
+body.wider-gemini-density-enabled message-content .markdown blockquote,
+body.wider-gemini-density-enabled message-content .markdown-main-panel blockquote {
+    line-height: var(--gemini-message-line-height) !important;
 }
 
 body.wider-gemini-density-enabled model-response .markdown > *,
@@ -359,6 +366,25 @@ body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-m
     margin-bottom: 0 !important;
 }
 
+/* 段落间距：gap 在 block 容器上不生效（2026-08 实测 .markdown 为 block），
+   改用相邻兄弟 margin；此规则须位于上面的重置规则之后 */
+body.wider-gemini-density-enabled model-response .markdown > * + *,
+body.wider-gemini-density-enabled model-response .markdown-main-panel > * + *,
+body.wider-gemini-density-enabled .model-response .markdown > * + *,
+body.wider-gemini-density-enabled .model-response .markdown-main-panel > * + *,
+body.wider-gemini-density-enabled response-container .markdown > * + *,
+body.wider-gemini-density-enabled response-container .markdown-main-panel > * + *,
+body.wider-gemini-density-enabled .response-container .markdown > * + *,
+body.wider-gemini-density-enabled .response-container .markdown-main-panel > * + *,
+body.wider-gemini-density-enabled .presented-response-container .markdown > * + *,
+body.wider-gemini-density-enabled .presented-response-container .markdown-main-panel > * + *,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown > * + *,
+body.wider-gemini-density-enabled [data-message-author-role="assistant"] .markdown-main-panel > * + *,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown > * + *,
+body.wider-gemini-density-enabled [data-message-author-role="model"] .markdown-main-panel > * + * {
+    margin-top: var(--gemini-message-paragraph-spacing) !important;
+}
+
 body.wider-gemini-density-enabled model-response p,
 body.wider-gemini-density-enabled model-response .markdown p,
 body.wider-gemini-density-enabled message-content p,
@@ -367,7 +393,6 @@ body.wider-gemini-density-enabled .presented-response-container p,
 body.wider-gemini-density-enabled user-query p,
 body.wider-gemini-density-enabled user-query-content p {
     line-height: var(--gemini-message-line-height) !important;
-    margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
 
@@ -400,10 +425,7 @@ body.wider-gemini-density-enabled .response-container ul,
 body.wider-gemini-density-enabled .response-container ol,
 body.wider-gemini-density-enabled .presented-response-container ul,
 body.wider-gemini-density-enabled .presented-response-container ol {
-    margin-top: 0 !important;
     margin-bottom: 0 !important;
-    gap: var(--gemini-message-paragraph-spacing) !important;
-    row-gap: var(--gemini-message-paragraph-spacing) !important;
 }
 
 body.wider-gemini-density-enabled model-response td,

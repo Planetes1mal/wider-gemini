@@ -2,7 +2,7 @@
 
 # Wider Gemini
 
-[![版本](https://img.shields.io/badge/version-2.4.0-blue.svg)](#)
+[![版本](https://img.shields.io/badge/version-2.5.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![平台](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![许可证：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -40,7 +40,7 @@
 - **用户消息铺满宽度** — 可选开关，让用户消息铺满对话区宽度并左对齐（与 AI 回答一致），而不是收缩成靠右的小气泡。
 - **分单位编辑预设** — `px` 与 `%` 使用独立预设，可编辑预设名称和数值，也可重置为默认值。
 - **代码块换行** — 可选开启，长代码行无需横向滚动。
-- **自动刷新** — 可选在修改设置后刷新已打开的 Gemini 标签页，使新设置立即生效。
+- **实时生效** — 修改设置后立即应用到所有已打开的 Gemini 标签页和已安装的应用窗口，无需刷新；仅当页面收不到消息时才回退为刷新该页面。
 - **设置持久化** — 宽度单位、宽度数值、阅读密度、字号、界面语言、换行、范围与预设会在下次使用时恢复。
 
 ## 环境要求
@@ -110,6 +110,7 @@
 | `manifest.json` | 扩展清单（MV3） |
 | `settings-utils.js` | 弹窗与内容脚本共用的设置规范化逻辑 |
 | `gemini-content.js`、`gemini-content.css` | 注入 `gemini.google.com` 的内容脚本 |
+| `background.js` | Service worker：给先于扩展加载的 Gemini 页面（PWA 冷启动、安装/更新时）补注入内容脚本 |
 | `popup.html`、`popup.js`、`popup.css` | 工具栏弹窗 |
 | `_locales/` | 国际化（`en`、`zh_CN`） |
 | `icons/` | 图标资源 |

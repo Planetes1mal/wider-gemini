@@ -19,3 +19,5 @@ CONTEXT.md
 .superpowers/
 icons/宣传图/
 icons/宣传图/**
+tests/**
+tests/

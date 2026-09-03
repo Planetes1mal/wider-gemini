@@ -23,6 +23,7 @@ copy popup.css "%TEMP_DIR%\" >nul
 copy settings-utils.js "%TEMP_DIR%\" >nul
 copy gemini-content.js "%TEMP_DIR%\" >nul
 copy gemini-content.css "%TEMP_DIR%\" >nul
+copy background.js "%TEMP_DIR%\" >nul
 copy LICENSE "%TEMP_DIR%\" >nul
 
 REM Copy icon directory

@@ -1,6 +1,11 @@
 (function () {
     'use strict';
 
+    // 浏览器启动时（如 PWA 冷启动）Gemini 页面可能先于扩展加载而错过声明式注入，
+    // 由 background.js 补注入本脚本；若本页已注入过则直接跳过，避免重复初始化。
+    if (window.widerGeminiContentLoaded) return;
+    window.widerGeminiContentLoaded = true;
+
     function isExtensionContextValid() {
         try {
             return chrome.runtime && chrome.runtime.id;
@@ -12,6 +17,7 @@
     const settingsUtils = window.widerGeminiSettings;
     const defaultNormalizedSettings = settingsUtils.normalizeStorage({});
     let currentRangeSettings = defaultNormalizedSettings;
+    let isInitialized = false;
 
     // Gemini 原生字号（2026-08 实测，正文基准 17px）；按字号比例缩放为像素值
     const NATIVE_FONT_SIZES = {
@@ -298,6 +304,10 @@
     }
 
     function init() {
+        // DOMContentLoaded 与 load 都会触发 init，只初始化一次
+        if (isInitialized) return;
+        isInitialized = true;
+
         applySettings();
         observeUrlChanges();
 

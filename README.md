@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -40,7 +40,7 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 - **User message full width** — Optional toggle to make user messages fill the conversation width and left-align (matching AI responses) instead of shrinking into a right-aligned bubble.
 - **Separate editable presets** — Keep separate preset values for `px` and `%`, edit preset labels and values, or reset them to defaults.
 - **Code block wrapping** — Optional wrapping so long code lines do not require horizontal scrolling.
-- **Auto-refresh** — Optionally reload open Gemini tabs after you change settings so they pick up new values immediately.
+- **Live updates** — Changes apply immediately to every open Gemini tab and installed app window without reloading; a tab is only reloaded as a fallback when it cannot be reached.
 - **Persistent settings** — Width unit, width value, reading density, font size, language, wrap preference, range, and presets are saved for the next session.
 
 ## Requirements
@@ -110,6 +110,7 @@ On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug`
 | `manifest.json` | Extension manifest (MV3) |
 | `settings-utils.js` | Shared settings normalization for popup and content scripts |
 | `gemini-content.js`, `gemini-content.css` | Content script on `gemini.google.com` |
+| `background.js` | Service worker that re-injects the content script into Gemini pages opened before the extension loaded (PWA cold start, install/update) |
 | `popup.html`, `popup.js`, `popup.css` | Toolbar popup |
 | `_locales/` | i18n (`en`, `zh_CN`) |
 | `icons/` | Toolbar and store icons |

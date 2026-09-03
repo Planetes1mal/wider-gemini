@@ -4,6 +4,22 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## x.y.z` section when a `vX.Y.Z` tag is pushed.
 
+## 2.5.0 (2026-09-03)
+
+### Features
+
+- Settings changes now apply live in every open Gemini tab and installed app window instead of reloading each tab after every change. A tab is only reloaded as a fallback when it cannot receive the update.
+
+### Fixes
+
+- Fixed the extension not applying when Gemini is opened as an installed Chrome app (PWA) until the page is refreshed. At browser startup the Gemini window can finish loading before the extension does, so it never received the content script; a new background service worker now injects it into any Gemini page that is already open when the extension starts, installs, or updates.
+
+- Fixed the content script initializing twice on every page load (both `DOMContentLoaded` and `load` triggered it), which attached duplicate observers and drag listeners.
+
+### Other
+
+- Added the `scripting` permission and an explicit host permission for `gemini.google.com` for the startup re-injection. The host was already covered by the content script, so this does not add a new permission warning.
+
 ## 2.4.0 (2026-08-12)
 
 ### Features

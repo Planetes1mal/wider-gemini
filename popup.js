@@ -340,10 +340,6 @@ function showRefreshNotice() {
     }, 2000);
 }
 
-function hideRefreshNotice() {
-    refreshNotice.classList.remove('show');
-}
-
 function syncRangeProgress(input) {
     if (!input) return;
     const min = parseFloat(input.min) || 0;
@@ -733,6 +729,21 @@ function updateUserFullWidthStatus(enabled) {
     userFullWidthStatus.textContent = enabled ? statusOn : statusOff;
 }
 
+// 把设置变更实时推送给所有 Gemini 页面（含已安装的应用窗口）；
+// 只有页面收不到消息（内容脚本不在）时才回退为刷新该页面
+function notifyGeminiTabs(message) {
+    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
+        tabs.forEach(tab => {
+            if (tab.discarded) return;
+
+            chrome.tabs.sendMessage(tab.id, message).catch(() => {
+                showRefreshNotice();
+                chrome.tabs.reload(tab.id);
+            });
+        });
+    });
+}
+
 function updateWidthSetting(setting) {
     const normalized = settingsUtils.normalizeWidthSetting(setting, {
         widthMin: currentWidthMin,
@@ -746,32 +757,16 @@ function updateWidthSetting(setting) {
         chatWidthSetting: normalized,
         chatWidth: settingsUtils.getLegacyChatWidth(normalized)
     });
-    showRefreshNotice();
 
-    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
-        if (tabs.length === 0) {
-            hideRefreshNotice();
-            return;
+    notifyGeminiTabs({
+        action: 'updateWidthSetting',
+        setting: normalized,
+        ranges: {
+            widthMin: currentWidthMin,
+            widthMax: currentWidthMax,
+            widthPercentMin: currentWidthPercentMin,
+            widthPercentMax: currentWidthPercentMax
         }
-
-        tabs.forEach(tab => {
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'updateWidthSetting',
-                setting: normalized,
-                ranges: {
-                    widthMin: currentWidthMin,
-                    widthMax: currentWidthMax,
-                    widthPercentMin: currentWidthPercentMin,
-                    widthPercentMax: currentWidthPercentMax
-                }
-            }).catch(err => {
-                // Ignore error
-            });
-
-            setTimeout(() => {
-                chrome.tabs.reload(tab.id);
-            }, 100);
-        });
     });
 }
 
@@ -780,75 +775,27 @@ function updateDensity(settings) {
     const fontSize = settingsUtils.normalizeFontSize(settings.messageFontSize);
     const payload = { ...normalized, messageFontSize: fontSize };
     chrome.storage.sync.set(payload);
-    showRefreshNotice();
 
-    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
-        if (tabs.length === 0) {
-            hideRefreshNotice();
-            return;
-        }
-
-        tabs.forEach(tab => {
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'updateDensity',
-                settings: payload
-            }).catch(err => {
-                // Ignore error
-            });
-
-            setTimeout(() => {
-                chrome.tabs.reload(tab.id);
-            }, 100);
-        });
+    notifyGeminiTabs({
+        action: 'updateDensity',
+        settings: payload
     });
 }
 
 function updateCodeWrap(enabled) {
     chrome.storage.sync.set({ codeWrap: enabled });
-    showRefreshNotice();
 
-    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
-        if (tabs.length === 0) {
-            hideRefreshNotice();
-            return;
-        }
-
-        tabs.forEach(tab => {
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'updateCodeWrap',
-                enabled: enabled
-            }).catch(err => {
-                // Ignore error
-            });
-
-            setTimeout(() => {
-                chrome.tabs.reload(tab.id);
-            }, 100);
-        });
+    notifyGeminiTabs({
+        action: 'updateCodeWrap',
+        enabled: enabled
     });
 }
 
 function updateUserFullWidth(enabled) {
     chrome.storage.sync.set({ userFullWidth: enabled });
-    showRefreshNotice();
 
-    chrome.tabs.query({ url: 'https://gemini.google.com/*' }, function (tabs) {
-        if (tabs.length === 0) {
-            hideRefreshNotice();
-            return;
-        }
-
-        tabs.forEach(tab => {
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'updateUserFullWidth',
-                enabled: enabled
-            }).catch(err => {
-                // Ignore error
-            });
-
-            setTimeout(() => {
-                chrome.tabs.reload(tab.id);
-            }, 100);
-        });
+    notifyGeminiTabs({
+        action: 'updateUserFullWidth',
+        enabled: enabled
     });
 }

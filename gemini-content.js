@@ -30,8 +30,8 @@
     };
 
     const css_config = [
-        { key: '.conversation-container', value: 'max-width: {width}', sleep: 0 },
-        { key: '.conversation-container user-query', value: 'max-width: 100%', sleep: 0 },
+        { key: '.conversation-container, conversation-container', value: 'max-width: {width}', sleep: 0 },
+        { key: '.conversation-container user-query, conversation-container user-query', value: 'max-width: 100%', sleep: 0 },
         { key: 'input-container .input-area-container', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
         { key: 'input-container input-area-v2', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
         { key: '.chat-container', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
@@ -325,11 +325,12 @@
                                 classList.contains('input-area-container') ||
                                 classList.contains('upload-card') ||
                                 classList.contains('file-drop-area') ||
+                                tagName === 'conversation-container' ||
                                 tagName === 'user-query' ||
                                 tagName === 'input-container' ||
                                 tagName === 'upload-card' ||
                                 tagName === 'file-drop-area' ||
-                                node.querySelector?.('.conversation-container') ||
+                                node.querySelector?.('.conversation-container, conversation-container') ||
                                 node.querySelector?.('user-query') ||
                                 node.querySelector?.('.input-area-container') ||
                                 node.querySelector?.('upload-card') ||

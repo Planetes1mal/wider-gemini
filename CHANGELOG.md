@@ -2,7 +2,25 @@
 
 All notable changes to Wider Gemini are documented in this file.
 
-Release notes on GitHub are generated from the matching `## x.y.z` section when a `vX.Y.Z` tag is pushed.
+Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
+
+## 2.6.0-rc.1 (2026-09-08)
+
+### Fixes
+
+- Fixed width overrides missing deeply nested reply containers. Layout containers leading to `message-content` and reply text now follow the conversation width while preserving native sizing for images, buttons, and cards. Dialogs and menus, including nested overlays, are excluded from these new rules.
+
+- Added support for the `<conversation-container>` custom element alongside the existing `.conversation-container` class, including width adjustment, user message full width, dynamically inserted conversations, and chat-page layout detection.
+
+### Other
+
+- Prepared a release candidate for macOS layout reports. All four existing unit-test scripts and 73 synthetic browser layout cases passed. Candidate CSS was also checked on a live Windows Gemini page for pixel/percentage width updates and unchanged Drive picker dimensions. Confirmation from the affected macOS users is still pending; these checks do not establish that all reported macOS failures are resolved.
+
+- Added shared PowerShell packaging for local use and GitHub Actions, with prerelease tag/version validation and candidate ZIP names. The candidate uses manifest `version` `2.6.0` and `version_name` `2.6.0-rc.1`; its tag is `v2.6.0-rc.1` and its package is `wider-gemini-2.6.0-rc.1.zip`. Candidate releases are marked as prereleases without replacing the latest stable release.
+
+- Verified RC/stable packaging with 15 checks on both Windows PowerShell 5.1 and PowerShell 7, including exact changelog extraction and ZIP contents. The extracted candidate ZIP also loaded successfully in real headless Chrome with its version, localization, and popup verified.
+
+- Documented manual candidate installation and retesting. Chrome Web Store remains on stable `2.5.0`; disable that installation while testing the candidate. Chrome does not use `version_name` for upgrades, so unpacked candidate users must manually replace/reload files or switch back to the store installation.
 
 ## 2.5.0 (2026-09-03)
 

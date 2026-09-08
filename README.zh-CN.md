@@ -2,14 +2,16 @@
 
 # Wider Gemini
 
-[![版本](https://img.shields.io/badge/version-2.5.0-blue.svg)](#)
-[![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
+[![版本](https://img.shields.io/badge/version-2.6.0--rc.1-orange.svg)](#)
+[![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=stable)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![平台](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![许可证：MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > **🎉 现已上架 Chrome 应用商店！**  
 > 从 [Chrome 应用商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed) 获取  
 > **离线 / 手动安装：** 安装包见 [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases)
+
+当前源码为 **2.6.0-rc.1** 候选版，用于测试 Gemini 布局兼容性。Chrome 应用商店仍为 **2.5.0** 稳定版，尚待受影响的 macOS 用户确认效果。
 
 让 Google Gemini 的对话界面更宽，支持自定义宽度滑块和预设按钮。
 
@@ -23,6 +25,7 @@
     - [Chrome 应用商店（推荐）](#chrome-应用商店推荐)
     - [GitHub Releases](#github-releases)
     - [从源码安装](#从源码安装)
+    - [测试 2.6.0-rc.1](#测试-260-rc1)
   - [使用说明](#使用说明)
   - [开发](#开发)
   - [仓库结构](#仓库结构)
@@ -57,7 +60,7 @@
 
 ### GitHub Releases
 
-1. 打开 [Releases](https://github.com/Planetes1mal/wider-gemini/releases)，在 **Assets** 中下载最新的 `wider-gemini-*.zip`。
+1. 打开 [Releases](https://github.com/Planetes1mal/wider-gemini/releases)，选择最新稳定版，在 **Assets** 中下载 `wider-gemini-*.zip`。标有 **Pre-release** 的版本用于测试。
 2. 解压；文件夹根目录须包含 `manifest.json`。
 3. 访问 `chrome://extensions/`，开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择该文件夹。
 
@@ -65,6 +68,17 @@
 
 1. 克隆本仓库，或在 GitHub 上下载仓库源码 ZIP。
 2. 访问 `chrome://extensions/`，开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择仓库根目录（含 `manifest.json` 的文件夹）。
+
+### 测试 2.6.0-rc.1
+
+此候选版处理 Gemini 深层回复容器的内部限宽，并补充 `<conversation-container>` 标签支持；尚不能确认已解决全部 macOS 反馈。
+
+1. 按[开发说明](#开发)打包当前源码；如果该候选版已发布，也可从 [Releases](https://github.com/Planetes1mal/wider-gemini/releases) 下载 `wider-gemini-2.6.0-rc.1.zip`。
+2. 在 `chrome://extensions/` 中停用商店安装的 Wider Gemini 及其他修改 Gemini 样式的扩展。解压候选版，开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择含 `manifest.json` 的文件夹。
+3. 刷新 Gemini，打开普通对话，将页面缩放设为 **100%**。保持窗口大小和滚动位置不变，对比 **700px / 1600px** 或 **50% / 100%**。检查 AI 回复、用户消息和底部输入框；设置应实时生效，刷新后仍保留。最大实际宽度仍受页面可用空间限制。
+4. 检查代码换行、图片、表格及 Drive 选择器。请在对应 issue 中反馈操作系统、Chrome 版本、候选版版本、设置及前后截图，尤其欢迎受影响的 macOS 用户复测。
+
+候选版仅供手动安装。清单使用数字版本 `version: "2.6.0"`，并以 `version_name: "2.6.0-rc.1"` 标记候选版；Chrome 不根据 `version_name` 判断升级。更换其他候选版或正式版时，请替换已解压文件，并在 `chrome://extensions/` 点击 **重新加载**；若要恢复商店版，请停用或移除手动加载的副本，再启用商店安装的版本。切换版本后刷新 Gemini。
 
 ## 使用说明
 
@@ -97,9 +111,10 @@
 
 项目为 **纯 HTML / CSS / JavaScript**，使用 Chrome **Manifest V3**，**无构建步骤**、无 npm 依赖。请与现有源码保持一致的结构、命名以及 `chrome.*` API 的用法。
 
-- **Windows 下打商店 / 发布包：** 在仓库根目录运行 `package.bat`，生成 `wider-gemini-<version>.zip`（与上架包及 GitHub **Assets** 内容一致）。
-- **GitHub Release：** 更新 `manifest.json` 版本、README 版本徽章，并在 `CHANGELOG.md` 添加 `## x.y.z` 条目；提交并推送 `main` 后，再推送 tag `vX.Y.Z`（须与 `manifest.json` 版本一致）。Actions 会从对应 changelog 章节生成 Release 正文，并附带 `wider-gemini-X.Y.Z.zip`。
-- **Chrome Web Store：** 手动把 GitHub Release Assets 中的同一个 ZIP 上传到 Chrome Web Store。
+- **打包：** `scripts/package.ps1` 是本地及 CI 共用的 ZIP 打包器，不依赖 Node.js。Windows 在仓库根目录运行 `package.bat`；macOS / Linux 安装 PowerShell 后运行 `pwsh -File ./scripts/package.ps1`。均生成 `wider-gemini-<release-version>.zip`，ZIP 根目录包含 `manifest.json`。本候选版文件名为 `wider-gemini-2.6.0-rc.1.zip`。
+- **版本号：** Chrome 要求 `manifest.json` 的 `version` 为数字版本。候选版将 `version` 设为下一正式版本、`version_name` 设为预发布名称，例如 `2.6.0` 和 `2.6.0-rc.1`。发布版本优先取 `version_name`，没有时取 `version`。正式发布 `2.6.0` 时移除 `version_name`，保留 `version: "2.6.0"`。
+- **GitHub Release：** 更新 manifest、两份 README 版本徽章，并在 `CHANGELOG.md` 添加匹配的 `## <release-version>` 章节。提交并推送 `main` 后，再推送对应 tag，例如 `v2.6.0-rc.1`。Actions 会验证 tag，通过 `pwsh` 调用同一个打包器，从匹配的 changelog 章节生成正文并附上 ZIP。候选版标为 **Pre-release**，不替换最新稳定版。
+- **Chrome Web Store：** 仅上传验证通过的稳定版，使用对应稳定版 GitHub Release Assets 中的同一个 ZIP。本候选版不上传商店；手动测试者需按上文说明替换文件并重新加载，或切回商店版。
 
 在 Gemini 页面，内容脚本会在 `window.widerGeminiDebug` 上暴露调试方法（例如 `getCurrentWidth()`、`findDragElements()`、`applyDragStyles()`），可在浏览器 **开发者工具** 控制台中使用。
 
@@ -114,7 +129,8 @@
 | `popup.html`、`popup.js`、`popup.css` | 工具栏弹窗 |
 | `_locales/` | 国际化（`en`、`zh_CN`） |
 | `icons/` | 图标资源 |
-| `package.bat` | Windows 下打包商店用 ZIP |
+| `package.bat` | Windows 打包入口，调用共用打包器 |
+| `scripts/package.ps1` | 本地 / GitHub Actions 共用的 ZIP 打包及发布版本校验 |
 | `CHANGELOG.md` | 版本说明；GitHub Release 正文从此文件对应章节提取 |
 
 ## 隐私

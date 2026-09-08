@@ -17,7 +17,9 @@ body {
     mat-sidenav-content:has(chat-window),
     .mat-drawer-content:has(chat-window),
     mat-sidenav-content:has(.conversation-container),
-    .mat-drawer-content:has(.conversation-container) {
+    .mat-drawer-content:has(.conversation-container),
+    mat-sidenav-content:has(conversation-container),
+    .mat-drawer-content:has(conversation-container) {
         overflow: visible !important;
         height: auto !important;
         min-height: 100vh !important;
@@ -28,12 +30,14 @@ body {
 .content-wrapper:has(chat-window),
 .main-content:has(chat-window),
 .content-container:has(chat-window),
-.content-container:has(.conversation-container) {
+.content-container:has(.conversation-container),
+.content-container:has(conversation-container) {
     max-width: none !important;
 }
 
 [role="main"]:has(chat-window),
-[role="main"]:has(.conversation-container) {
+[role="main"]:has(.conversation-container),
+[role="main"]:has(conversation-container) {
     max-width: none !important;
 }
 
@@ -42,14 +46,16 @@ chat-window,
 chat-window-content,
 .chat-history-scroll-container,
 .chat-history,
-.conversation-container {
+.conversation-container,
+conversation-container {
     max-width: none !important;
     box-sizing: border-box !important;
 }
 
 main > div:has(user-query),
 main > div:has(model-response),
-main > div:has(.conversation-container) {
+main > div:has(.conversation-container),
+main > div:has(conversation-container) {
     max-width: none !important;
     width: 100% !important;
 }
@@ -152,23 +158,48 @@ response-container > * > * {
     max-width: var(--gemini-chat-width) !important;
 }
 
+/* 新版回复正文可能嵌套超过两层。仅解除通往正文的布局容器及正文自身的限宽，
+   保留图片、按钮、引用卡片等内容的原生尺寸；弹窗和菜单不参与正文路径匹配。 */
+:is(model-response, response-container)
+    :is(div, structured-content-container):has(
+        :is(message-content, .message-content):not(
+            :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+            :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+        )
+    ):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ),
+:is(model-response, response-container)
+    :is(message-content, .message-content, .markdown, .markdown-main-panel):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ) {
+    max-width: 100% !important;
+}
+
 hallucination-disclaimer {
     display: none !important;
 }
 
 /* User message full-width (optional) — bubble fills the row and left-aligns,
    matching the AI response width while keeping its background.
-   Scoped to .conversation-container so the bottom input composer
+   Scoped to conversation containers so the bottom input composer
    (in input-container, outside the conversation) is never affected. */
 body.wider-gemini-user-full-width .conversation-container .user-query-bubble-container,
 body.wider-gemini-user-full-width .conversation-container .user-query-container,
-body.wider-gemini-user-full-width .conversation-container user-query-content {
+body.wider-gemini-user-full-width .conversation-container user-query-content,
+body.wider-gemini-user-full-width conversation-container .user-query-bubble-container,
+body.wider-gemini-user-full-width conversation-container .user-query-container,
+body.wider-gemini-user-full-width conversation-container user-query-content {
     align-items: stretch !important;
     justify-content: flex-start !important;
 }
 
 body.wider-gemini-user-full-width .conversation-container .user-query-bubble-with-background,
-body.wider-gemini-user-full-width .conversation-container div[aria-label="User message"] {
+body.wider-gemini-user-full-width .conversation-container div[aria-label="User message"],
+body.wider-gemini-user-full-width conversation-container .user-query-bubble-with-background,
+body.wider-gemini-user-full-width conversation-container div[aria-label="User message"] {
     max-width: 100% !important;
     width: 100% !important;
     margin-left: 0 !important;

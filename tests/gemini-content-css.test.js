@@ -102,4 +102,27 @@ assert.ok(
     'message-actions max-width/margin unlock selector must exist'
 );
 
+// luminous 用 response-element 包裹代码块并限宽（实测 740px），代码框不随列加宽
+assert.ok(
+    css.includes('model-response response-element'),
+    'response-element max-width unlock selector must exist'
+);
+
+// luminous 给正文路径上各类包装容器统一限宽，通用规则整体解锁（排除媒体/表单/浮层）
+assert.ok(
+    css.includes('img, video, svg, canvas, iframe, button, input, select, textarea,'),
+    'generic markdown max-width unlock rule must exclude media and form controls'
+);
+
+// 表格滚动条：禁用外层出血式滚动包装，滚动容器画出通栏轨道
+assert.ok(
+    css.includes('.horizontal-scroll-wrapper:has(table-block)'),
+    'horizontal-scroll-wrapper bleed must be disabled around table-block'
+);
+
+assert.ok(
+    css.includes('table-block .table-content::-webkit-scrollbar-track'),
+    'table scroll container must render a full-width scrollbar track'
+);
+
 console.log('gemini-content CSS tests passed');

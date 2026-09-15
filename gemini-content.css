@@ -109,6 +109,50 @@ table-block .table-content,
 .table-block .table-content {
     width: 100% !important;
     overflow-x: auto !important;
+    /* Gemini 自带 24px 左右内边距（border-box），table 的 width:100% 只填满
+       内边距盒（实测 611px < 容器 659px），视觉比正文窄。清零水平内边距让表格铺满 */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* 表格底部行（导出/溢出菜单按钮）同样自带 24px 水平内边距，
+   清零让按钮与表格左边缘对齐 */
+table-block .table-footer,
+.table-block .table-footer {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* luminous 表格的横向滚动由内部 .table-content 承担；外层 .horizontal-scroll-wrapper
+   的出血式布局（overflow: scroll + margin-inline:-20px + padding-inline:20px）
+   会多出一条不贴边的滚动条（2026-09 实测 scrollLeft=0 时滑块仍缩进），禁用之 */
+.horizontal-scroll-wrapper:has(table-block) {
+    overflow: visible !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+}
+
+/* 表格横向滚动条：Gemini 默认轨道透明、只剩 4px 滑块，视觉上"对不齐"。
+   画出通栏轨道作参照，滑块静止时贴左边缘 */
+table-block .table-content::-webkit-scrollbar,
+.table-block .table-content::-webkit-scrollbar {
+    height: 4px !important;
+}
+
+table-block .table-content::-webkit-scrollbar-track,
+.table-block .table-content::-webkit-scrollbar-track {
+    /* Gemini 给轨道加了 margin-inline: var(--gem-sys-spacing--xxl)（约 48px），
+       与内容内边距配套；内边距已清零，轨道 margin 同步清零才能通栏贴边 */
+    margin-inline: 0 !important;
+    background: rgba(128, 128, 128, 0.15) !important;
+    border-radius: 999px !important;
+}
+
+table-block .table-content::-webkit-scrollbar-thumb,
+.table-block .table-content::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.45) !important;
+    border: none !important;
+    border-radius: 999px !important;
 }
 
 /* Input area — keep input-container full width so notebook Sources chip keeps native spacing.
@@ -210,6 +254,32 @@ user-query message-actions {
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+}
+
+/* luminous 用 response-element 包裹代码块等块级元素并设阅读宽度上限
+   （2026-09 实测 max-width: 740px），导致代码框不随列加宽。
+   解除限宽，框体铺满列宽；内部 pre 的横向滚动不受影响。 */
+model-response response-element,
+response-container response-element,
+.response-container response-element,
+.presented-response-container response-element,
+message-content response-element {
+    max-width: 100% !important;
+}
+
+/* luminous 会给回复正文路径上的各类包装容器统一加阅读宽度上限
+   （2026-09 实测 p≈708px、response-element=740px、.attachment-container=708px），
+   逐组件点名会持续漏网，统一解除正文 markdown 内所有元素的限宽。
+   max-width:100% 只移除上限、不会拉伸元素，另排除媒体/表单控件与浮层菜单，
+   保住原生尺寸与弹窗布局。 */
+:is(model-response, response-container, .response-container, .presented-response-container)
+    :is(.markdown, .markdown-main-panel)
+    :not(
+        img, video, svg, canvas, iframe, button, input, select, textarea,
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ) {
+    max-width: 100% !important;
 }
 
 hallucination-disclaimer {

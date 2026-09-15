@@ -84,4 +84,22 @@ assert.ok(
     'adjacent-sibling margin selector must exist'
 );
 
+// luminous 可读性排版会给文字级元素单独设阅读宽度上限（p ≈ 70ch），
+// 必须解除 markdown 内文字元素及用户提问文字的限宽
+assert.ok(
+    css.includes(':is(p, li, ul, ol, blockquote, h1, h2, h3, h4, h5, h6):not('),
+    'text-level max-width unlock selector must exist for luminous readable width'
+);
+
+assert.ok(
+    css.includes('user-query :is(p, .query-text, .query-text-line):not('),
+    'user query text max-width unlock selector must exist'
+);
+
+// luminous 也限制回复操作栏宽度并自动居中，导致按钮相对正文缩进
+assert.ok(
+    css.includes('model-response message-actions'),
+    'message-actions max-width/margin unlock selector must exist'
+);
+
 console.log('gemini-content CSS tests passed');

@@ -178,6 +178,40 @@ response-container > * > * {
     max-width: 100% !important;
 }
 
+/* Gemini "luminous" 可读性排版（enable-luminous-content-width）会给文字级元素
+   单独设置阅读宽度上限（2026-09 实测 p 被限制在约 70ch ≈ 708px），与容器宽度无关，
+   导致容器已加宽而正文仍窄。解除回复/提问正文内文字元素的限宽；
+   代码块、图片、按钮等保持原生行为。 */
+:is(model-response, response-container, .response-container, .presented-response-container)
+    :is(.markdown, .markdown-main-panel)
+    :is(p, li, ul, ol, blockquote, h1, h2, h3, h4, h5, h6):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ),
+user-query :is(p, .query-text, .query-text-line):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ),
+user-query-content :is(p, .query-text, .query-text-line):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ) {
+    max-width: 100% !important;
+}
+
+/* luminous 同样给回复操作栏（点赞/重新生成等）设了阅读宽度上限并自动居中，
+   导致按钮相对左对齐的正文缩进（2026-09 实测 message-actions 被限 708px、
+   margin-left auto ≈ 84px）。解除限宽并去掉居中，让按钮栏与正文左对齐。 */
+model-response message-actions,
+response-container message-actions,
+.response-container message-actions,
+.presented-response-container message-actions,
+user-query message-actions {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
 hallucination-disclaimer {
     display: none !important;
 }

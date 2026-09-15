@@ -34,8 +34,9 @@
         { key: '.conversation-container user-query, conversation-container user-query', value: 'max-width: 100%', sleep: 0 },
         { key: 'input-container .input-area-container', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
         { key: 'input-container input-area-v2', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
-        { key: '.chat-container', value: 'max-width: {width}; margin-left: auto; margin-right: auto', sleep: 0 },
-        { key: '.chat-container.xap-drag-in-progress', value: 'max-width: {width}', sleep: 0 },
+        // 外层保留原生间距所需的空间，宽度设置只约束消息和输入框内部。
+        { key: '.chat-container', value: 'max-width: 100%; margin-left: auto; margin-right: auto', sleep: 0 },
+        { key: '.chat-container.xap-drag-in-progress', value: 'max-width: 100%', sleep: 0 },
         { key: '.chat-container.xap-drag-in-progress > *', value: 'max-width: 100%', sleep: 0 },
         { key: 'input-container upload-card', value: 'max-width: 100%', sleep: 0 },
         { key: 'input-container .upload-card', value: 'max-width: 100%', sleep: 0 },
@@ -150,13 +151,11 @@
 
         root.style.setProperty('--gemini-chat-width', widthCssValue);
         modifyElementStyles(widthCssValue);
-        applyDragDropStyles(widthCssValue);
+        applyDragDropStyles();
         console.log(`[Wider Gemini] Applied width ${widthCssValue}`);
     }
 
-    function applyDragDropStyles(width) {
-        const currentWidth = width || getCurrentWidthCssValue();
-
+    function applyDragDropStyles() {
         const possibleSelectors = [
             '[class*="drop"]',
             '[class*="drag"]',
@@ -200,7 +199,7 @@
 
         const chatContainer = document.querySelector('.chat-container.xap-drag-in-progress');
         if (chatContainer) {
-            chatContainer.style.setProperty('max-width', currentWidth, 'important');
+            chatContainer.style.setProperty('max-width', '100%', 'important');
 
             const dragChildren = chatContainer.querySelectorAll('*');
             dragChildren.forEach(child => {
@@ -376,8 +375,7 @@
                     return;
                 }
 
-                const width = getCurrentWidthCssValue();
-                applyDragDropStyles(width);
+                applyDragDropStyles();
 
                 const chatContainer = document.querySelector('.chat-container');
                 if (chatContainer && chatContainer.classList.contains('xap-drag-in-progress')) {
@@ -400,16 +398,14 @@
 
         document.addEventListener('dragenter', function (e) {
             startDragCheck();
-            const width = getCurrentWidthCssValue();
-            applyDragDropStyles(width);
+            applyDragDropStyles();
         }, true);
 
         document.addEventListener('dragover', function (e) {
             if (!isDragging) {
                 startDragCheck();
             }
-            const width = getCurrentWidthCssValue();
-            applyDragDropStyles(width);
+            applyDragDropStyles();
         }, true);
 
         document.addEventListener('dragleave', function (e) {
@@ -423,8 +419,7 @@
         document.addEventListener('drop', function (e) {
             setTimeout(() => {
                 stopDragCheck();
-                const width = getCurrentWidthCssValue();
-                applyDragDropStyles(width);
+                applyDragDropStyles();
                 applySettings();
             }, 200);
         }, true);
@@ -525,7 +520,7 @@
 
             applyDragStyles: function () {
                 const width = getCurrentWidthCssValue();
-                applyDragDropStyles(width);
+                applyDragDropStyles();
                 console.log('Applied drag styles, width:', width);
             },
 

@@ -4,6 +4,18 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
+## 2.6.0 (2026-09-15)
+
+### Fixes
+
+- Improved width adjustment for Gemini's updated layouts, including response text, code blocks, and tables.
+- Improved alignment of message actions, thinking indicators, and image captions.
+- Fixed messages and the input bar narrowing while dragging a local file over the input area.
+
+### Other
+
+- Thanks to @PANPEIWEN for the Gemini layout compatibility improvements in [#10](https://github.com/Planetes1mal/wider-gemini/pull/10).
+
 ## 2.6.0-rc.1 (2026-09-08)
 
 ### Fixes

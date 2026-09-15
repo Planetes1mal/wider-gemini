@@ -2,7 +2,7 @@ English | [中文](./README.zh-CN.md)
 
 # Wider Gemini
 
-[![Version](https://img.shields.io/badge/version-2.6.0--rc.1-orange.svg)](#)
+[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](#)
 [![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=stable)](https://github.com/Planetes1mal/wider-gemini/releases)
 [![Platform](https://img.shields.io/badge/platform-Chrome-blue.svg)](https://www.google.com/chrome/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -11,7 +11,7 @@ English | [中文](./README.zh-CN.md)
 > Get it from [Chrome Web Store](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed)  
 > **Offline / manual installs:** Packages are on [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases)
 
-This source checkout is **2.6.0-rc.1**, a release candidate for testing Gemini layout compatibility. The Chrome Web Store version remains **2.5.0**. Confirmation from the affected macOS users is still pending.
+This source checkout is **2.6.0**, a stable release with Gemini layout compatibility fixes. Chrome Web Store availability follows the store's review and publication process; use [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases) for manual installation.
 
 Make Google Gemini's conversation interface wider with a custom width slider and presets.
 
@@ -25,7 +25,7 @@ Make Google Gemini's conversation interface wider with a custom width slider and
     - [Chrome Web Store (recommended)](#chrome-web-store-recommended)
     - [GitHub Releases](#github-releases)
     - [From source](#from-source)
-    - [Testing 2.6.0-rc.1](#testing-260-rc1)
+    - [Upgrading from 2.6.0-rc.1](#upgrading-from-260-rc1)
   - [Usage](#usage)
   - [Development](#development)
   - [Repository layout](#repository-layout)
@@ -69,16 +69,16 @@ Make Google Gemini's conversation interface wider with a custom width slider and
 1. Clone this repository or download the repository ZIP from GitHub.
 2. Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the repository root (the folder that contains `manifest.json`).
 
-### Testing 2.6.0-rc.1
+### Upgrading from 2.6.0-rc.1
 
-This candidate addresses internal width limits in deeply nested Gemini replies and adds support for the `<conversation-container>` element. It does not establish that every reported macOS issue is resolved.
+The candidate and stable release both use numeric `version: "2.6.0"`. Chrome does not use `version_name` to determine upgrades, so manually installed candidates do not automatically update to this stable release.
 
-1. Package this checkout using the [development instructions](#development), or download `wider-gemini-2.6.0-rc.1.zip` from [Releases](https://github.com/Planetes1mal/wider-gemini/releases) if that candidate has been published.
-2. In `chrome://extensions/`, disable the Chrome Web Store installation of Wider Gemini and any other Gemini styling extension. Unzip the candidate, enable **Developer mode**, then use **Load unpacked** to select the folder containing `manifest.json`.
-3. Refresh Gemini, open a regular conversation, and keep page zoom at **100%**. Compare **700px / 1600px** or **50% / 100%** at the same window size and scroll position. Check AI replies, user messages, and the input bar; settings should apply live and persist after refresh. The available page space still limits the maximum width.
-4. Check code wrapping, images, tables, and the Drive picker. Report the operating system, Chrome version, candidate version, settings, and before/after screenshots in the relevant issue, especially if testing an affected macOS account.
+1. Download `wider-gemini-2.6.0.zip` from [Releases](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.6.0).
+2. Unzip it into the folder used for the candidate, replacing the existing extension files.
+3. Open `chrome://extensions/`, find the unpacked Wider Gemini installation, and click **Reload**.
+4. Refresh Gemini. Keep only one Wider Gemini installation enabled.
 
-The candidate is for manual installation only. Its manifest uses numeric `version: "2.6.0"` with `version_name: "2.6.0-rc.1"`. Chrome does not use `version_name` to determine upgrades. To move to another candidate or the final release, replace the unpacked files and click **Reload** in `chrome://extensions/`; to return to the store version, disable or remove the unpacked copy and re-enable the store installation. Refresh Gemini after switching versions.
+To return to the store version, disable or remove the unpacked copy and re-enable the Chrome Web Store installation, then refresh Gemini. Store updates become available after publication.
 
 ## Usage
 
@@ -111,10 +111,10 @@ Use the **Language** section at the bottom to switch the popup between following
 
 There is **no build step** or package manager: the project is vanilla HTML, CSS, and JavaScript (Chrome **Manifest V3**). Follow the patterns in the existing source files (structure, naming, and `chrome.*` usage).
 
-- **Packaging:** `scripts/package.ps1` is the shared ZIP packager; it does not require Node.js. On Windows, run `package.bat` in the repository root. On macOS / Linux with PowerShell installed, run `pwsh -File ./scripts/package.ps1`. Both produce `wider-gemini-<release-version>.zip` with `manifest.json` at the ZIP root. For this candidate the filename is `wider-gemini-2.6.0-rc.1.zip`.
+- **Packaging:** `scripts/package.ps1` is the shared ZIP packager; it does not require Node.js. On Windows, run `package.bat` in the repository root. On macOS / Linux with PowerShell installed, run `pwsh -File ./scripts/package.ps1`. Both produce `wider-gemini-<release-version>.zip` with `manifest.json` at the ZIP root. For this release the filename is `wider-gemini-2.6.0.zip`.
 - **Versioning:** Chrome's `manifest.json` `version` must be numeric. For a candidate, set `version` to the upcoming stable version and `version_name` to its prerelease name, such as `2.6.0` and `2.6.0-rc.1`. The release version is `version_name` when present, otherwise `version`. For the final `2.6.0` release, remove `version_name` and retain `version: "2.6.0"`.
-- **GitHub Release:** update the manifest, both README version badges, and a matching `## <release-version>` section in `CHANGELOG.md`. After committing and pushing `main`, push the matching tag, for example `v2.6.0-rc.1`. Actions validates the tag, runs the same packager using `pwsh`, extracts the matching changelog section, and attaches the ZIP. Candidate tags create a **Pre-release** and do not replace the latest stable release.
-- **Chrome Web Store:** publish only a tested stable release, uploading the same ZIP as the stable GitHub Release asset. Keep this candidate out of the store; manual testers must replace/reload it or switch back to the store installation as described above.
+- **GitHub Release:** update the manifest, both README version badges, and a matching `## <release-version>` section in `CHANGELOG.md`. After committing and pushing `main`, push the matching tag, for example `v2.6.0`. Actions validates the tag, runs the same packager using `pwsh`, extracts the matching changelog section, and attaches the ZIP. Candidate tags create a **Pre-release** and do not replace the latest stable release.
+- **Chrome Web Store:** publish only a tested stable release, uploading the same ZIP as the stable GitHub Release asset. Candidates stay out of the store; manual testers must replace/reload them or switch back to the store installation as described above.
 
 On a Gemini tab, the content script exposes helpers on `window.widerGeminiDebug` (for example `getCurrentWidth()`, `findDragElements()`, `applyDragStyles()`). Use the browser **Developer tools** console.
 

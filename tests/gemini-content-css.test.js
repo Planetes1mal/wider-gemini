@@ -125,4 +125,37 @@ assert.ok(
     'table scroll container must render a full-width scrollbar track'
 );
 
+// luminous 给回复区子容器（头部/思考层/底部/操作栏外层）统一加 24px 水平外边距
+assert.ok(
+    css.includes('model-response .response-container-header'),
+    'response-container-header margin unlock selector must exist'
+);
+
+assert.ok(
+    css.includes('model-response thinking-overlay'),
+    'thinking-overlay margin unlock selector must exist'
+);
+
+// 三个点加载态：pending-request 下撑满整列；thinking-overlay 内与文字并排时恢复内容宽度
+assert.ok(
+    css.includes('pending-request > thinking-dots-animation'),
+    'thinking-dots-animation standalone stretch selector must exist'
+);
+
+assert.ok(
+    css.includes('thinking-overlay > thinking-dots-animation'),
+    'thinking-dots-animation in-overlay content-width selector must exist'
+);
+
+// 图片说明：margin 清零，偏移量由内容脚本 alignImageCaptions() 测量后设置
+assert.ok(
+    css.includes('.hero-caption-row .caption'),
+    'image caption margin reset selector must exist'
+);
+
+assert.ok(
+    css.includes('alignImageCaptions()'),
+    'CSS comment must document the JS-driven caption alignment'
+);
+
 console.log('gemini-content CSS tests passed');

@@ -218,6 +218,28 @@
         }
     }
 
+    // 图片说明跟随图片左缘：图片在容器内居中显示，且 fit-content 会按图片
+    // 自然宽度（而非显示宽度）收缩，CSS 无法表达"对齐到图片左缘"。
+    // 直接测量 img 与说明行的实际渲染位置，给说明行设置等量左内边距。
+    // 幂等：每次先移除旧值再测量，可安全重复调用。
+    function alignImageCaptions() {
+        try {
+            document.querySelectorAll('single-image').forEach(host => {
+                const img = host.querySelector('.image-button img');
+                const captionRow = host.querySelector('.hero-caption-row');
+                if (!img || !captionRow) return;
+
+                captionRow.style.removeProperty('padding-left');
+                const delta = img.getBoundingClientRect().left - captionRow.getBoundingClientRect().left;
+                if (delta > 1) {
+                    captionRow.style.setProperty('padding-left', `${Math.round(delta)}px`, 'important');
+                }
+            });
+        } catch (e) {
+            console.log('[Wider Gemini] alignImageCaptions failed:', e.message);
+        }
+    }
+
     function applySettings() {
         if (!isExtensionContextValid()) {
             console.log('[Wider Gemini] Extension context invalid, stopping');
@@ -247,6 +269,7 @@
                 applyCodeWrap(settings.codeWrap);
                 applyUserFullWidth(settings.userFullWidth);
                 applyDensitySettings(settings);
+                alignImageCaptions();
             });
         } catch (e) {
             console.log('[Wider Gemini] Failed to get storage:', e.message);
@@ -330,6 +353,7 @@
                                 tagName === 'input-container' ||
                                 tagName === 'upload-card' ||
                                 tagName === 'file-drop-area' ||
+                                tagName === 'single-image' ||
                                 node.querySelector?.('.conversation-container, conversation-container') ||
                                 node.querySelector?.('user-query') ||
                                 node.querySelector?.('.input-area-container') ||
@@ -428,6 +452,20 @@
                 applySettings();
             }, 200);
         }, true);
+
+        // 图片异步加载，load 事件不冒泡，需捕获阶段监听；
+        // 窗口尺寸变化会改变图片居中位置，防抖后重新测量
+        document.addEventListener('load', function (e) {
+            if (e.target && e.target.matches && e.target.matches('single-image img')) {
+                alignImageCaptions();
+            }
+        }, true);
+
+        let captionResizeTimer = null;
+        window.addEventListener('resize', function () {
+            if (captionResizeTimer) clearTimeout(captionResizeTimer);
+            captionResizeTimer = setTimeout(alignImageCaptions, 150);
+        });
 
         console.log('[Wider Gemini] MutationObserver and drag listeners started');
     }

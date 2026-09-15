@@ -109,6 +109,50 @@ table-block .table-content,
 .table-block .table-content {
     width: 100% !important;
     overflow-x: auto !important;
+    /* Gemini 自带 24px 左右内边距（border-box），table 的 width:100% 只填满
+       内边距盒（实测 611px < 容器 659px），视觉比正文窄。清零水平内边距让表格铺满 */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* 表格底部行（导出/溢出菜单按钮）同样自带 24px 水平内边距，
+   清零让按钮与表格左边缘对齐 */
+table-block .table-footer,
+.table-block .table-footer {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* luminous 表格的横向滚动由内部 .table-content 承担；外层 .horizontal-scroll-wrapper
+   的出血式布局（overflow: scroll + margin-inline:-20px + padding-inline:20px）
+   会多出一条不贴边的滚动条（2026-09 实测 scrollLeft=0 时滑块仍缩进），禁用之 */
+.horizontal-scroll-wrapper:has(table-block) {
+    overflow: visible !important;
+    margin-inline: 0 !important;
+    padding-inline: 0 !important;
+}
+
+/* 表格横向滚动条：Gemini 默认轨道透明、只剩 4px 滑块，视觉上"对不齐"。
+   画出通栏轨道作参照，滑块静止时贴左边缘 */
+table-block .table-content::-webkit-scrollbar,
+.table-block .table-content::-webkit-scrollbar {
+    height: 4px !important;
+}
+
+table-block .table-content::-webkit-scrollbar-track,
+.table-block .table-content::-webkit-scrollbar-track {
+    /* Gemini 给轨道加了 margin-inline: var(--gem-sys-spacing--xxl)（约 48px），
+       与内容内边距配套；内边距已清零，轨道 margin 同步清零才能通栏贴边 */
+    margin-inline: 0 !important;
+    background: rgba(128, 128, 128, 0.15) !important;
+    border-radius: 999px !important;
+}
+
+table-block .table-content::-webkit-scrollbar-thumb,
+.table-block .table-content::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.45) !important;
+    border: none !important;
+    border-radius: 999px !important;
 }
 
 /* Input area — keep input-container full width so notebook Sources chip keeps native spacing.
@@ -172,6 +216,133 @@ response-container > * > * {
     ),
 :is(model-response, response-container)
     :is(message-content, .message-content, .markdown, .markdown-main-panel):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ) {
+    max-width: 100% !important;
+}
+
+/* Gemini "luminous" 可读性排版（enable-luminous-content-width）会给文字级元素
+   单独设置阅读宽度上限（2026-09 实测 p 被限制在约 70ch ≈ 708px），与容器宽度无关，
+   导致容器已加宽而正文仍窄。解除回复/提问正文内文字元素的限宽；
+   代码块、图片、按钮等保持原生行为。 */
+:is(model-response, response-container, .response-container, .presented-response-container)
+    :is(.markdown, .markdown-main-panel)
+    :is(p, li, ul, ol, blockquote, h1, h2, h3, h4, h5, h6):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ),
+user-query :is(p, .query-text, .query-text-line):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ),
+user-query-content :is(p, .query-text, .query-text-line):not(
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
+        :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
+    ) {
+    max-width: 100% !important;
+}
+
+/* luminous 同样给回复操作栏（点赞/重新生成等）设了阅读宽度上限并自动居中，
+   导致按钮相对左对齐的正文缩进（2026-09 实测 message-actions 被限 708px、
+   margin-left auto ≈ 84px）。解除限宽并去掉居中，让按钮栏与正文左对齐。 */
+model-response message-actions,
+response-container message-actions,
+.response-container message-actions,
+.presented-response-container message-actions,
+user-query message-actions {
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* luminous 给回复区子容器（头部状态栏、thinking-overlay 思考层、底部区、
+   操作栏外层）统一加了 24px 水平外边距（--gem-sys-spacing--xxl 体系，
+   2026-09 实测 margin-left: 24px，宽度 611px < 容器 659px），
+   清零并恢复自动宽度，让它们与正文同宽对齐 */
+model-response .response-container-header,
+response-container .response-container-header,
+model-response thinking-overlay,
+response-container thinking-overlay,
+model-response .response-footer,
+response-container .response-footer,
+model-response .response-container-footer,
+response-container .response-container-footer {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    /* 不能用 width:auto：这些元素在 flex 布局中会收缩到内容宽度并被挤到
+       一侧（2026-09 实测 thinking-overlay 的思考文字被顶到最右），显式撑满 */
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* 独立加载态：thinking-dots-animation 是 pending-request（column flex 且子项居中）
+   的弹性子项，width:auto 会收缩到内容宽度并水平居中（2026-09 实测被挤到列中央
+   left:606）。显式撑满整列，让三个点回到列左缘 */
+pending-request > thinking-dots-animation {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    align-self: stretch !important;
+}
+
+/* 思考文字态：dots 与 .thinking-container 是 thinking-overlay（row flex）内的兄弟，
+   保持 100% 宽度会把文字挤到右缘（2026-09 实测 dots 占 531px、文字 left:831）。
+   恢复内容宽度并禁止拉伸 */
+model-response thinking-overlay > thinking-dots-animation,
+response-container thinking-overlay > thinking-dots-animation {
+    width: auto !important;
+    max-width: none !important;
+    flex: 0 0 auto !important;
+}
+
+/* thinking-overlay 撑满后是 flex 容器，且 Gemini 设了 direction: rtl
+   （2026-09 实测子元素 .thinking-container 贴右缘 left:798 = 容器右缘-自身宽度），
+   flex 起点被翻到右侧。改回 ltr 并强制整链左对齐 */
+model-response thinking-overlay,
+response-container thinking-overlay {
+    direction: ltr !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+}
+
+model-response thinking-overlay .thinking-container,
+response-container thinking-overlay .thinking-container {
+    align-self: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+/* 图片说明对齐：说明文字自身的 16px margin 清零，对齐到图片左缘的偏移量
+   由内容脚本 alignImageCaptions() 测量实际渲染位置后设置
+   （fit-content 会按图片自然宽度而非显示宽度收缩，CSS 方案不可行） */
+model-response single-image .hero-caption-row .caption,
+response-container single-image .hero-caption-row .caption {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* luminous 用 response-element 包裹代码块等块级元素并设阅读宽度上限
+   （2026-09 实测 max-width: 740px），导致代码框不随列加宽。
+   解除限宽，框体铺满列宽；内部 pre 的横向滚动不受影响。 */
+model-response response-element,
+response-container response-element,
+.response-container response-element,
+.presented-response-container response-element,
+message-content response-element {
+    max-width: 100% !important;
+}
+
+/* luminous 会给回复正文路径上的各类包装容器统一加阅读宽度上限
+   （2026-09 实测 p≈708px、response-element=740px、.attachment-container=708px），
+   逐组件点名会持续漏网，统一解除正文 markdown 内所有元素的限宽。
+   max-width:100% 只移除上限、不会拉伸元素，另排除媒体/表单控件与浮层菜单，
+   保住原生尺寸与弹窗布局。 */
+:is(model-response, response-container, .response-container, .presented-response-container)
+    :is(.markdown, .markdown-main-panel)
+    :not(
+        img, video, svg, canvas, iframe, button, input, select, textarea,
         :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
         :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
     ) {

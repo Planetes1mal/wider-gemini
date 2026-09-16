@@ -30,6 +30,10 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
 }
 
+html:lang(zh-TW) body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", "PingFang TC", sans-serif;
+}
+
 .container {
     padding: 14px;
 }
@@ -244,19 +248,85 @@ h1 {
 .language-select {
     width: 100%;
     height: 32px;
-    padding: 0 8px;
+    padding: 0 10px;
     border: 1px solid var(--border);
     border-radius: 7px;
     background: var(--surface);
     color: var(--text);
+    cursor: pointer;
     font: inherit;
     font-size: 12px;
+    font-weight: 600;
     outline: none;
+}
+
+.language-select:hover {
+    border-color: var(--accent);
+    background: var(--surface-muted);
 }
 
 .language-select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.language-select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* 支持时同步下拉列表样式；旧版浏览器保留原生选择器和键盘操作。 */
+@supports (appearance: base-select) {
+    .language-select,
+    .language-select::picker(select) {
+        appearance: base-select;
+    }
+
+    .language-select {
+        align-items: center;
+    }
+
+    .language-select::picker-icon {
+        color: var(--muted);
+    }
+
+    .language-select::picker(select) {
+        margin-block: 4px;
+        padding: 4px;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: var(--shadow);
+        font: inherit;
+    }
+
+    .language-select option {
+        min-height: 32px;
+        padding: 7px 10px;
+        border-radius: 5px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+    }
+
+    .language-select option:hover,
+    .language-select option:focus-visible,
+    .language-select option:checked {
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+    }
+
+    .language-select option:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: -2px;
+    }
+
+    .language-select option::checkmark {
+        order: 1;
+        margin-inline-start: auto;
+        color: var(--accent);
+    }
 }
 
 .slider-wrapper {

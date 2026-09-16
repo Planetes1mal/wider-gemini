@@ -111,6 +111,10 @@
     "message": "Language"
   },
   "uiLanguageAuto": {
-    "message": "Follow system"
+    "message": "Follow browser"
+  },
+  "localeCode": {
+    "message": "en",
+    "description": "HTML language tag for this translation."
   }
 }

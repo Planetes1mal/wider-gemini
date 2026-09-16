@@ -30,6 +30,7 @@ function loadLanguageDictionary(language) {
 }
 
 function localizeHtmlPage() {
+    document.documentElement.lang = t('localeCode', 'en');
     const ids = [
         "appName", "headerSubtitle", "widthLabel", "widthMin", "widthMax",
         "btnNarrow", "btnDefault", "btnWider", "btnUltra", "btnInsane",

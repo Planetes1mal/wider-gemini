@@ -1,0 +1,120 @@
+{
+  "appName": {
+    "message": "Wider Gemini"
+  },
+  "appDesc": {
+    "message": "讓 Google Gemini 的對話區域更寬，支援百分比寬度、閱讀密度調整與程式碼自動換行，提升大螢幕閱讀體驗。"
+  },
+  "headerSubtitle": {
+    "message": "讓對話介面更寬、更舒適"
+  },
+  "widthLabel": {
+    "message": "對話區域寬度"
+  },
+  "widthMin": {
+    "message": "最小寬度"
+  },
+  "widthMax": {
+    "message": "最大寬度"
+  },
+  "btnNarrow": {
+    "message": "窄"
+  },
+  "btnDefault": {
+    "message": "預設"
+  },
+  "btnWider": {
+    "message": "更寬"
+  },
+  "btnUltra": {
+    "message": "超寬"
+  },
+  "btnInsane": {
+    "message": "真的需要這麼寬嗎？"
+  },
+  "editPresets": {
+    "message": "編輯預設"
+  },
+  "donePresets": {
+    "message": "完成"
+  },
+  "cancelPresets": {
+    "message": "取消"
+  },
+  "managePresets": {
+    "message": "管理預設"
+  },
+  "managePresetsSummary": {
+    "message": "已自訂 5 個預設"
+  },
+  "resetToDefault": {
+    "message": "還原預設值"
+  },
+  "clampedHint": {
+    "message": "已限制在範圍內"
+  },
+  "codeWrapLabel": {
+    "message": "程式碼自動換行"
+  },
+  "userFullWidthLabel": {
+    "message": "使用者訊息填滿寬度"
+  },
+  "statusOn": {
+    "message": "啟用"
+  },
+  "statusOff": {
+    "message": "停用"
+  },
+  "infoText1": {
+    "message": "拖曳滑桿或點選預設按鈕來調整寬度"
+  },
+  "infoText2": {
+    "message": "設定會自動儲存並套用至所有 Gemini 分頁"
+  },
+  "refreshing": {
+    "message": "正在重新整理頁面..."
+  },
+  "widthUnit": {
+    "message": "寬度單位"
+  },
+  "densityLabel": {
+    "message": "閱讀密度"
+  },
+  "compactnessUnit": {
+    "message": "%"
+  },
+  "advancedDensity": {
+    "message": "進階間距"
+  },
+  "lineHeightLabel": {
+    "message": "行高"
+  },
+  "paragraphSpacingLabel": {
+    "message": "段落間距"
+  },
+  "fontSizeLabel": {
+    "message": "字型大小"
+  },
+  "resetFontSize": {
+    "message": "還原字型大小"
+  },
+  "resetDensity": {
+    "message": "還原間距"
+  },
+  "customSpacing": {
+    "message": "自訂"
+  },
+  "autoSpacing": {
+    "message": "自動"
+  },
+  "uiLanguageLabel": {
+    "message": "介面語言"
+  },
+  "uiLanguageAuto": {
+    "message": "跟隨瀏覽器"
+  },
+  "localeCode": {
+    "message": "zh-TW",
+    "description": "HTML language tag for this translation."
+  }
+}

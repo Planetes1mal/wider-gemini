@@ -165,9 +165,11 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(utils.normalizeUiLanguage('auto'), 'auto');
     assert.strictEqual(utils.normalizeUiLanguage('en'), 'en');
     assert.strictEqual(utils.normalizeUiLanguage('zh_CN'), 'zh_CN');
+    assert.strictEqual(utils.normalizeUiLanguage('zh_TW'), 'zh_TW');
     assert.strictEqual(utils.normalizeUiLanguage('fr'), 'auto');
     assert.strictEqual(utils.normalizeStorage({}).uiLanguage, 'auto');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'en' }).uiLanguage, 'en');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'zh_TW' }).uiLanguage, 'zh_TW');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'ja' }).uiLanguage, 'auto');
 }
 

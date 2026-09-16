@@ -48,7 +48,7 @@ $files = @(
     'manifest.json', 'popup.html', 'popup.js', 'popup.css', 'settings-utils.js',
     'gemini-content.js', 'gemini-content.css', 'background.js', 'LICENSE',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
-    '_locales/en/messages.json', '_locales/zh_CN/messages.json'
+    '_locales/en/messages.json', '_locales/zh_CN/messages.json', '_locales/zh_TW/messages.json'
 )
 foreach ($file in $files) {
     if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $file) -PathType Leaf)) {

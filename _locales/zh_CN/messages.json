@@ -111,6 +111,10 @@
     "message": "界面语言"
   },
   "uiLanguageAuto": {
-    "message": "跟随系统"
+    "message": "跟随浏览器"
+  },
+  "localeCode": {
+    "message": "zh-CN",
+    "description": "HTML language tag for this translation."
   }
 }

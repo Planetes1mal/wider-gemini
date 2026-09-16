@@ -14,7 +14,7 @@
     const DENSITY_APPLIED_MAX_PARAGRAPH_SPACING = 11;
     const DENSITY_APPLIED_MIN_PARAGRAPH_SPACING = 2;
     const FONT_SIZE_RANGE = { min: 75, max: 200, step: 5 };
-    const UI_LANGUAGES = ['auto', 'en', 'zh_CN'];
+    const UI_LANGUAGES = ['auto', 'en', 'zh_CN', 'zh_TW'];
 
     const DEFAULT_PRESETS_BY_UNIT = {
         [UNIT_PX]: [

@@ -1,5 +1,11 @@
 # Compatibility record
 
+## CI runner correction — September 23, 2026
+
+The first [main Tests run](https://github.com/Planetes1mal/wider-gemini/actions/runs/35953083191) and [v2.8.0 Release run](https://github.com/Planetes1mal/wider-gemini/actions/runs/35953084940) used Ubuntu 24.04.5, Node 24.20.0, and Chrome for Testing stable 154.0.8037.57. All five test scripts passed, including the 15 packaging checks, but Chrome aborted with `SIGABRT` before the synthetic layout fixture returned its browser report (`No browser report (null)`). This was a browser-startup failure, not a failed layout assertion; the available stderr tail does not establish its underlying cause. The dependent release job was skipped and these runs did not create a GitHub Release.
+
+The shared Tests workflow now uses `windows-latest`, matching the operating-system family of the successful local browser checks below. It retains the complete unit/packaging suite, Chrome for Testing stable, and all synthetic layout scenarios without changing browser security flags or extension runtime code. Release ZIP creation remains on Ubuntu. The Windows CI rerun is pending; the local artifact acceptance below does not establish a passing hosted CI run or successful publication.
+
 ## Version 2.8.0 release acceptance — September 23, 2026
 
 The final stable-release checks passed:

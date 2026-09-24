@@ -8,9 +8,11 @@ A Chrome extension for adjusting the width of Gemini conversations. Use the slid
 [![GitHub Release 2.8.0](https://img.shields.io/badge/release-v2.8.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.8.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-![Gemini conversation before and after widening](./docs/images/wider-gemini-preview.jpg)
+The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Wider Gemini.
 
-Top: default width. Bottom: a wider conversation with Wider Gemini.
+![Full Gemini conversation at 700px width](./docs/images/conversation-before.png)
+
+![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)
 
 ## Features
 

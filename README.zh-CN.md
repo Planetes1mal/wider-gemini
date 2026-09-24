@@ -8,9 +8,11 @@
 [![GitHub Release 2.8.0](https://img.shields.io/badge/release-v2.8.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.8.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-![Gemini 对话区加宽前后的对比](./docs/images/wider-gemini-preview.jpg)
+同一段完整的 Gemini 对话、同样的窗口大小：使用 Wider Gemini 将对话宽度分别设为 700px 和 1200px。
 
-上：默认宽度。下：使用 Wider Gemini 加宽后的对话区。
+![700px 宽度的完整 Gemini 对话页面](./docs/images/conversation-before.png)
+
+![1200px 宽度的同一完整 Gemini 对话页面](./docs/images/conversation-after.png)
 
 ## 功能
 

@@ -4,6 +4,13 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
+## Unreleased
+
+### Other
+
+- Redesigned the 16px, 48px, and 128px extension icons, with editable SVG sources and a rendering script.
+- Updated all three READMEs with full-page screenshots of the same Gemini conversation at 700px and 1200px, with the account avatar removed.
+
 ## 2.8.0 (2026-09-24)
 
 ### Fixes

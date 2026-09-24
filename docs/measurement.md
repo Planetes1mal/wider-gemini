@@ -74,7 +74,7 @@ For future links, use fixed lower-case source/medium/campaign names and record t
 
 The store can forward `utm_source`, `utm_medium`, and `utm_campaign` into its managed Google Analytics property. The official guide says the store `install` event follows acceptance of the permission prompt, and UTM fields may take 24–48 hours to finalize. Its property also applies privacy thresholds. Adding UTM links does not confirm that the property is enabled or that our exports expose campaign-level installs. Access to the CWS developer console was rejected by the browser tool (`Not allowed`); no alternative route was used and GA4 was not inspected or enabled. A human dashboard check remains pending. Until that is verified, record campaign installs as `Unavailable` and use tagged store views only as an exposure signal. [CWS Google Analytics and UTM](https://developer.chrome.com/docs/webstore/google-analytics)
 
-Local contribution drafts are in `.scratch/community-contributions/`: Korean native-language review, macOS width verification, one real upstream DOM reproduction, and a real installed-app cold start. Their statuses describe remaining work, not completed external contributions. They have not been posted as GitHub issues.
+Potential contribution topics include Korean native-language review, macOS width verification, a real upstream DOM reproduction, and an installed-app cold start. Prepared internal drafts are not published GitHub issues or completed external contributions.
 
 ## Keep outcomes separate from preparation
 

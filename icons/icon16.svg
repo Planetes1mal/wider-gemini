@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" role="img" aria-labelledby="title">
+  <title id="title">Wider Gemini — toolbar optical size</title>
+  <rect x="1" y="1" width="14" height="14" rx="3.5" fill="#2E55E7"/>
+  <g fill="#FFFFFF">
+    <path d="M5.5 4H5c-1.25 0-2 .75-2 2v4c0 1.25.75 2 2 2h.5v-1.5H5c-.375 0-.5-.125-.5-.5V6c0-.375.125-.5.5-.5h.5z"/>
+    <path d="M10.5 4h.5c1.25 0 2 .75 2 2v4c0 1.25-.75 2-2 2h-.5v-1.5h.5c.375 0 .5-.125.5-.5V6c0-.375-.125-.5-.5-.5h-.5z"/>
+    <rect x="6" y="6" width="4" height="1.5" rx=".75"/>
+    <rect x="6" y="8.5" width="3" height="1.5" rx=".75"/>
+  </g>
+</svg>

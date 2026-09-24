@@ -23,13 +23,11 @@ jobs:
       - name: Run unit and packaging tests
         run: node scripts/test.js
 
-      - name: Set up Chrome for Testing
-        id: chrome
-        uses: browser-actions/setup-chrome@v2
-        with:
-          chrome-version: stable
-
       - name: Run synthetic layout regression
-        env:
-          WG_CHROME: ${{ steps.chrome.outputs.chrome-path }}
-        run: node tests/e2e/message-width.js
+        shell: pwsh
+        run: |
+          $chromePath = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(default)'
+          $chromeVersion = (Get-Item -LiteralPath $chromePath).VersionInfo.ProductVersion
+          Write-Host "Google Chrome $chromeVersion ($chromePath)"
+          $env:WG_CHROME = $chromePath
+          node tests/e2e/message-width.js

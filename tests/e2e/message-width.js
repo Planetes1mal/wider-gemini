@@ -172,9 +172,14 @@
         '--disable-extensions', '--window-size=2000,1200', `--user-data-dir=${path.join(temp, 'profile')}`,
         '--dump-dom', '--virtual-time-budget=1000', pathToFileURL(file).href],
     { encoding:'utf8', windowsHide:true, timeout:30000, maxBuffer:4 * 1024 * 1024 });
+    const match = result.stdout?.match(/<pre id="results">([^<]+)<\/pre>/);
+    if (result.error || !match) {
+        console.error(`Chrome report failure: status=${result.status}, signal=${result.signal}`);
+        console.error(`stdout (first 1000 chars): ${result.stdout?.slice(0, 1000) || '(empty)'}`);
+        console.error(`stderr (first 2000 chars): ${result.stderr?.slice(0, 2000) || '(empty)'}`);
+    }
     if (result.error) throw result.error;
-    const match = result.stdout.match(/<pre id="results">([^<]+)<\/pre>/);
-    assert(match, `No browser report (${result.status}): ${result.stderr.slice(-600)}`);
+    assert(match, `No browser report (${result.status})`);
     const report = JSON.parse(match[1]);
     fs.writeFileSync(path.join(temp, 'results.json'), JSON.stringify(report, null, 4));
     console.log(`Synthetic fixture and measurements: ${temp}`);

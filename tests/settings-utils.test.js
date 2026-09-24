@@ -166,11 +166,17 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(utils.normalizeUiLanguage('en'), 'en');
     assert.strictEqual(utils.normalizeUiLanguage('zh_CN'), 'zh_CN');
     assert.strictEqual(utils.normalizeUiLanguage('zh_TW'), 'zh_TW');
+    assert.strictEqual(utils.normalizeUiLanguage('ko'), 'ko');
+    assert.strictEqual(utils.normalizeUiLanguage('ja'), 'ja');
+    assert.strictEqual(utils.normalizeUiLanguage('es'), 'es');
     assert.strictEqual(utils.normalizeUiLanguage('fr'), 'auto');
     assert.strictEqual(utils.normalizeStorage({}).uiLanguage, 'auto');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'en' }).uiLanguage, 'en');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'zh_TW' }).uiLanguage, 'zh_TW');
-    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'ja' }).uiLanguage, 'auto');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'ko' }).uiLanguage, 'ko');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'ja' }).uiLanguage, 'ja');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'es' }).uiLanguage, 'es');
+    assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'fr' }).uiLanguage, 'auto');
 }
 
 console.log('settings-utils tests passed');

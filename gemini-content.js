@@ -19,15 +19,20 @@
     let currentRangeSettings = defaultNormalizedSettings;
     let isInitialized = false;
 
-    // Gemini 原生字号（2026-08 实测，正文基准 17px）；按字号比例缩放为像素值
-    const NATIVE_FONT_SIZES = {
-        '--gemini-message-font-size': 17,
-        '--gemini-message-inline-code-font-size': 15,
-        '--gemini-message-code-font-size': 14,
-        '--gemini-message-h1-font-size': 28,
-        '--gemini-message-h2-font-size': 24,
-        '--gemini-message-h3-font-size': 20
-    };
+    const READING_ROOT_SELECTOR = [
+        ':is(model-response, .model-response, response-container, .response-container, .presented-response-container,',
+        '[data-message-author-role="assistant"], [data-message-author-role="model"])',
+        ':is(.markdown, .markdown-main-panel, message-content),',
+        ':is(user-query, user-query-content, [data-message-author-role="user"], [aria-label="User message"])',
+        ':is(.query-text, .query-text-line, .gds-body-l)'
+    ].join(' ');
+    const READING_TEXT_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, blockquote, ul, ol, li, td, th, pre, code';
+    const READING_EXCLUDED_SELECTOR =
+        '.cdk-overlay-container, .cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"], dialog';
+    const READING_CLASSES = [
+        'wider-gemini-density-enabled', 'wider-gemini-font-enabled', 'wider-gemini-spacing-custom'
+    ];
+    const measuredReadingNodes = new WeakSet();
 
     const css_config = [
         { key: '.conversation-container, conversation-container', value: 'max-width: {width}', sleep: 0 },
@@ -90,23 +95,87 @@
             .trim() || '1000px';
     }
 
+    function prepareReadingLayout(scopes) {
+        const candidates = new Set();
+        const add = node => {
+            if (node && node.nodeType === 1 && node.isConnected &&
+                node.closest(READING_ROOT_SELECTOR) && !node.closest(READING_EXCLUDED_SELECTOR)) {
+                candidates.add(node);
+            }
+        };
+        for (const scope of scopes) {
+            if (scope.nodeType !== 1) continue;
+            if (scope.matches(`${READING_ROOT_SELECTOR}, ${READING_TEXT_SELECTOR}`)) add(scope);
+            scope.querySelectorAll(`${READING_ROOT_SELECTOR}, ${READING_TEXT_SELECTOR}`).forEach(add);
+            // 插入/删除段落会改变相邻节点的 :first-child / :last-child 原生间距。
+            if (scope.matches(READING_TEXT_SELECTOR) || scope.tagName === 'DIV') {
+                for (const sibling of [scope.previousElementSibling, scope.nextElementSibling]) {
+                    if (sibling) measuredReadingNodes.delete(sibling);
+                    add(sibling);
+                }
+            }
+        }
+        for (const node of [...candidates]) {
+            add(node.parentElement); // 包含嵌套段落的容器，以及 flex/grid 的原生 row-gap。
+        }
+        const pending = [...candidates].filter(node => !measuredReadingNodes.has(node));
+        if (!pending.length) return;
+
+        // 仅新节点采样时暂时关闭本扩展排版；同一任务内恢复，不观察 style/data 属性。
+        // 滑块更新只改根变量，不重新测量已有消息，更不会采到自己压缩后的值。
+        const enabled = READING_CLASSES.filter(name => document.body.classList.contains(name));
+        enabled.forEach(name => document.body.classList.remove(name));
+        let measurements;
+        try {
+            measurements = pending.map(node => {
+                const style = getComputedStyle(node);
+                return { node, font: parseFloat(style.fontSize), line: parseFloat(style.lineHeight),
+                    top: parseFloat(style.marginTop), bottom: parseFloat(style.marginBottom),
+                    gap: parseFloat(style.rowGap), display: style.display };
+            });
+        } finally {
+            enabled.forEach(name => document.body.classList.add(name));
+        }
+        for (const { node, font, line, top, bottom, gap, display } of measurements) {
+            const isRoot = node.matches(READING_ROOT_SELECTOR);
+            const text = node.matches(READING_TEXT_SELECTOR) || isRoot;
+            // 不从消息根给嵌入的 overlay 继承字号/行高，正文块仍各自应用。
+            if (text && !node.querySelector(READING_EXCLUDED_SELECTOR) && Number.isFinite(font) && font > 0) {
+                node.style.setProperty('--wg-native-font-size', `${font}px`);
+                node.setAttribute('data-wg-typography', '');
+                if (Number.isFinite(line) && line > 0) {
+                    const compactLine = Math.min(line, Math.max(font * 1.15, line * 0.82));
+                    node.style.setProperty('--wg-native-line-height', `${line}px`);
+                    node.style.setProperty('--wg-line-reduction', `${line - compactLine}px`);
+                    node.setAttribute('data-wg-line', '');
+                }
+            }
+            if (!isRoot && !node.matches('li, td, th, code') && display !== 'inline' && display !== 'contents' &&
+                Number.isFinite(top) && Number.isFinite(bottom)) {
+                node.style.setProperty('--wg-native-margin-top', `${top}px`);
+                node.style.setProperty('--wg-native-margin-bottom', `${bottom}px`);
+                node.setAttribute('data-wg-spacing', node.previousElementSibling ? 'after' : 'first');
+            }
+            if (Number.isFinite(gap) && gap > 0) {
+                node.style.setProperty('--wg-native-row-gap', `${gap}px`);
+                node.setAttribute('data-wg-gap', '');
+            }
+            measuredReadingNodes.add(node);
+        }
+    }
+
     function applyDensitySettings(settings) {
         const root = document.documentElement;
+        const progress = settings.messageCompactness / 100;
+        root.style.setProperty('--gemini-density-progress', String(progress));
+        root.style.setProperty('--gemini-density-spacing-scale', String(1 - 0.875 * progress));
+        root.style.setProperty('--gemini-font-scale', String(settings.messageFontSize / 100));
         root.style.setProperty('--gemini-message-line-height', String(settings.messageLineHeight));
         root.style.setProperty('--gemini-message-paragraph-spacing', `${settings.messageParagraphSpacing}px`);
-
-        const factor = settings.messageFontSize / 100;
-        for (const [prop, nativePx] of Object.entries(NATIVE_FONT_SIZES)) {
-            root.style.setProperty(prop, `${(nativePx * factor).toFixed(2)}px`);
-        }
-
-        if (settings.messageSpacingCustom || settings.messageCompactness > 0 || settings.messageFontSize !== 100) {
-            document.body.classList.add('wider-gemini-density-enabled');
-            console.log('[Wider Gemini] Applied message density', settings.messageLineHeight, settings.messageParagraphSpacing, settings.messageFontSize);
-        } else {
-            document.body.classList.remove('wider-gemini-density-enabled');
-            console.log('[Wider Gemini] Message density disabled');
-        }
+        document.body.classList.toggle('wider-gemini-density-enabled',
+            settings.messageSpacingCustom || settings.messageCompactness > 0);
+        document.body.classList.toggle('wider-gemini-spacing-custom', settings.messageSpacingCustom);
+        document.body.classList.toggle('wider-gemini-font-enabled', settings.messageFontSize !== 100);
     }
 
     function applyCodeWrap(enabled) {
@@ -173,15 +242,14 @@
                 elements.forEach(element => {
                     if (processedElements.has(element)) return;
 
-                    const style = window.getComputedStyle(element);
                     const classes = Array.from(element.classList || []).join(' ').toLowerCase();
-
+                    if (!classes.includes('drop') && !classes.includes('drag') &&
+                        !classes.includes('upload') && !classes.includes('zone')) return;
                     const inputArea = element.closest('.input-area-container, input-container, .chat-container');
-                    const isLikelyDropZone = inputArea && (
-                        (classes.includes('drop') ||
-                            classes.includes('drag') ||
-                            classes.includes('upload') ||
-                            classes.includes('zone')) &&
+                    if (!inputArea) return;
+
+                    const style = window.getComputedStyle(element);
+                    const isLikelyDropZone = (
                         style.display !== 'none' &&
                         style.visibility !== 'hidden' &&
                         (parseInt(style.width) > 100 || style.position === 'fixed' || style.position === 'absolute')
@@ -203,13 +271,12 @@
 
             const dragChildren = chatContainer.querySelectorAll('*');
             dragChildren.forEach(child => {
-                const childStyle = window.getComputedStyle(child);
                 const childClasses = Array.from(child.classList || []).join(' ').toLowerCase();
+                if (!childClasses.includes('drop') && !childClasses.includes('drag') &&
+                    !childClasses.includes('upload')) return;
 
-                if ((childClasses.includes('drop') ||
-                    childClasses.includes('drag') ||
-                    childClasses.includes('upload')) &&
-                    childStyle.display !== 'none' &&
+                const childStyle = window.getComputedStyle(child);
+                if (childStyle.display !== 'none' &&
                     parseInt(childStyle.width) > 100) {
                     child.style.setProperty('max-width', '100%', 'important');
                 }
@@ -281,9 +348,11 @@
 
             if (request.action === 'updateWidthSetting') {
                 applyWidthStyle(request.setting, request.ranges);
+                alignImageCaptions();
                 sendResponse({ success: true });
             } else if (request.action === 'updateWidth') {
                 applyWidthStyle({ value: request.width, unit: 'px' });
+                alignImageCaptions();
                 sendResponse({ success: true });
             } else if (request.action === 'updateCodeWrap') {
                 applyCodeWrap(request.enabled);
@@ -330,16 +399,19 @@
         if (isInitialized) return;
         isInitialized = true;
 
+        prepareReadingLayout([document.body]);
         applySettings();
         observeUrlChanges();
 
         const observer = new MutationObserver(function (mutations) {
             let shouldUpdate = false;
+            const readingScopes = [];
 
             mutations.forEach(mutation => {
                 if (mutation.type === 'childList') {
                     for (const node of mutation.addedNodes) {
                         if (node.nodeType === 1) {
+                            readingScopes.push(node);
                             const classList = node.classList || [];
                             const tagName = node.tagName ? node.tagName.toLowerCase() : '';
 
@@ -364,6 +436,10 @@
                             }
                         }
                     }
+                    if (mutation.removedNodes.length && mutation.target.nodeType === 1) {
+                        for (const child of mutation.target.children) measuredReadingNodes.delete(child);
+                        readingScopes.push(mutation.target);
+                    }
                 }
 
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
@@ -374,6 +450,7 @@
                 }
             });
 
+            prepareReadingLayout(readingScopes);
             if (shouldUpdate) {
                 applySettings();
             }
@@ -489,8 +566,10 @@
 
                 if (changes.chatWidthSetting) {
                     applyWidthStyle(changes.chatWidthSetting.newValue);
+                    alignImageCaptions();
                 } else if (changes.chatWidth) {
                     applyWidthStyle({ value: changes.chatWidth.newValue, unit: 'px' });
+                    alignImageCaptions();
                 }
 
                 if (changes.codeWrap) {

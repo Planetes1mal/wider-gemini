@@ -116,5 +116,149 @@
   "localeCode": {
     "message": "zh-TW",
     "description": "HTML language tag for this translation."
+  },
+  "helpLink": {
+    "message": "說明與回報"
+  },
+  "sourceLink": {
+    "message": "GitHub · 原始碼"
+  },
+  "helpPageTitle": {
+    "message": "Wider Gemini · 說明"
+  },
+  "helpTitle": {
+    "message": "使用說明與意見回饋"
+  },
+  "helpGettingStarted": {
+    "message": "讓 Gemini 更適合你的螢幕"
+  },
+  "helpOpenPopup": {
+    "message": "開啟 Gemini，點擊瀏覽器工具列中的 Wider Gemini 圖示，即可調整設定。"
+  },
+  "helpWidthTitle": {
+    "message": "訊息區域寬度"
+  },
+  "helpWidthBody": {
+    "message": "選擇 px 設定固定寬度，或選擇 % 隨視窗大小變化。拖曳滑桿或選擇預設組合；兩種單位各有獨立的預設組合。"
+  },
+  "helpCodeTitle": {
+    "message": "程式碼換行"
+  },
+  "helpCodeBody": {
+    "message": "開啟「程式碼自動換行」，減少閱讀長程式碼時的橫向捲動。關閉後保留不折行的程式碼顯示。"
+  },
+  "helpReadingTitle": {
+    "message": "字級與間距"
+  },
+  "helpReadingBody": {
+    "message": "字級可在75%至200%之間調整，不必縮放整個頁面。自動密度為0時保留原生段距和行高比例，提高密度會逐漸收緊原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。"
+  },
+  "helpLiveSettings": {
+    "message": "變更會即時套用至已開啟的 Gemini 分頁並自動儲存。是否跨裝置同步取決於瀏覽器的同步設定。"
+  },
+  "helpOpenGemini": {
+    "message": "開啟 Gemini"
+  },
+  "helpTroubleshooting": {
+    "message": "顯示不如預期？"
+  },
+  "helpTroubleshootPage": {
+    "message": "確認你正在使用 gemini.google.com，且已啟用 Wider Gemini。透過 Chrome 將該網站安裝為應用程式（PWA）也受支援；不支援 Google 原生桌面應用程式。"
+  },
+  "helpTroubleshootRefresh": {
+    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理一次 Gemini 頁面再試。"
+  },
+  "helpTroubleshootReport": {
+    "message": "若問題仍在，請記錄重現步驟與視窗大小。可附上已移除私人內容的螢幕擷取畫面，並說明是否使用了其他修改 Gemini 版面的擴充功能。"
+  },
+  "helpReportIssue": {
+    "message": "回報問題"
+  },
+  "helpDiagnosticsTitle": {
+    "message": "設定診斷報告"
+  },
+  "helpDiagnosticsPrivacy": {
+    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器主版本、平台與版面設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
+  },
+  "helpGenerateReport": {
+    "message": "產生報告"
+  },
+  "helpReportPreview": {
+    "message": "預覽"
+  },
+  "helpCopyReport": {
+    "message": "複製報告"
+  },
+  "helpSupportProject": {
+    "message": "如果 Wider Gemini 對你有幫助，歡迎為專案點 Star，或留下真實的使用評價。"
+  },
+  "helpGitHubLink": {
+    "message": "檢視原始碼 / 在 GitHub 點 Star"
+  },
+  "helpReviewLink": {
+    "message": "在 Chrome 線上應用程式商店評價"
+  },
+  "helpReportGenerating": {
+    "message": "正在讀取設定…"
+  },
+  "helpReportReady": {
+    "message": "報告已產生。請先檢視，再視需要複製分享。"
+  },
+  "helpReportError": {
+    "message": "無法讀取設定，請從擴充功能重新開啟說明頁後再試。"
+  },
+  "helpReportCopied": {
+    "message": "已複製，可以貼到問題回報中。"
+  },
+  "helpReportCopyFallback": {
+    "message": "無法自動複製，已選取報告，請手動複製。"
+  },
+  "taskPresets": {
+    "message": "任務預設"
+  },
+  "taskReading": {
+    "message": "長文閱讀"
+  },
+  "taskTable": {
+    "message": "表格"
+  },
+  "taskCode": {
+    "message": "程式碼"
+  },
+  "taskLarge": {
+    "message": "大字"
+  },
+  "taskHint": {
+    "message": "遵守自訂寬度範圍。還原會將以上四類設定恢復至最近一次套用之前。"
+  },
+  "taskApply": {
+    "message": "套用"
+  },
+  "taskRestore": {
+    "message": "還原套用前設定"
+  },
+  "taskPreview": {
+    "message": "寬度 {width} · 字級 {font}% · 原生間距 · 程式碼換行{wrap}"
+  },
+  "taskSaving": {
+    "message": "正在儲存設定…"
+  },
+  "taskApplied": {
+    "message": "已套用。套用前的設定已儲存在此裝置。"
+  },
+  "taskRestored": {
+    "message": "已還原套用前的設定。"
+  },
+  "taskSaveError": {
+    "message": "無法儲存或讀取設定，請重新開啟彈出視窗再試。"
+  },
+  "helpTaskTitle": {
+    "message": "任務預設"
+  },
+  "helpTaskBody": {
+    "message": "選擇長文閱讀、表格、程式碼或大字，查看設定摘要後點選套用。預設只調整寬度、字級、間距和程式碼換行，並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這四類設定的調整。"
+  },
+  "autoSpacingHint": {
+    "message": "自動模式跟隨各則訊息的原生間距。移動任一滑桿後，將手動套用下方兩項數值。"
   }
 }

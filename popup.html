@@ -16,6 +16,26 @@
             <p class="header-subtitle" id="i18n-headerSubtitle">让对话界面更宽更舒适</p>
         </header>
 
+        <section class="card task-card" aria-labelledby="i18n-taskPresets">
+            <div class="card-header">
+                <span class="card-icon" aria-hidden="true">T</span>
+                <label for="taskPresetSelect" class="card-title" id="i18n-taskPresets">Task presets</label>
+            </div>
+            <select id="taskPresetSelect" class="language-select" aria-describedby="taskPresetPreview taskPresetHint" disabled>
+                <option value="reading" id="i18n-taskReading">Long reading</option>
+                <option value="table" id="i18n-taskTable">Tables</option>
+                <option value="code" id="i18n-taskCode">Code</option>
+                <option value="large" id="i18n-taskLarge">Large text</option>
+            </select>
+            <p id="taskPresetPreview" class="task-preview"></p>
+            <p id="taskPresetHint" class="task-hint"><span id="i18n-taskHint">Width respects your limits. Apply when ready; restore undoes the most recent task preset on this device.</span></p>
+            <div class="task-actions">
+                <button type="button" id="applyTaskPreset" class="secondary-btn task-apply" disabled><span id="i18n-taskApply">Apply</span></button>
+                <button type="button" id="restoreTaskPreset" class="secondary-btn" disabled><span id="i18n-taskRestore">Restore previous settings</span></button>
+            </div>
+            <p id="taskPresetStatus" class="task-status" role="status" aria-live="polite"></p>
+        </section>
+
         <section class="card width-card">
             <div class="card-header">
                 <span class="card-icon">W</span>
@@ -83,6 +103,7 @@
                 <span class="collapse-summary" id="densitySummary"></span>
             </button>
             <div class="collapse-body" id="advancedDensityBody" hidden>
+                <p class="task-hint" id="i18n-autoSpacingHint">Auto follows each message's native spacing. Moving either slider applies both values below manually.</p>
                 <label class="range-label density-row"><span id="i18n-lineHeightLabel">行高</span>
                     <input type="range" id="lineHeightSlider" min="1.15" max="1.8" step="0.01" value="1.42">
                     <span id="lineHeightValue">1.42</span>
@@ -155,6 +176,9 @@
                 <option value="en">English</option>
                 <option value="zh_CN">简体中文</option>
                 <option value="zh_TW">繁體中文</option>
+                <option value="ko">한국어</option>
+                <option value="ja">日本語</option>
+                <option value="es">Español</option>
             </select>
         </section>
 
@@ -165,6 +189,11 @@
                 <p class="info-text" id="i18n-infoText2">设置会自动保存并应用到所有 Gemini 标签页</p>
             </div>
         </section>
+
+        <footer class="support-links">
+            <a href="help.html" target="_blank" rel="noopener" id="i18n-helpLink">Help &amp; feedback</a>
+            <a href="https://github.com/Planetes1mal/wider-gemini" target="_blank" rel="noopener noreferrer" id="i18n-sourceLink">GitHub · Source</a>
+        </footer>
 
         <div id="refreshNotice" class="refresh-notice">
             <span class="refresh-spinner" aria-hidden="true"></span>

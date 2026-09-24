@@ -436,6 +436,53 @@ h1 {
     color: var(--accent);
 }
 
+.task-preview,
+.task-hint,
+.task-status {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.task-hint {
+    color: var(--muted);
+}
+
+.task-status:empty {
+    display: none;
+}
+
+.task-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.task-actions .secondary-btn {
+    min-height: 36px;
+    height: auto;
+    padding: 7px 10px;
+    white-space: normal;
+}
+
+.task-actions .task-apply {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+}
+
+.task-card button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.task-card button:disabled,
+.task-card select:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
 .preset-buttons {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -743,4 +790,28 @@ input:checked + .slider-toggle::before {
     .density-row input[type="range"]::-moz-range-thumb {
         border-color: var(--surface);
     }
+}
+/* 帮助与源码入口保持低调，不打断设置操作。 */
+.support-links {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 6px 2px;
+    font-size: 12px;
+}
+
+.support-links a {
+    color: var(--muted);
+    padding: 8px 0;
+    text-underline-offset: 3px;
+}
+
+.support-links a:hover {
+    color: var(--accent);
+}
+
+.support-links a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 3px;
 }

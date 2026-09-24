@@ -1,0 +1,44 @@
+name: Bug report / 问题反馈
+description: Report a layout or settings problem with steps we can reproduce.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or 中文 are welcome. Please remove private conversation text, account details, and conversation URLs from screenshots and reports.
+        欢迎使用中文或英文。请先移除截图和描述中的私人对话、账号信息及会话链接。
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened? / 出现了什么问题？
+      description: Describe the expected result and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: Include the page type, width/unit, relevant switches, and non-sensitive sample content if useful.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Versions / 环境版本
+      description: Extension version, browser version, and OS.
+      placeholder: Wider Gemini 2.x.x; Chrome xxx; Windows / macOS / Linux
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where does it happen? / 使用入口
+      options:
+        - Gemini website in a browser tab / 浏览器中的 Gemini 网页
+        - Gemini installed as a Chrome app (PWA) / Chrome 安装的 Gemini 网站应用
+        - Native Gemini app or Chrome's built-in panel / 原生 Gemini 应用或 Chrome 内置面板
+        - Other / 其他
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshot or extra details / 截图或补充信息
+      description: Optional. Use sample content and hide personal details. Mention other layout extensions if relevant.

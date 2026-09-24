@@ -19,5 +19,12 @@ CONTEXT.md
 .superpowers/
 icons/宣传图/
 icons/宣传图/**
-tests/**
-tests/
+# Publish reusable tests; keep local diagnostics and experimental scripts private.
+tests/*
+!tests/*.test.js
+!tests/e2e/
+tests/e2e/*
+!tests/e2e/message-width.js
+!tests/e2e/performance.js
+!tests/e2e/package-load.js
+!tests/e2e/popup-language.js

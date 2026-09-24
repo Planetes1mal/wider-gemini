@@ -14,7 +14,7 @@
     const DENSITY_APPLIED_MAX_PARAGRAPH_SPACING = 11;
     const DENSITY_APPLIED_MIN_PARAGRAPH_SPACING = 2;
     const FONT_SIZE_RANGE = { min: 75, max: 200, step: 5 };
-    const UI_LANGUAGES = ['auto', 'en', 'zh_CN', 'zh_TW'];
+    const UI_LANGUAGES = ['auto', 'en', 'zh_CN', 'zh_TW', 'ko', 'ja', 'es'];
 
     const DEFAULT_PRESETS_BY_UNIT = {
         [UNIT_PX]: [
@@ -182,6 +182,8 @@
     }
 
     function deriveDensityFromCompactness(compactness) {
+        // 保留旧字段作为高级手动控件的起始值和存储兼容层。
+        // Auto 的实际间距由内容脚本按各消息的原生样式连续缩放，不使用这些绝对值。
         const normalizedCompactness = Math.round(clampNumber(compactness, 0, 100));
 
         if (normalizedCompactness === 0) {

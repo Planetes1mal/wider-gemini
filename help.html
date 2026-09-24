@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="helpPageTitle">Wider Gemini · Help</title>
+    <link rel="stylesheet" href="help.css">
+    <script src="settings-utils.js" defer></script>
+    <script src="help.js" defer></script>
+</head>
+
+<body>
+    <main class="container">
+        <header class="header">
+            <span class="header-icon" aria-hidden="true">WG</span>
+            <div>
+                <p class="brand">Wider Gemini <span id="extensionVersion" class="version"></span></p>
+                <h1 data-i18n="helpTitle">Help & feedback</h1>
+            </div>
+        </header>
+
+        <section class="card" aria-labelledby="gettingStartedTitle">
+            <h2 id="gettingStartedTitle" data-i18n="helpGettingStarted">Make Gemini fit your screen</h2>
+            <p data-i18n="helpOpenPopup">Open Gemini, then click the Wider Gemini toolbar icon to adjust your settings.</p>
+            <dl class="instructions">
+                <div>
+                    <dt data-i18n="helpTaskTitle">Task presets</dt>
+                    <dd data-i18n="helpTaskBody">Choose Long reading, Tables, Code, or Large text, review the settings, then click Apply. These change width, font size, spacing, and code wrapping. Your width limits still apply. Restore previous settings undoes the most recent task preset on this device, even after closing the popup; it replaces any later changes to those settings.</dd>
+                </div>
+                <div>
+                    <dt data-i18n="helpWidthTitle">Conversation width</dt>
+                    <dd data-i18n="helpWidthBody">Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset; each unit has its own presets.</dd>
+                </div>
+                <div>
+                    <dt data-i18n="helpCodeTitle">Code wrapping</dt>
+                    <dd data-i18n="helpCodeBody">Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. Turn it off to preserve unbroken code lines.</dd>
+                </div>
+                <div>
+                    <dt data-i18n="helpReadingTitle">Text size & spacing</dt>
+                    <dd data-i18n="helpReadingBody">Adjust font size from 75% to 200% without zooming the whole page. At Auto density 0, native paragraph gaps and line-height proportions are preserved. Higher density gradually reduces native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density.</dd>
+                </div>
+            </dl>
+            <p class="note" data-i18n="helpLiveSettings">Changes apply to open Gemini tabs and are saved automatically. Sync across devices depends on your browser's sync settings.</p>
+            <a class="text-link" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer"
+                data-i18n="helpOpenGemini">Open Gemini</a>
+        </section>
+
+        <section class="card" aria-labelledby="troubleshootingTitle">
+            <h2 id="troubleshootingTitle" data-i18n="helpTroubleshooting">Something looks wrong?</h2>
+            <ol class="troubleshooting">
+                <li data-i18n="helpTroubleshootPage">Check that you are on gemini.google.com and Wider Gemini is enabled. It also works with this website installed as a Chrome app (PWA). Google's native desktop apps are not supported.</li>
+                <li data-i18n="helpTroubleshootRefresh">If a setting does not appear after installing or updating the extension, reload the Gemini page once and try again.</li>
+                <li data-i18n="helpTroubleshootReport">If the problem continues, note the steps to reproduce it and your window size. A screenshot with private content removed can help; mention any other extensions that change Gemini's layout.</li>
+            </ol>
+            <a class="button primary" href="https://github.com/Planetes1mal/wider-gemini/issues/new/choose"
+                target="_blank" rel="noopener noreferrer" data-i18n="helpReportIssue">Report a problem</a>
+        </section>
+
+        <section class="card" aria-labelledby="diagnosticsTitle">
+            <h2 id="diagnosticsTitle" data-i18n="helpDiagnosticsTitle">Settings report</h2>
+            <p id="diagnosticPrivacy" data-i18n="helpDiagnosticsPrivacy">Generate a report to preview before sharing it in an issue. It includes only the extension version, browser major version, platform, and layout settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically.</p>
+            <div class="actions">
+                <button type="button" id="generateReport" class="button primary"
+                    data-i18n="helpGenerateReport">Generate report</button>
+            </div>
+            <div id="reportPreview" class="report-preview" hidden>
+                <label for="diagnosticReport" data-i18n="helpReportPreview">Preview</label>
+                <textarea id="diagnosticReport" rows="15" readonly spellcheck="false"
+                    aria-describedby="diagnosticPrivacy"></textarea>
+                <button type="button" id="copyReport" class="button secondary"
+                    data-i18n="helpCopyReport">Copy report</button>
+            </div>
+            <p id="reportStatus" class="status" role="status" aria-live="polite"></p>
+        </section>
+
+        <footer class="footer">
+            <p data-i18n="helpSupportProject">If Wider Gemini helps you, you can star the project or leave an honest review.</p>
+            <nav class="footer-links">
+                <a href="https://github.com/Planetes1mal/wider-gemini" target="_blank" rel="noopener noreferrer"
+                    data-i18n="helpGitHubLink">Source code & Star on GitHub</a>
+                <a href="https://chromewebstore.google.com/detail/wider-gemini/apadogadaahdjhhmbdhkmdecbobijoed/reviews"
+                    target="_blank" rel="noopener noreferrer" data-i18n="helpReviewLink">Review on Chrome Web Store</a>
+            </nav>
+        </footer>
+    </main>
+</body>
+
+</html>

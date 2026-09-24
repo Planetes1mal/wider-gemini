@@ -1,0 +1,264 @@
+{
+  "appName": {
+    "message": "Wider Gemini"
+  },
+  "appDesc": {
+    "message": "Google Gemini의 대화 너비, 글자 크기, 문단 간격과 코드 줄바꿈을 조절해 더 편하게 읽으세요."
+  },
+  "headerSubtitle": {
+    "message": "Gemini 대화를 더 넓고 편안하게"
+  },
+  "widthLabel": {
+    "message": "대화 너비"
+  },
+  "widthMin": {
+    "message": "최소 너비"
+  },
+  "widthMax": {
+    "message": "최대 너비"
+  },
+  "btnNarrow": {
+    "message": "좁게"
+  },
+  "btnDefault": {
+    "message": "기본"
+  },
+  "btnWider": {
+    "message": "넓게"
+  },
+  "btnUltra": {
+    "message": "더 넓게"
+  },
+  "btnInsane": {
+    "message": "최대로"
+  },
+  "editPresets": {
+    "message": "프리셋 편집"
+  },
+  "donePresets": {
+    "message": "완료"
+  },
+  "cancelPresets": {
+    "message": "취소"
+  },
+  "managePresets": {
+    "message": "프리셋 관리"
+  },
+  "managePresetsSummary": {
+    "message": "프리셋 5개 사용자 지정됨"
+  },
+  "resetToDefault": {
+    "message": "기본값으로 초기화"
+  },
+  "clampedHint": {
+    "message": "설정 범위에 맞게 조정됨"
+  },
+  "codeWrapLabel": {
+    "message": "코드 자동 줄바꿈"
+  },
+  "userFullWidthLabel": {
+    "message": "내 메시지도 전체 너비로"
+  },
+  "statusOn": {
+    "message": "켜짐"
+  },
+  "statusOff": {
+    "message": "꺼짐"
+  },
+  "infoText1": {
+    "message": "슬라이더를 움직이거나 프리셋 버튼을 눌러 너비를 조절하세요."
+  },
+  "infoText2": {
+    "message": "설정은 자동으로 저장되며 모든 Gemini 탭에 적용됩니다."
+  },
+  "refreshing": {
+    "message": "페이지 새로고침 중…"
+  },
+  "widthUnit": {
+    "message": "너비 단위"
+  },
+  "densityLabel": {
+    "message": "읽기 밀도"
+  },
+  "compactnessUnit": {
+    "message": "%"
+  },
+  "advancedDensity": {
+    "message": "간격 세부 설정"
+  },
+  "lineHeightLabel": {
+    "message": "줄 간격"
+  },
+  "paragraphSpacingLabel": {
+    "message": "문단 간격"
+  },
+  "fontSizeLabel": {
+    "message": "글자 크기"
+  },
+  "resetFontSize": {
+    "message": "글자 크기 초기화"
+  },
+  "resetDensity": {
+    "message": "간격 초기화"
+  },
+  "customSpacing": {
+    "message": "사용자 지정"
+  },
+  "autoSpacing": {
+    "message": "자동"
+  },
+  "uiLanguageLabel": {
+    "message": "언어"
+  },
+  "uiLanguageAuto": {
+    "message": "브라우저 언어 사용"
+  },
+  "localeCode": {
+    "message": "ko",
+    "description": "HTML language tag for this translation."
+  },
+  "helpLink": {
+    "message": "도움말 및 피드백"
+  },
+  "sourceLink": {
+    "message": "GitHub · 소스 코드"
+  },
+  "helpPageTitle": {
+    "message": "Wider Gemini · 도움말"
+  },
+  "helpTitle": {
+    "message": "도움말 및 피드백"
+  },
+  "helpGettingStarted": {
+    "message": "Gemini를 내 화면에 맞게"
+  },
+  "helpOpenPopup": {
+    "message": "Gemini를 연 다음 브라우저 도구 모음에서 Wider Gemini 아이콘을 눌러 설정을 조절하세요."
+  },
+  "helpWidthTitle": {
+    "message": "대화 너비"
+  },
+  "helpWidthBody": {
+    "message": "고정 너비를 사용하려면 px를, 브라우저 창의 표시 영역 너비에 비례하도록 하려면 %를 선택하세요. 슬라이더를 움직이거나 프리셋을 선택할 수 있습니다. 단위별로 프리셋이 따로 저장됩니다."
+  },
+  "helpCodeTitle": {
+    "message": "코드 줄바꿈"
+  },
+  "helpCodeBody": {
+    "message": "코드 자동 줄바꿈을 켜면 긴 코드를 읽을 때 가로 스크롤을 줄일 수 있습니다. 원래 코드의 줄 구성을 유지하려면 끄세요."
+  },
+  "helpReadingTitle": {
+    "message": "글자 크기와 간격"
+  },
+  "helpReadingBody": {
+    "message": "페이지 전체를 확대하지 않고 글자 크기를 75%~200%로 조절할 수 있습니다. 자동 모드에서 밀도 0은 기본 문단 간격과 줄 높이 비율을 유지합니다. 밀도를 높이면 기본 간격이 점진적으로 줄어듭니다. 간격 세부 설정에서는 정확한 값을 직접 지정할 수 있으며, 간격 초기화를 누르면 현재 밀도의 자동 모드로 돌아갑니다."
+  },
+  "helpLiveSettings": {
+    "message": "변경 사항은 열려 있는 Gemini 탭에 적용되고 자동으로 저장됩니다. 기기 간 동기화는 브라우저의 동기화 설정에 따라 달라집니다."
+  },
+  "helpOpenGemini": {
+    "message": "Gemini 열기"
+  },
+  "helpTroubleshooting": {
+    "message": "화면이 제대로 표시되지 않나요?"
+  },
+  "helpTroubleshootPage": {
+    "message": "gemini.google.com에 접속했는지, Wider Gemini가 켜져 있는지 확인하세요. 이 웹사이트를 Chrome 앱(PWA)으로 설치한 경우에도 사용할 수 있습니다. Google의 네이티브 데스크톱 앱은 지원하지 않습니다."
+  },
+  "helpTroubleshootRefresh": {
+    "message": "확장 프로그램을 설치하거나 업데이트한 뒤 설정이 반영되지 않으면 Gemini 페이지를 한 번 새로고침하고 다시 시도하세요."
+  },
+  "helpTroubleshootReport": {
+    "message": "문제가 계속되면 재현 단계와 창 크기를 기록해 주세요. 개인정보를 가린 스크린샷도 도움이 됩니다. Gemini 화면을 변경하는 다른 확장 프로그램을 사용 중이라면 함께 알려 주세요."
+  },
+  "helpReportIssue": {
+    "message": "문제 신고"
+  },
+  "helpDiagnosticsTitle": {
+    "message": "설정 보고서"
+  },
+  "helpDiagnosticsPrivacy": {
+    "message": "문제 신고에 첨부하기 전에 보고서를 생성하고 내용을 확인할 수 있습니다. 확장 프로그램 버전, 브라우저 주 버전, 운영체제와 화면 설정만 포함됩니다. 대화, 페이지 URL, 제목, 사용자 지정 프리셋 이름은 포함되지 않습니다. 보고서는 자동으로 전송되지 않습니다."
+  },
+  "helpGenerateReport": {
+    "message": "보고서 생성"
+  },
+  "helpReportPreview": {
+    "message": "미리보기"
+  },
+  "helpCopyReport": {
+    "message": "보고서 복사"
+  },
+  "helpSupportProject": {
+    "message": "Wider Gemini가 도움이 되었다면 GitHub에서 Star를 누르거나 솔직한 사용 후기를 남겨 주세요."
+  },
+  "helpGitHubLink": {
+    "message": "GitHub 소스 코드 및 Star"
+  },
+  "helpReviewLink": {
+    "message": "Chrome 웹 스토어에 후기 남기기"
+  },
+  "helpReportGenerating": {
+    "message": "설정을 읽는 중…"
+  },
+  "helpReportReady": {
+    "message": "보고서가 준비되었습니다. 내용을 확인한 뒤 공유하려면 복사하세요."
+  },
+  "helpReportError": {
+    "message": "설정을 읽을 수 없습니다. 확장 프로그램에서 도움말을 다시 열고 시도하세요."
+  },
+  "helpReportCopied": {
+    "message": "복사했습니다. 문제 신고에 보고서를 붙여넣을 수 있습니다."
+  },
+  "helpReportCopyFallback": {
+    "message": "자동으로 복사하지 못했습니다. 보고서가 선택되어 있으니 직접 복사해 주세요."
+  },
+  "taskPresets": {
+    "message": "작업별 프리셋"
+  },
+  "taskReading": {
+    "message": "긴 글 읽기"
+  },
+  "taskTable": {
+    "message": "표"
+  },
+  "taskCode": {
+    "message": "코드"
+  },
+  "taskLarge": {
+    "message": "큰 글자"
+  },
+  "taskHint": {
+    "message": "설정한 너비 범위를 따릅니다. 복원하면 위 네 가지 설정이 마지막 적용 전의 값으로 돌아갑니다."
+  },
+  "taskApply": {
+    "message": "적용"
+  },
+  "taskRestore": {
+    "message": "적용 전 설정 복원"
+  },
+  "taskPreview": {
+    "message": "너비 {width} · 글자 {font}% · 기본 간격 · 코드 줄바꿈 {wrap}"
+  },
+  "taskSaving": {
+    "message": "설정 저장 중…"
+  },
+  "taskApplied": {
+    "message": "적용했습니다. 이전 설정은 이 기기에 저장되었습니다."
+  },
+  "taskRestored": {
+    "message": "적용 전 설정을 복원했습니다."
+  },
+  "taskSaveError": {
+    "message": "설정을 저장하거나 읽을 수 없습니다. 팝업을 다시 열고 시도하세요."
+  },
+  "helpTaskTitle": {
+    "message": "작업별 프리셋"
+  },
+  "helpTaskBody": {
+    "message": "긴 글 읽기, 표, 코드, 큰 글자 중 하나를 선택하고 설정 내용을 확인한 뒤 적용을 누르세요. 너비, 글자 크기, 간격, 코드 줄바꿈만 변경되며 설정한 너비 범위를 따릅니다. 적용 전 설정 복원은 팝업을 닫은 뒤에도 이 기기에서 마지막으로 적용한 프리셋을 되돌립니다. 이후 이 네 가지 설정을 변경했다면 해당 변경 사항도 이전 값으로 덮어씁니다."
+  },
+  "autoSpacingHint": {
+    "message": "자동 모드는 각 메시지의 기본 간격을 따릅니다. 슬라이더 하나를 움직이면 아래 두 값이 모두 수동으로 적용됩니다."
+  }
+}

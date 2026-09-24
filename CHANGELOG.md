@@ -4,6 +4,37 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
+## 2.8.0 (2026-09-23)
+
+### Fixes
+
+- Base automatic reading density on each message's native spacing, with gradual low-density steps. Font-only changes preserve native paragraph gaps and proportional line height; manual spacing still supports an exact 0px gap.
+- Keep saved Auto density percentages, interpreted using the new relative curve; saved explicit manual spacing values are unchanged.
+- Save width, text size, and reading density when a slider is released, so closing the popup immediately does not discard the change.
+- Preserve literal custom preset names and keep default preset names translated after editing or resetting presets.
+- Update both numeric width inputs to the selected unit's limits, so valid percentage widths are accepted.
+- Realign image captions when conversation width changes, including settings received from another tab.
+- Avoid reading computed styles for unrelated elements during file dragging. Existing drag behavior and width rules are preserved.
+
+### Features
+
+- Added task presets for long reading, tables, code, and large text, with a settings preview, explicit Apply, and one previous layout that can be restored on the same device after reopening the popup. Custom width limits and unrelated preferences are preserved.
+- Added local help and feedback with troubleshooting and optional issue, source, and review links. The popup and help support English, Simplified Chinese, Traditional Chinese, Korean, Japanese, and Spanish, with browser-language matching and manual selection. Korean, Japanese, and Spanish translations are machine-assisted; native-speaker improvements are welcome.
+- Added a diagnostic settings preview that users can copy into a bug report. It contains extension/browser versions and layout preferences, without conversations, page URLs, titles, or custom preset names. Reports are not sent automatically.
+
+### Other
+
+- Added reproducible long-conversation performance measurements, a dated compatibility record, and engineering case studies for startup injection, Drive overlay boundaries, browser regressions, and release traceability.
+- Added local CSV/GitHub measurement tools, an initial traffic baseline, and English/Traditional Chinese reading guides. No extension telemetry is added.
+- Added a separate local reading-layout experiment with two synthetic samples and a blank participant worksheet; mixed prose/table widths are not part of the extension.
+- Added `--skip-packaging` to the test runner for internal iterations; the default CI and release suite is unchanged.
+- Added the existing regression checks to the source tree, CI before release packaging, and contribution and compatibility documentation.
+- Preserved PR #10's conversation-width, input, upload, and overlay boundaries while changing the reading-density/font-size mechanism.
+
+The [dated compatibility record](https://github.com/Planetes1mal/wider-gemini/blob/v2.8.0/docs/compatibility.md) distinguishes current-source unit and isolated Windows Chrome synthetic-layout checks from outstanding live Gemini, system PWA cold-start, and macOS verification. This release does not claim new acceptance of those live/device flows.
+
+If you manually installed a 2.8.0 release candidate, replace/reload it with the stable files; Chrome compares the numeric version and does not automatically upgrade that candidate to this build.
+
 ## 2.7.0 (2026-09-16)
 
 ### Features

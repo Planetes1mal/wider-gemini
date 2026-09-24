@@ -116,5 +116,149 @@
   "localeCode": {
     "message": "zh-CN",
     "description": "HTML language tag for this translation."
+  },
+  "helpLink": {
+    "message": "帮助与反馈"
+  },
+  "sourceLink": {
+    "message": "GitHub · 源码"
+  },
+  "helpPageTitle": {
+    "message": "Wider Gemini · 帮助"
+  },
+  "helpTitle": {
+    "message": "帮助与反馈"
+  },
+  "helpGettingStarted": {
+    "message": "让 Gemini 更适合你的屏幕"
+  },
+  "helpOpenPopup": {
+    "message": "打开 Gemini，点击浏览器工具栏中的 Wider Gemini 图标，即可调整设置。"
+  },
+  "helpWidthTitle": {
+    "message": "消息区域宽度"
+  },
+  "helpWidthBody": {
+    "message": "选择 px 设置固定宽度，或选择 % 随窗口大小变化。拖动滑块或选择预设；两种单位各有独立的预设。"
+  },
+  "helpCodeTitle": {
+    "message": "代码换行"
+  },
+  "helpCodeBody": {
+    "message": "开启“代码自动换行”，减少阅读长代码时的横向滚动。关闭后保留不折行的代码显示。"
+  },
+  "helpReadingTitle": {
+    "message": "字号与间距"
+  },
+  "helpReadingBody": {
+    "message": "字号可在75%至200%之间调整，无需缩放整个页面。自动密度为0时保留原生段距和行高比例，提高密度会逐渐收紧原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。"
+  },
+  "helpLiveSettings": {
+    "message": "修改会即时应用到已打开的 Gemini 标签页并自动保存。是否跨设备同步取决于浏览器的同步设置。"
+  },
+  "helpOpenGemini": {
+    "message": "打开 Gemini"
+  },
+  "helpTroubleshooting": {
+    "message": "显示不符合预期？"
+  },
+  "helpTroubleshootPage": {
+    "message": "确认你正在使用 gemini.google.com，且已启用 Wider Gemini。通过 Chrome 将该网站安装为应用（PWA）也受支持；不支持 Google 原生桌面应用。"
+  },
+  "helpTroubleshootRefresh": {
+    "message": "安装或更新扩展后，如果设置没有生效，请刷新一次 Gemini 页面再试。"
+  },
+  "helpTroubleshootReport": {
+    "message": "若问题仍在，请记录复现步骤和窗口大小。可以附上已去除私人内容的截图，并说明是否使用了其他修改 Gemini 布局的扩展。"
+  },
+  "helpReportIssue": {
+    "message": "反馈问题"
+  },
+  "helpDiagnosticsTitle": {
+    "message": "设置诊断报告"
+  },
+  "helpDiagnosticsPrivacy": {
+    "message": "生成后可先预览，再决定是否分享到问题反馈中。报告仅包含扩展版本、浏览器主版本、平台和布局设置，不包含聊天内容、网页网址、标题或自定义预设名称，也不会自动发送。"
+  },
+  "helpGenerateReport": {
+    "message": "生成报告"
+  },
+  "helpReportPreview": {
+    "message": "预览"
+  },
+  "helpCopyReport": {
+    "message": "复制报告"
+  },
+  "helpSupportProject": {
+    "message": "如果 Wider Gemini 对你有帮助，欢迎为项目点 Star，或留下真实的使用评价。"
+  },
+  "helpGitHubLink": {
+    "message": "查看源码 / 在 GitHub 点 Star"
+  },
+  "helpReviewLink": {
+    "message": "在 Chrome 应用商店评价"
+  },
+  "helpReportGenerating": {
+    "message": "正在读取设置…"
+  },
+  "helpReportReady": {
+    "message": "报告已生成。请先查看，再按需复制分享。"
+  },
+  "helpReportError": {
+    "message": "无法读取设置，请从扩展重新打开帮助页后再试。"
+  },
+  "helpReportCopied": {
+    "message": "已复制，可以粘贴到问题反馈中。"
+  },
+  "helpReportCopyFallback": {
+    "message": "无法自动复制，已选中报告，请手动复制。"
+  },
+  "taskPresets": {
+    "message": "任务预设"
+  },
+  "taskReading": {
+    "message": "长文阅读"
+  },
+  "taskTable": {
+    "message": "表格"
+  },
+  "taskCode": {
+    "message": "代码"
+  },
+  "taskLarge": {
+    "message": "大字"
+  },
+  "taskHint": {
+    "message": "遵守自定义宽度范围。恢复会将以上四类设置还原至最近一次应用之前。"
+  },
+  "taskApply": {
+    "message": "应用"
+  },
+  "taskRestore": {
+    "message": "恢复应用前设置"
+  },
+  "taskPreview": {
+    "message": "宽度 {width} · 字号 {font}% · 原生间距 · 代码换行{wrap}"
+  },
+  "taskSaving": {
+    "message": "正在保存设置…"
+  },
+  "taskApplied": {
+    "message": "已应用。应用前的设置已保存在此设备。"
+  },
+  "taskRestored": {
+    "message": "已恢复应用前的设置。"
+  },
+  "taskSaveError": {
+    "message": "无法保存或读取设置，请重新打开弹窗再试。"
+  },
+  "helpTaskTitle": {
+    "message": "任务预设"
+  },
+  "helpTaskBody": {
+    "message": "选择长文阅读、表格、代码或大字，查看设置摘要后点击应用。预设只调整宽度、字号、间距和代码换行，并遵守自定义宽度范围。“恢复应用前设置”可撤销此设备上最近一次应用，即使已关闭弹窗；恢复会覆盖之后对这四类设置的调整。"
+  },
+  "autoSpacingHint": {
+    "message": "自动模式跟随各消息的原生间距。移动任一滑块后，将手动应用下方两项数值。"
   }
 }

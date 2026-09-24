@@ -116,5 +116,149 @@
   "localeCode": {
     "message": "en",
     "description": "HTML language tag for this translation."
+  },
+  "helpLink": {
+    "message": "Help & feedback"
+  },
+  "sourceLink": {
+    "message": "GitHub · Source"
+  },
+  "helpPageTitle": {
+    "message": "Wider Gemini · Help"
+  },
+  "helpTitle": {
+    "message": "Help & feedback"
+  },
+  "helpGettingStarted": {
+    "message": "Make Gemini fit your screen"
+  },
+  "helpOpenPopup": {
+    "message": "Open Gemini, then click the Wider Gemini toolbar icon to adjust your settings."
+  },
+  "helpWidthTitle": {
+    "message": "Conversation width"
+  },
+  "helpWidthBody": {
+    "message": "Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset; each unit has its own presets."
+  },
+  "helpCodeTitle": {
+    "message": "Code wrapping"
+  },
+  "helpCodeBody": {
+    "message": "Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. Turn it off to preserve unbroken code lines."
+  },
+  "helpReadingTitle": {
+    "message": "Text size & spacing"
+  },
+  "helpReadingBody": {
+    "message": "Adjust font size from 75% to 200% without zooming the whole page. At Auto density 0, native paragraph gaps and line-height proportions are preserved. Higher density gradually reduces native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density."
+  },
+  "helpLiveSettings": {
+    "message": "Changes apply to open Gemini tabs and are saved automatically. Sync across devices depends on your browser's sync settings."
+  },
+  "helpOpenGemini": {
+    "message": "Open Gemini"
+  },
+  "helpTroubleshooting": {
+    "message": "Something looks wrong?"
+  },
+  "helpTroubleshootPage": {
+    "message": "Check that you are on gemini.google.com and Wider Gemini is enabled. It also works with this website installed as a Chrome app (PWA). Google's native desktop apps are not supported."
+  },
+  "helpTroubleshootRefresh": {
+    "message": "If a setting does not appear after installing or updating the extension, reload the Gemini page once and try again."
+  },
+  "helpTroubleshootReport": {
+    "message": "If the problem continues, note the steps to reproduce it and your window size. A screenshot with private content removed can help; mention any other extensions that change Gemini's layout."
+  },
+  "helpReportIssue": {
+    "message": "Report a problem"
+  },
+  "helpDiagnosticsTitle": {
+    "message": "Settings report"
+  },
+  "helpDiagnosticsPrivacy": {
+    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser major version, platform, and layout settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
+  },
+  "helpGenerateReport": {
+    "message": "Generate report"
+  },
+  "helpReportPreview": {
+    "message": "Preview"
+  },
+  "helpCopyReport": {
+    "message": "Copy report"
+  },
+  "helpSupportProject": {
+    "message": "If Wider Gemini helps you, you can star the project or leave an honest review."
+  },
+  "helpGitHubLink": {
+    "message": "Source code & Star on GitHub"
+  },
+  "helpReviewLink": {
+    "message": "Review on Chrome Web Store"
+  },
+  "helpReportGenerating": {
+    "message": "Reading settings…"
+  },
+  "helpReportReady": {
+    "message": "Report ready. Review it, then copy it if you want to share it."
+  },
+  "helpReportError": {
+    "message": "Could not read settings. Reopen help from the extension and try again."
+  },
+  "helpReportCopied": {
+    "message": "Copied. You can paste the report into your issue."
+  },
+  "helpReportCopyFallback": {
+    "message": "Copy was unavailable. The report is selected; copy it manually."
+  },
+  "taskPresets": {
+    "message": "Task presets"
+  },
+  "taskReading": {
+    "message": "Long reading"
+  },
+  "taskTable": {
+    "message": "Tables"
+  },
+  "taskCode": {
+    "message": "Code"
+  },
+  "taskLarge": {
+    "message": "Large text"
+  },
+  "taskHint": {
+    "message": "Uses your width limits. Restore returns the four settings above to their values before the last Apply."
+  },
+  "taskApply": {
+    "message": "Apply"
+  },
+  "taskRestore": {
+    "message": "Restore previous settings"
+  },
+  "taskPreview": {
+    "message": "Width {width} · Font {font}% · Native spacing · Code wrap {wrap}"
+  },
+  "taskSaving": {
+    "message": "Saving settings…"
+  },
+  "taskApplied": {
+    "message": "Applied. Previous settings are saved on this device."
+  },
+  "taskRestored": {
+    "message": "Previous settings restored."
+  },
+  "taskSaveError": {
+    "message": "Could not save or load settings. Reopen the popup and try again."
+  },
+  "helpTaskTitle": {
+    "message": "Task presets"
+  },
+  "helpTaskBody": {
+    "message": "Choose Long reading, Tables, Code, or Large text, review the settings, then click Apply. These change width, font size, spacing, and code wrapping. Your width limits still apply. Restore previous settings undoes the most recent task preset on this device, even after closing the popup; it replaces any later changes to those settings."
+  },
+  "autoSpacingHint": {
+    "message": "Auto follows each message's native spacing. Moving either slider applies both values below manually."
   }
 }

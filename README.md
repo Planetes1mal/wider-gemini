@@ -4,8 +4,8 @@ English | [简体中文](./README.zh-CN.md) | [繁體中文](./docs/i18n/README.
 
 A Chrome extension for adjusting the width of Gemini conversations. Use the slider or pick a preset to fit the conversation to your screen.
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed)
-[![GitHub Release](https://img.shields.io/github/v/release/Planetes1mal/wider-gemini?label=release)](https://github.com/Planetes1mal/wider-gemini/releases)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
+[![GitHub Release 2.8.0](https://img.shields.io/badge/release-v2.8.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.8.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ![Gemini conversation before and after widening](./docs/images/wider-gemini-preview.jpg)
@@ -18,13 +18,15 @@ Top: default width. Bottom: a wider conversation with Wider Gemini.
 - **Adjust text size and spacing**: Scale text from 75% to 200%, with separate controls for line height and paragraph spacing.
 - **Wrap code**: Keep long lines of code within the conversation area.
 - **Full-width user messages**: Left-align your messages and give them the full conversation width, just like Gemini's replies.
-- **Three interface languages**: English, Simplified Chinese, and Traditional Chinese. Follow your browser's language or choose one manually.
+- **Interface languages**: English, Simplified Chinese, Traditional Chinese, Korean, Japanese, and Spanish. Follow your browser's language or choose one manually. Korean, Japanese, and Spanish translations are machine-assisted; native-speaker improvements are welcome.
 
 Settings are saved automatically, and changes apply immediately to open Gemini pages.
 
 ## Installation
 
-Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed) and click **Add to Chrome**.
+Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and click **Add to Chrome**.
+
+GitHub releases and Chrome Web Store updates can follow different schedules. For version 2.8.0, use the matching GitHub release below.
 
 <details>
 <summary>Manual installation</summary>
@@ -33,6 +35,8 @@ Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apa
 2. Extract it to a folder you intend to keep. Make sure the folder contains `manifest.json`.
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.
+
+If you manually installed a 2.8.0 release candidate, replace its files and reload the extension to use the stable build; it will not automatically upgrade from the candidate.
 
 </details>
 
@@ -43,6 +47,10 @@ Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apa
 3. Adjust the font size and reading density, or turn on code wrapping as needed.
 
 Use **Manage presets** to edit preset names and widths. `px` and `%` each have their own set of presets. The language selector is at the bottom of the popup.
+
+Use **Task presets** for long reading, tables, code, and large text. Preview the settings, then apply them; **Restore previous settings** restores the previous layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
+
+Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Wider Gemini works on Gemini webpages and Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel.
 
 ## Privacy
 
@@ -60,8 +68,16 @@ git clone https://github.com/Planetes1mal/wider-gemini.git
 
 Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the repository folder. After changing the code, reload the extension and refresh Gemini.
 
+For internal iterations, run `node scripts/test.js --skip-packaging` for the existing unit checks without creating a ZIP. See [Contributing](./CONTRIBUTING.md) for browser and release checks and [Engineering and compatibility](./docs/engineering.md) for layout boundaries.
+
+The [dated compatibility record](./docs/compatibility.md) separates verified source behavior from untested devices. For the experimental comparison of prose and table widths, run `node scripts/reading-lab.js`; this [local reading lab](./docs/lab/README.md) is separate from the extension.
+
 ## Feedback and contributions
 
-If something looks wrong, open an [issue](https://github.com/Planetes1mal/wider-gemini/issues) with a screenshot, your browser version, and the extension version to help reproduce it. Pull requests are welcome.
+If something looks wrong, open **Help & feedback** in the popup, copy the diagnostic settings, and include the steps in an [issue](https://github.com/Planetes1mal/wider-gemini/issues/new/choose). Remove private information from screenshots before sharing. Pull requests are welcome.
+
+If you find Wider Gemini useful, a GitHub star helps other people discover it.
+
+Stars are optional. To receive version notifications, use the repository's **Watch → Custom → Releases** setting; see [GitHub's notification guide](https://docs.github.com/en/subscriptions-and-notifications/get-started/configuring-notifications).
 
 Licensed under the [MIT License](./LICENSE).

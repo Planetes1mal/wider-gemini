@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wider Gemini · Reading lab</title>
+    <link rel="stylesheet" href="lab.css">
+    <script src="lab.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#sample">跳到範例 / Skip to sample</a>
+    <header class="page-header">
+        <div class="brand"><span aria-hidden="true">WG</span> Wider Gemini <small>READING LAB</small></div>
+        <h1>比較兩種閱讀版面。</h1>
+        <p class="intro">Same answer, different reading layouts. 在同一份範例上比較整段加寬與正文限寬。</p>
+        <p class="notice">內部實驗 · 合成內容，非 Gemini 頁面。「正文限寬」尚未加入擴充功能；不儲存、不上傳操作資料。</p>
+    </header>
+
+    <main>
+        <section class="controls" aria-label="閱讀設定 / Reading settings">
+            <fieldset>
+                <legend>版面 / Layout</legend>
+                <label class="choice"><input type="radio" name="layout" value="uniform" checked> 統一寬度 <small>Uniform</small></label>
+                <label class="choice"><input type="radio" name="layout" value="mixed"> 正文限寬 <small>Mixed · experimental</small></label>
+            </fieldset>
+            <div class="control">
+                <label for="width">內容寬度 / Width <output id="widthValue" for="width">1200 px</output></label>
+                <input id="width" type="range" min="700" max="1600" step="50" value="1200">
+            </div>
+            <div class="control">
+                <label for="sampleChoice">範例 / Sample</label>
+                <select id="sampleChoice"><option value="a">A · Search</option><option value="b">B · Retry</option></select>
+            </div>
+            <div class="control">
+                <label for="font">文字大小 / Text size</label>
+                <select id="font"><option value="100">100%</option><option value="125">125%</option><option value="150">150%</option></select>
+            </div>
+            <label class="choice wrap-control"><input id="wrap" type="checkbox" checked> 程式碼換行 / Wrap code</label>
+            <button id="reset" type="button">重設版面 / Reset layout</button>
+        </section>
+        <p class="status" id="layoutStatus" role="status">統一寬度：文字、表格和程式碼共用內容寬度。</p>
+
+        <article id="sample" class="sample" tabindex="-1" aria-labelledby="sampleTitle">
+            <div class="prose">
+                <p class="eyebrow">SAMPLE ANSWER / 範例回答</p>
+                <h2 id="sampleTitle">Designing a responsive search interface</h2>
+                <p>A fast search experience begins with deciding which work belongs in the browser and which belongs on the server. Sending a request for every keystroke creates redundant work. Debouncing waits until typing pauses, while request cancellation stops an older response from replacing newer results. Neither technique makes a slow query fast: indexing and caching solve different parts of the problem.</p>
+                <p>Start with one clear rule: the latest query owns the screen. Preserve keyboard focus as results arrive, explain when no matches are found, and keep the current query visible after a network failure. A small response cache can make repeated searches feel immediate, but its expiry must match how quickly the underlying data changes.</p>
+                <p lang="zh-Hant">這份範例包含說明段落、六欄比較表和一段搜尋程式碼。請依下方的三個題目閱讀與查找，並保持相同的視窗與文字大小。「統一寬度」與「正文限寬」呈現相同內容；完成兩個區塊後，再記錄哪一種較適合你的任務，以及理由。</p>
+            </div>
+
+            <section aria-labelledby="tableTitle">
+                <h3 id="tableTitle" class="prose">Compare the trade-offs</h3>
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Comparison table; scroll horizontally on narrow screens">
+                    <table>
+                        <caption>Illustrative engineering choices — the timing values are sample data, not benchmarks.</caption>
+                        <thead><tr><th scope="col">Approach</th><th scope="col">Best fit</th><th scope="col">Example policy</th><th scope="col">Benefit</th><th scope="col">Trade-off</th><th scope="col">Where it runs</th></tr></thead>
+                        <tbody>
+                            <tr><th scope="row">Debounce</th><td>Typing a query</td><td>Wait 300 ms after input</td><td>Fewer requests</td><td>Small delay before searching</td><td>Browser</td></tr>
+                            <tr><th scope="row">Cancellation</th><td>Fast query changes</td><td>Abort the previous request</td><td>Avoid stale results</td><td>Server work may still continue</td><td>Browser + server</td></tr>
+                            <tr><th scope="row">Response cache</th><td>Repeated queries</td><td>Expire entries after 60 s</td><td>Reuse recent results</td><td>Cached data can be outdated</td><td>Browser or server</td></tr>
+                            <tr><th scope="row">Inverted index</th><td>Large text collections</td><td>Update when documents change</td><td>Efficient text lookup</td><td>Index maintenance and storage</td><td>Server</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section aria-labelledby="codeTitle">
+                <h3 id="codeTitle" class="prose">Keep the latest query in control</h3>
+                <div class="code-heading"><span>JavaScript · illustrative snippet</span><span id="wrapStatus">Wrapped</span></div>
+                <pre tabindex="0" aria-label="JavaScript search example"><code>let timer;
+let request;
+
+function search(query) {
+    clearTimeout(timer);
+    request?.abort();
+    const current = new AbortController();
+    request = current;
+    timer = setTimeout(async () =&gt; {
+        try {
+            const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&amp;include=title,summary,updatedAt&amp;sort=relevance`, { signal: current.signal });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const results = await response.json();
+            if (request === current) renderResults(results);
+        } catch (error) {
+            if (error.name !== 'AbortError' &amp;&amp; request === current) showError(error.message);
+        }
+    }, 300);
+}</code></pre>
+                <p class="prose">The controller is created for each query and captured by that query's callback. The identity check before rendering makes the ownership rule explicit. The user still needs a visible loading state, a useful empty state, and a way to retry a failed request.</p>
+            </section>
+        </article>
+
+        <section class="evaluation" aria-labelledby="evaluationTitle">
+            <div>
+                <p class="eyebrow">TRY THREE TASKS / 試做三件事</p>
+                <h2 id="evaluationTitle">比較時，用同樣的內容與條件。</h2>
+                <ol id="taskList">
+                    <li>Read the first two paragraphs. Explain why cancellation and caching solve different problems.</li>
+                    <li>Find the cache expiry in the table, then locate where an inverted index runs.</li>
+                    <li>Find the debounce delay and the condition that prevents stale results from rendering.</li>
+                </ol>
+                <details id="answers"><summary>參考答案 / Answer key</summary><p id="answerText">Cancellation avoids showing stale responses; caching reuses earlier results. Cache expiry: 60 s. Inverted index: server. Debounce: 300 ms. Render only when <code>request === current</code>.</p></details>
+                <p class="muted">左右切換可能帶來熟悉效應。正式試用時交替安排先看哪一版，並使用等難度的不同內容。不要把這個單頁的完成時間當成使用者研究結果。</p>
+            </div>
+            <form id="feedback">
+                <label for="preference">較偏好的版面 / Preference</label>
+                <select id="preference"><option value="">尚未選擇 / Not chosen</option><option value="uniform">統一寬度 / Uniform</option><option value="mixed">正文限寬 / Mixed</option><option value="no-preference">沒有明顯差異 / No preference</option></select>
+                <label for="notes">哪裡比較容易或困難？ / What felt easier or harder?</label>
+                <textarea id="notes" rows="4" placeholder="只記錄閱讀體驗，請勿填寫私人對話或帳號資料。"></textarea>
+                <p class="muted">只在記憶體中保留。下載會存到自己的裝置，不會送出表單。</p>
+                <button type="submit" class="primary">產生筆記 / Generate notes</button>
+                <p id="downloadStatus" role="status"></p>
+                <div id="exportNotes" hidden>
+                    <label for="notesPreview">可複製的 JSON / JSON to copy</label>
+                    <textarea id="notesPreview" rows="8" readonly spellcheck="false"></textarea>
+                    <a id="downloadNotes" download="wider-gemini-reading-notes.json">儲存 JSON / Save JSON</a>
+                </div>
+            </form>
+        </section>
+    </main>
+    <template id="sampleB">
+        <div class="prose">
+            <p class="eyebrow">SAMPLE ANSWER / 範例回答 B</p>
+            <h2 id="sampleTitle">Designing a reliable retry policy</h2>
+            <p>A reliable network client begins with deciding which failures are temporary and which require a user to change something. Retrying every failed request creates redundant work. Backoff gives a busy service time to recover, while jitter keeps many clients from trying again together. Neither technique repairs an invalid request: input validation and a useful error message solve different parts of the problem.</p>
+            <p>Start with one clear rule: stop when repeating the request cannot help. Preserve the user's input across temporary failures, explain when retries have ended, and provide a deliberate way to try again. A timeout can prevent a single attempt from waiting forever, but the total retry budget must also remain small enough for the task.</p>
+            <p lang="zh-Hant">這份範例包含說明段落、六欄比較表和一段重試程式碼。請依下方的三個題目閱讀與查找，並保持相同的視窗與文字大小。「統一寬度」與「正文限寬」呈現相同內容；完成兩個區塊後，再記錄哪一種較適合你的任務，以及理由。</p>
+        </div>
+        <section aria-labelledby="tableTitle">
+            <h3 id="tableTitle" class="prose">Compare the trade-offs</h3>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Comparison table; scroll horizontally on narrow screens">
+                <table>
+                    <caption>Illustrative engineering choices — the timing values are sample data, not benchmarks.</caption>
+                    <thead><tr><th scope="col">Approach</th><th scope="col">Best fit</th><th scope="col">Example policy</th><th scope="col">Benefit</th><th scope="col">Trade-off</th><th scope="col">Where it runs</th></tr></thead>
+                    <tbody>
+                        <tr><th scope="row">Backoff</th><td>Temporary overload</td><td>Start at 400 ms</td><td>Reduce retry pressure</td><td>Longer wait before recovery</td><td>Client</td></tr>
+                        <tr><th scope="row">Jitter</th><td>Many concurrent clients</td><td>Add a random delay</td><td>Spread retry attempts</td><td>Timing becomes variable</td><td>Client</td></tr>
+                        <tr><th scope="row">Timeout</th><td>A stalled request</td><td>Stop an attempt after 8 s</td><td>Bound the waiting time</td><td>May stop a slow success</td><td>Client</td></tr>
+                        <tr><th scope="row">Rate limit</th><td>Protecting a busy service</td><td>Reject excess requests</td><td>Keep load manageable</td><td>Some requests must wait</td><td>Server gateway</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section aria-labelledby="codeTitle">
+            <h3 id="codeTitle" class="prose">Stop when a retry cannot help</h3>
+            <div class="code-heading"><span>JavaScript · illustrative snippet</span><span id="wrapStatus">Wrapped</span></div>
+            <pre tabindex="0" aria-label="JavaScript retry example"><code>async function loadStatus(jobId) {
+    for (let attempt = 0; attempt &lt; 3; attempt++) {
+        try {
+            const response = await fetch(`/api/jobs/${encodeURIComponent(jobId)}/status?include=progress,updatedAt,summary&amp;format=compact`, { signal: AbortSignal.timeout(8000) });
+            if (response.ok) return await response.json();
+            if (response.status &lt; 500) throw new Error('Request needs attention');
+        } catch (error) {
+            if (error.message === 'Request needs attention') throw error;
+        }
+        if (attempt === 2) break;
+        const delay = 400 * (2 ** attempt) + Math.random() * 100;
+        await new Promise(resolve =&gt; setTimeout(resolve, delay));
+    }
+    throw new Error('Retry budget exhausted');
+}</code></pre>
+            <p class="prose">This simplified example retries temporary failures within a fixed budget. It stops on a client-side status instead of silently repeating the same invalid request. A production client would decide which specific statuses and operations are retryable; this snippet is reading material, not a complete networking library.</p>
+        </section>
+    </template>
+    <footer>Wider Gemini · Internal reading experiment. Nothing here changes your extension settings.</footer>
+</body>
+</html>

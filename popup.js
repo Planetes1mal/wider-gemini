@@ -41,7 +41,9 @@ function localizeHtmlPage() {
         "lineHeightLabel", "paragraphSpacingLabel", "resetDensity",
         "fontSizeLabel", "resetFontSize",
         "customSpacing", "autoSpacing",
-        "uiLanguageLabel", "uiLanguageAuto"
+        "uiLanguageLabel", "uiLanguageAuto", "helpLink", "sourceLink",
+        "taskPresets", "taskReading", "taskTable", "taskCode", "taskLarge", "taskHint", "taskApply", "taskRestore",
+        "autoSpacingHint"
     ];
 
     ids.forEach(id => {
@@ -127,7 +129,8 @@ function renderPresetButtons(presets, widthMin, widthMax, currentSetting) {
         btn.dataset.unit = preset.unit;
         const name = getPresetName(preset);
         const icon = PRESET_ICONS[i] || 'W';
-        btn.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-text">${name}</span><span class="btn-value">${formatWidthValue(preset)}</span>`;
+        btn.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-text"></span><span class="btn-value">${formatWidthValue(preset)}</span>`;
+        btn.querySelector('.btn-text').textContent = name;
         if (isSameWidthSetting(currentSetting, preset)) btn.classList.add('preset-btn-active');
         container.appendChild(btn);
     });
@@ -163,10 +166,13 @@ function renderPresetButtonsEditMode(presets) {
             widthPercentMax: currentWidthPercentMax
         }, currentWidthSetting.unit);
         row.innerHTML = `
-            <span class="preset-edit-label" title="${name.replace(/"/g, '&quot;')}">${name}</span>
+            <span class="preset-edit-label"></span>
             <input type="number" class="preset-edit-width" data-index="${i}" value="${preset.value}" min="${range.min}" max="${range.max}" step="${range.step}">
             <span class="preset-edit-unit" data-index="${i}">${getUnitLabel(currentWidthSetting.unit)}</span>
         `;
+        const label = row.querySelector('.preset-edit-label');
+        label.textContent = name;
+        label.title = name;
         const input = row.querySelector('.preset-edit-width');
         input.addEventListener('blur', function () {
             const unit = currentWidthSetting.unit;
@@ -209,9 +215,11 @@ function saveManagePresetsFromRows() {
         const nameInput = row && row.querySelector('.manage-name');
         const widthInput = row && row.querySelector('.manage-width');
         const name = nameInput ? nameInput.value.trim() : getPresetName(p);
+        const defaultName = t(p.nameKey || DEFAULTS.presets[i].nameKey, '');
+        const customName = name && name !== defaultName ? name : undefined;
         const unit = currentWidthSetting.unit;
         const value = widthInput ? parseFloat(widthInput.value) : p.value;
-        return settingsUtils.normalizePreset({ id: p.id, nameKey: p.nameKey, name: name || undefined, value, unit }, i, {
+        return settingsUtils.normalizePreset({ id: p.id, nameKey: p.nameKey, name: customName, value, unit }, i, {
             widthMin: currentWidthMin,
             widthMax: currentWidthMax,
             widthPercentMin: currentWidthPercentMin,
@@ -240,12 +248,14 @@ function renderManagePresetsRows(presets) {
             widthPercentMax: currentWidthPercentMax
         }, currentWidthSetting.unit);
         row.innerHTML = `
-            <input type="text" class="manage-name" value="${displayName.replace(/"/g, '&quot;')}" placeholder="${defaultName}" data-index="${i}">
+            <input type="text" class="manage-name" data-index="${i}">
             <input type="number" class="manage-width" value="${preset.value}" min="${range.min}" max="${range.max}" step="${range.step}" data-index="${i}">
             <span class="manage-unit" data-index="${i}">${getUnitLabel(currentWidthSetting.unit)}</span>
             <button type="button" class="secondary-btn reset-preset-btn" data-index="${i}">${t('resetToDefault', '重置为默认')}</button>
         `;
         const nameInput = row.querySelector('.manage-name');
+        nameInput.value = displayName;
+        nameInput.placeholder = defaultName;
         const widthInput = row.querySelector('.manage-width');
         const save = () => saveManagePresetsFromRows();
         nameInput.addEventListener('blur', save);
@@ -320,6 +330,18 @@ const userFullWidthToggle = document.getElementById('userFullWidthToggle');
 const userFullWidthStatus = document.getElementById('userFullWidthStatus');
 const uiLanguageSelect = document.getElementById('uiLanguageSelect');
 const refreshNotice = document.getElementById('refreshNotice');
+const taskPresetSelect = document.getElementById('taskPresetSelect');
+const applyTaskPreset = document.getElementById('applyTaskPreset');
+const restoreTaskPreset = document.getElementById('restoreTaskPreset');
+const taskPresetStatus = document.getElementById('taskPresetStatus');
+const TASK_UNDO_KEY = 'taskPresetUndo';
+const TASK_PRESETS = {
+    reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110, codeWrap: true },
+    table: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: false },
+    code: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: true },
+    large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140, codeWrap: true }
+};
+let taskUndoSettings = null;
 
 let widthUpdateTimer = null;
 let densityUpdateTimer = null;
@@ -369,7 +391,9 @@ function applyWidthUi(settings) {
     widthMinInput.value = range.min;
     widthMaxInput.value = range.max;
     widthMinInput.min = currentWidthSetting.unit === settingsUtils.UNIT_PERCENT ? PERCENT_RANGE_MIN : RANGE_MIN;
+    widthMaxInput.min = widthMinInput.min;
     widthMaxInput.max = currentWidthSetting.unit === settingsUtils.UNIT_PERCENT ? PERCENT_RANGE_MAX : RANGE_MAX;
+    widthMinInput.max = widthMaxInput.max;
     widthMinInput.step = range.step;
     widthMaxInput.step = range.step;
     widthSlider.min = range.min;
@@ -386,7 +410,90 @@ function applyWidthUi(settings) {
     if (!managePresetsBody.hidden) {
         renderManagePresetsRows(currentPresets);
     }
+    updateTaskPreview();
 }
+
+function getTaskRanges() {
+    return {
+        widthMin: currentWidthMin,
+        widthMax: currentWidthMax,
+        widthPercentMin: currentWidthPercentMin,
+        widthPercentMax: currentWidthPercentMax
+    };
+}
+
+// 仅写入任务使用的字段，原宽度预设、范围、语言及用户消息宽度保持独立。
+function getTaskPayload(settings) {
+    const chatWidthSetting = settingsUtils.normalizeWidthSetting(settings.chatWidthSetting, getTaskRanges());
+    return {
+        chatWidthSetting,
+        chatWidth: settingsUtils.getLegacyChatWidth(chatWidthSetting),
+        ...settingsUtils.normalizeDensity(settings),
+        messageFontSize: settingsUtils.normalizeFontSize(settings.messageFontSize),
+        codeWrap: settings.codeWrap === true
+    };
+}
+
+function updateTaskPreview() {
+    const settings = getTaskPayload(TASK_PRESETS[taskPresetSelect.value]);
+    document.getElementById('taskPresetPreview').textContent = t('taskPreview')
+        .replace('{width}', formatWidthValue(settings.chatWidthSetting))
+        .replace('{font}', settings.messageFontSize)
+        .replace('{wrap}', t(settings.codeWrap ? 'statusOn' : 'statusOff'));
+}
+
+function setTaskBusy(busy) {
+    taskPresetSelect.disabled = busy;
+    applyTaskPreset.disabled = busy;
+    restoreTaskPreset.disabled = busy || !taskUndoSettings;
+}
+
+async function saveTaskSettings(settings) {
+    const payload = getTaskPayload(settings);
+    await chrome.storage.sync.set(payload);
+    applyWidthUi({ ...getTaskRanges(), chatWidthSetting: payload.chatWidthSetting });
+    applyDensityUi(payload);
+    applyFontSizeUi(payload);
+    codeWrapToggle.checked = payload.codeWrap;
+    updateCodeWrapStatus(payload.codeWrap);
+    notifyGeminiTabs({ action: 'updateWidthSetting', setting: payload.chatWidthSetting, ranges: getTaskRanges() });
+    notifyGeminiTabs({ action: 'updateDensity', settings: payload });
+    notifyGeminiTabs({ action: 'updateCodeWrap', enabled: payload.codeWrap });
+}
+
+async function runTaskPreset(restore) {
+    clearTimeout(widthUpdateTimer);
+    clearTimeout(densityUpdateTimer);
+    setTaskBusy(true);
+    taskPresetStatus.textContent = t('taskSaving');
+    try {
+        if (restore) {
+            await saveTaskSettings(taskUndoSettings);
+            await chrome.storage.local.remove(TASK_UNDO_KEY);
+            taskUndoSettings = null;
+        } else {
+            const snapshot = getTaskPayload({
+                chatWidthSetting: currentWidthSetting,
+                ...currentDensity,
+                messageFontSize: currentFontSize,
+                codeWrap: codeWrapToggle.checked
+            });
+            await chrome.storage.local.set({ [TASK_UNDO_KEY]: snapshot });
+            taskUndoSettings = snapshot;
+            await saveTaskSettings(TASK_PRESETS[taskPresetSelect.value]);
+        }
+        taskPresetStatus.textContent = t(restore ? 'taskRestored' : 'taskApplied');
+    } catch (error) {
+        console.error('[Wider Gemini] Task preset could not be saved:', error);
+        taskPresetStatus.textContent = t('taskSaveError');
+    } finally {
+        setTaskBusy(false);
+    }
+}
+
+taskPresetSelect.addEventListener('change', updateTaskPreview);
+applyTaskPreset.addEventListener('click', () => runTaskPreset(false));
+restoreTaskPreset.addEventListener('click', () => runTaskPreset(true));
 
 function applyDensityUi(settings) {
     currentDensity = settingsUtils.normalizeDensity(settings);
@@ -474,6 +581,13 @@ chrome.storage.sync.get([
         updateCodeWrapStatus(settings.codeWrap);
         userFullWidthToggle.checked = settings.userFullWidth;
         updateUserFullWidthStatus(settings.userFullWidth);
+        chrome.storage.local.get(TASK_UNDO_KEY).then(result => {
+            taskUndoSettings = result[TASK_UNDO_KEY] || null;
+            setTaskBusy(false);
+        }).catch(error => {
+            console.error('[Wider Gemini] Task preset restore could not be loaded:', error);
+            taskPresetStatus.textContent = t('taskSaveError');
+        });
     });
 });
 
@@ -528,6 +642,7 @@ function onRangeInput(isMin) {
     widthValue.textContent = next.value;
     syncRangeProgress(widthSlider);
     renderPresetsForMode(currentPresets);
+    updateTaskPreview();
     updateWidthSetting(next);
 }
 
@@ -547,6 +662,12 @@ widthSlider.addEventListener('input', function () {
     widthUpdateTimer = setTimeout(() => {
         updateWidthSetting(currentWidthSetting);
     }, 500);
+});
+
+// 松手时立即提交，避免关闭弹窗取消尚未执行的防抖回调。
+widthSlider.addEventListener('change', function () {
+    clearTimeout(widthUpdateTimer);
+    updateWidthSetting(currentWidthSetting);
 });
 
 [unitPxBtn, unitPercentBtn].forEach(btn => {
@@ -678,6 +799,13 @@ fontSizeSlider.addEventListener('input', function () {
     densityUpdateTimer = setTimeout(() => {
         updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
     }, 500);
+});
+
+[compactnessSlider, fontSizeSlider].forEach(input => {
+    input.addEventListener('change', function () {
+        clearTimeout(densityUpdateTimer);
+        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
+    });
 });
 
 resetFontSizeBtn.addEventListener('click', function () {

@@ -1,0 +1,13 @@
+participant_code,first_sample,first_layout,second_sample,second_layout,viewport,width_px,browser_zoom,font_percent,code_wrap,task_limit_seconds,first_prose_success,first_prose_seconds,first_prose_errors,first_prose_assistance,first_table_success,first_table_seconds,first_table_errors,first_table_assistance,first_code_success,first_code_seconds,first_code_errors,first_code_assistance,second_prose_success,second_prose_seconds,second_prose_errors,second_prose_assistance,second_table_success,second_table_seconds,second_table_errors,second_table_assistance,second_code_success,second_code_seconds,second_code_errors,second_code_assistance,first_scroll_actions,second_scroll_actions,preference,adjustments,notes
+P01,A,uniform,B,mixed,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P02,A,mixed,B,uniform,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P03,B,uniform,A,mixed,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P04,B,mixed,A,uniform,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P05,A,uniform,B,mixed,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P06,A,mixed,B,uniform,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P07,B,uniform,A,mixed,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P08,B,mixed,A,uniform,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P09,A,uniform,B,mixed,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P10,A,mixed,B,uniform,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P11,B,uniform,A,mixed,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P12,B,mixed,A,uniform,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

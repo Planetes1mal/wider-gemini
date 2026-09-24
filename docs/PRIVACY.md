@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Effective date:** March 23, 2026
+**Effective date:** September 19, 2026
 
 This policy describes how the **Wider Gemini** browser extension (“Extension”, “we”, “us”) handles information when you use it. It is provided in English and Chinese; both sections have the same meaning.
 
@@ -18,7 +18,11 @@ The Extension **does not** collect, sell, or transmit your personal data, chat c
 
 **Local settings.** The Extension uses the browser’s extension storage API (`chrome.storage`, including sync where your browser profile supports it) only to save **your preferences**, such as chat width, code-wrap options, and preset buttons. That data is managed by your browser and remains under your control.
 
+Applying a task preset also saves one previous layout in device-local extension storage (`chrome.storage.local`) so you can restore it after reopening the popup. This snapshot contains layout preferences only, is replaced by the next task-preset application, and is removed when restored. It does not contain conversation content or sync as part of this undo feature.
+
 **Site access.** The Extension runs on `https://gemini.google.com/*` to apply CSS and related UI adjustments. It does **not** read, log, or upload your prompts, replies, or other page content to external servers operated by the Extension.
+
+**Optional diagnostic copy.** The help page can display the extension version, browser version, platform, and selected layout settings on your device. It excludes conversations, page URLs, browsing history, and custom preset names. Nothing is sent automatically: copying only puts the displayed text on your clipboard. You choose whether to share it in a public GitHub issue.
 
 ### 3. Third parties
 
@@ -50,7 +54,11 @@ Questions about this policy or the Extension may be reported via the GitHub repo
 
 **本地设置。** 扩展仅通过浏览器提供的扩展存储接口（`chrome.storage`，在您的浏览器配置支持时含同步）保存**您的偏好设置**，例如对话宽度、代码换行选项与预设按钮等。数据由浏览器管理，并由您本人控制。
 
+应用任务预设时，还会在本机扩展存储（`chrome.storage.local`）保留一份应用前的版式，方便重新打开弹窗后恢复。这份快照仅包含版式偏好，下一次应用任务预设时会被替换，恢复后会被删除；不包含对话内容，这项撤销功能也不会同步该快照。
+
 **网站访问范围。** 扩展仅在 `https://gemini.google.com/*` 上运行，以注入 CSS 等方式调整界面。扩展**不会**读取、记录或将您的提问、回答或其他页面内容上传至由本扩展运营的远程服务器。
+
+**可选的诊断复制。** 帮助页可以在本机显示扩展版本、浏览器版本、平台和部分版式设置，不包含对话、页面网址、浏览记录或自定义预设名称。不会自动发送任何内容；复制操作仅将已显示的文本放入剪贴板。是否将其分享至公开的 GitHub Issue，由您自行决定。
 
 ### 3. 第三方
 

@@ -1,0 +1,264 @@
+{
+  "appName": {
+    "message": "Wider Gemini"
+  },
+  "appDesc": {
+    "message": "Amplía Google Gemini y ajusta la densidad de lectura y el ajuste de línea del código para leer con más comodidad."
+  },
+  "headerSubtitle": {
+    "message": "Conversaciones más amplias y cómodas de leer"
+  },
+  "widthLabel": {
+    "message": "Ancho del chat"
+  },
+  "widthMin": {
+    "message": "Ancho mínimo"
+  },
+  "widthMax": {
+    "message": "Ancho máximo"
+  },
+  "btnNarrow": {
+    "message": "Estrecho"
+  },
+  "btnDefault": {
+    "message": "Normal"
+  },
+  "btnWider": {
+    "message": "Ancho"
+  },
+  "btnUltra": {
+    "message": "Extra"
+  },
+  "btnInsane": {
+    "message": "Máximo"
+  },
+  "editPresets": {
+    "message": "Editar preajustes"
+  },
+  "donePresets": {
+    "message": "Listo"
+  },
+  "cancelPresets": {
+    "message": "Cancelar"
+  },
+  "managePresets": {
+    "message": "Gestionar preajustes"
+  },
+  "managePresetsSummary": {
+    "message": "5 preajustes personalizados"
+  },
+  "resetToDefault": {
+    "message": "Restablecer valores predeterminados"
+  },
+  "clampedHint": {
+    "message": "Ajustado al rango permitido"
+  },
+  "codeWrapLabel": {
+    "message": "Ajuste de línea del código"
+  },
+  "userFullWidthLabel": {
+    "message": "Mis mensajes a todo el ancho"
+  },
+  "statusOn": {
+    "message": "Activado"
+  },
+  "statusOff": {
+    "message": "Desactivado"
+  },
+  "infoText1": {
+    "message": "Arrastra el control deslizante o elige un preajuste para cambiar el ancho"
+  },
+  "infoText2": {
+    "message": "Los ajustes se guardan automáticamente y se aplican a todas las pestañas de Gemini"
+  },
+  "refreshing": {
+    "message": "Recargando la página…"
+  },
+  "widthUnit": {
+    "message": "Unidad de ancho"
+  },
+  "densityLabel": {
+    "message": "Densidad de lectura"
+  },
+  "compactnessUnit": {
+    "message": "%"
+  },
+  "advancedDensity": {
+    "message": "Espaciado avanzado"
+  },
+  "lineHeightLabel": {
+    "message": "Altura de línea"
+  },
+  "paragraphSpacingLabel": {
+    "message": "Espacio entre párrafos"
+  },
+  "fontSizeLabel": {
+    "message": "Tamaño del texto"
+  },
+  "resetFontSize": {
+    "message": "Restablecer tamaño del texto"
+  },
+  "resetDensity": {
+    "message": "Restablecer espaciado"
+  },
+  "customSpacing": {
+    "message": "Personalizado"
+  },
+  "autoSpacing": {
+    "message": "Automático"
+  },
+  "uiLanguageLabel": {
+    "message": "Idioma"
+  },
+  "uiLanguageAuto": {
+    "message": "Usar idioma del navegador"
+  },
+  "localeCode": {
+    "message": "es",
+    "description": "HTML language tag. Machine-assisted internal translation; pending native-speaker review."
+  },
+  "helpLink": {
+    "message": "Ayuda y comentarios"
+  },
+  "sourceLink": {
+    "message": "GitHub · Código fuente"
+  },
+  "helpPageTitle": {
+    "message": "Wider Gemini · Ayuda"
+  },
+  "helpTitle": {
+    "message": "Ayuda y comentarios"
+  },
+  "helpGettingStarted": {
+    "message": "Adapta Gemini a tu pantalla"
+  },
+  "helpOpenPopup": {
+    "message": "Abre Gemini y haz clic en el icono de Wider Gemini de la barra de herramientas para cambiar los ajustes."
+  },
+  "helpWidthTitle": {
+    "message": "Ancho de la conversación"
+  },
+  "helpWidthBody": {
+    "message": "Elige px para un ancho fijo o % para adaptarlo al tamaño de la ventana. Mueve el control deslizante o elige un preajuste; cada unidad tiene sus propios preajustes."
+  },
+  "helpCodeTitle": {
+    "message": "Ajuste de línea del código"
+  },
+  "helpCodeBody": {
+    "message": "Activa el ajuste de línea del código para leer líneas largas con menos desplazamiento horizontal. Desactívalo para mostrarlas sin dividirlas en varias líneas visuales."
+  },
+  "helpReadingTitle": {
+    "message": "Tamaño del texto y espaciado"
+  },
+  "helpReadingBody": {
+    "message": "Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página. Con densidad 0 en Auto se conservan las separaciones entre párrafos y la proporción original de la altura de línea. Una mayor densidad reduce el espaciado gradualmente. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual."
+  },
+  "helpLiveSettings": {
+    "message": "Los cambios se aplican a las pestañas abiertas de Gemini y se guardan automáticamente. La sincronización entre dispositivos depende de los ajustes de sincronización del navegador."
+  },
+  "helpOpenGemini": {
+    "message": "Abrir Gemini"
+  },
+  "helpTroubleshooting": {
+    "message": "¿Algo no se ve bien?"
+  },
+  "helpTroubleshootPage": {
+    "message": "Comprueba que estás en gemini.google.com y que Wider Gemini está activado. También funciona con este sitio instalado como aplicación de Chrome (PWA). Las aplicaciones de escritorio nativas de Google no son compatibles."
+  },
+  "helpTroubleshootRefresh": {
+    "message": "Si un ajuste no se refleja después de instalar o actualizar la extensión, recarga la página de Gemini una vez e inténtalo de nuevo."
+  },
+  "helpTroubleshootReport": {
+    "message": "Si el problema continúa, anota los pasos para reproducirlo y el tamaño de la ventana. Una captura sin contenido privado puede ayudar; indica si usas otras extensiones que modifican el diseño de Gemini."
+  },
+  "helpReportIssue": {
+    "message": "Informar de un problema"
+  },
+  "helpDiagnosticsTitle": {
+    "message": "Informe de ajustes"
+  },
+  "helpDiagnosticsPrivacy": {
+    "message": "Genera un informe y revísalo antes de compartirlo al informar de un problema. Solo incluye la versión de la extensión, la versión principal del navegador, la plataforma y los ajustes de diseño. No contiene conversaciones, URL de páginas, títulos ni nombres de preajustes personalizados. No se envía nada automáticamente."
+  },
+  "helpGenerateReport": {
+    "message": "Generar informe"
+  },
+  "helpReportPreview": {
+    "message": "Vista previa"
+  },
+  "helpCopyReport": {
+    "message": "Copiar informe"
+  },
+  "helpSupportProject": {
+    "message": "Si Wider Gemini te resulta útil, puedes dar una estrella al proyecto o dejar una reseña sincera."
+  },
+  "helpGitHubLink": {
+    "message": "Código fuente y estrella en GitHub"
+  },
+  "helpReviewLink": {
+    "message": "Reseña en Chrome Web Store"
+  },
+  "helpReportGenerating": {
+    "message": "Leyendo los ajustes…"
+  },
+  "helpReportReady": {
+    "message": "Informe listo. Revísalo y cópialo si quieres compartirlo."
+  },
+  "helpReportError": {
+    "message": "No se pudieron leer los ajustes. Vuelve a abrir la ayuda desde la extensión e inténtalo de nuevo."
+  },
+  "helpReportCopied": {
+    "message": "Copiado. Puedes pegarlo al informar del problema."
+  },
+  "helpReportCopyFallback": {
+    "message": "No se pudo copiar automáticamente. El informe está seleccionado; cópialo manualmente."
+  },
+  "taskPresets": {
+    "message": "Preajustes por tarea"
+  },
+  "taskReading": {
+    "message": "Lectura larga"
+  },
+  "taskTable": {
+    "message": "Tablas"
+  },
+  "taskCode": {
+    "message": "Código"
+  },
+  "taskLarge": {
+    "message": "Texto grande"
+  },
+  "taskHint": {
+    "message": "Respeta tus límites de ancho. Restaurar devuelve los cuatro ajustes anteriores a los valores que tenían antes de la última aplicación."
+  },
+  "taskApply": {
+    "message": "Aplicar"
+  },
+  "taskRestore": {
+    "message": "Restaurar ajustes anteriores"
+  },
+  "taskPreview": {
+    "message": "Ancho {width} · Texto {font}% · Espaciado nativo · Ajuste de código {wrap}"
+  },
+  "taskSaving": {
+    "message": "Guardando los ajustes…"
+  },
+  "taskApplied": {
+    "message": "Aplicado. Los ajustes anteriores se guardan en este dispositivo."
+  },
+  "taskRestored": {
+    "message": "Se han restaurado los ajustes anteriores."
+  },
+  "taskSaveError": {
+    "message": "No se pudieron guardar o cargar los ajustes. Vuelve a abrir la ventana de la extensión e inténtalo de nuevo."
+  },
+  "helpTaskTitle": {
+    "message": "Preajustes por tarea"
+  },
+  "helpTaskBody": {
+    "message": "Elige Lectura larga, Tablas, Código o Texto grande, revisa los ajustes y haz clic en Aplicar. Se cambian el ancho, el tamaño del texto, el espaciado y el ajuste de línea del código. Se respetan tus límites de ancho. Restaurar ajustes anteriores deshace el último preajuste por tarea aplicado en este dispositivo, incluso después de cerrar la ventana de la extensión; también reemplaza los cambios posteriores en esos ajustes."
+  },
+  "autoSpacingHint": {
+    "message": "Auto respeta el espaciado original de cada mensaje. Al mover cualquier control, se aplican manualmente los dos valores siguientes."
+  }
+}

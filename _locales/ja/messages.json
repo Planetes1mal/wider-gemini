@@ -1,0 +1,264 @@
+{
+  "appName": {
+    "message": "Wider Gemini"
+  },
+  "appDesc": {
+    "message": "Google Gemini の会話の幅、文字や段落の間隔、コードの折り返しを調整して、より快適に読めるようにします。"
+  },
+  "headerSubtitle": {
+    "message": "会話を広く、読みやすく"
+  },
+  "widthLabel": {
+    "message": "会話の幅"
+  },
+  "widthMin": {
+    "message": "最小幅"
+  },
+  "widthMax": {
+    "message": "最大幅"
+  },
+  "btnNarrow": {
+    "message": "狭め"
+  },
+  "btnDefault": {
+    "message": "標準"
+  },
+  "btnWider": {
+    "message": "広め"
+  },
+  "btnUltra": {
+    "message": "ワイド"
+  },
+  "btnInsane": {
+    "message": "超ワイド"
+  },
+  "editPresets": {
+    "message": "プリセットを編集"
+  },
+  "donePresets": {
+    "message": "完了"
+  },
+  "cancelPresets": {
+    "message": "キャンセル"
+  },
+  "managePresets": {
+    "message": "プリセットを管理"
+  },
+  "managePresetsSummary": {
+    "message": "5つのプリセットをカスタマイズ"
+  },
+  "resetToDefault": {
+    "message": "初期設定に戻す"
+  },
+  "clampedHint": {
+    "message": "設定範囲内に調整しました"
+  },
+  "codeWrapLabel": {
+    "message": "コードを自動で折り返す"
+  },
+  "userFullWidthLabel": {
+    "message": "自分のメッセージを幅いっぱいに表示"
+  },
+  "statusOn": {
+    "message": "オン"
+  },
+  "statusOff": {
+    "message": "オフ"
+  },
+  "infoText1": {
+    "message": "スライダーを動かすか、プリセットを選んで幅を調整できます"
+  },
+  "infoText2": {
+    "message": "設定は自動で保存され、すべての Gemini タブに適用されます"
+  },
+  "refreshing": {
+    "message": "ページを再読み込みしています…"
+  },
+  "widthUnit": {
+    "message": "幅の単位"
+  },
+  "densityLabel": {
+    "message": "文章の密度"
+  },
+  "compactnessUnit": {
+    "message": "%"
+  },
+  "advancedDensity": {
+    "message": "間隔の詳細設定"
+  },
+  "lineHeightLabel": {
+    "message": "行の高さ"
+  },
+  "paragraphSpacingLabel": {
+    "message": "段落の間隔"
+  },
+  "fontSizeLabel": {
+    "message": "文字サイズ"
+  },
+  "resetFontSize": {
+    "message": "文字サイズをリセット"
+  },
+  "resetDensity": {
+    "message": "間隔をリセット"
+  },
+  "customSpacing": {
+    "message": "カスタム"
+  },
+  "autoSpacing": {
+    "message": "自動"
+  },
+  "uiLanguageLabel": {
+    "message": "言語"
+  },
+  "uiLanguageAuto": {
+    "message": "ブラウザの設定に従う"
+  },
+  "localeCode": {
+    "message": "ja",
+    "description": "HTML language tag. Machine-assisted internal translation; pending native-speaker review."
+  },
+  "helpLink": {
+    "message": "ヘルプ・フィードバック"
+  },
+  "sourceLink": {
+    "message": "GitHub · ソースコード"
+  },
+  "helpPageTitle": {
+    "message": "Wider Gemini · ヘルプ"
+  },
+  "helpTitle": {
+    "message": "ヘルプ・フィードバック"
+  },
+  "helpGettingStarted": {
+    "message": "Gemini を画面に合わせて読みやすく"
+  },
+  "helpOpenPopup": {
+    "message": "Gemini を開き、ブラウザのツールバーにある Wider Gemini のアイコンをクリックして設定を調整します。"
+  },
+  "helpWidthTitle": {
+    "message": "会話の幅"
+  },
+  "helpWidthBody": {
+    "message": "幅を固定するには px、ウィンドウの大きさに合わせるには % を選びます。スライダーを動かすか、プリセットを選んでください。単位ごとに別々のプリセットがあります。"
+  },
+  "helpCodeTitle": {
+    "message": "コードの折り返し"
+  },
+  "helpCodeBody": {
+    "message": "「コードを自動で折り返す」をオンにすると、長い行を読むときの横スクロールを減らせます。折り返さずに表示するにはオフにします。"
+  },
+  "helpReadingTitle": {
+    "message": "文字サイズと間隔"
+  },
+  "helpReadingBody": {
+    "message": "ページ全体を拡大せず、文字サイズを75%〜200%に調整できます。自動モードの密度0では元の段落間隔と行高の比率を保ちます。密度を上げると元の間隔が徐々に狭くなります。「間隔の詳細設定」では値を手動で指定でき、「間隔をリセット」で現在の密度の自動モードに戻ります。"
+  },
+  "helpLiveSettings": {
+    "message": "変更は開いている Gemini タブに適用され、自動で保存されます。端末間で同期されるかどうかは、ブラウザの同期設定によります。"
+  },
+  "helpOpenGemini": {
+    "message": "Gemini を開く"
+  },
+  "helpTroubleshooting": {
+    "message": "表示がおかしいときは"
+  },
+  "helpTroubleshootPage": {
+    "message": "gemini.google.com を開いていて、Wider Gemini が有効になっていることを確認してください。このサイトを Chrome アプリ（PWA）としてインストールした場合にも対応しています。Google のネイティブデスクトップアプリには対応していません。"
+  },
+  "helpTroubleshootRefresh": {
+    "message": "拡張機能のインストールや更新後に設定が反映されない場合は、Gemini のページを一度再読み込みしてからお試しください。"
+  },
+  "helpTroubleshootReport": {
+    "message": "問題が続く場合は、再現手順とウィンドウの大きさを記録してください。個人情報や非公開の内容を除いたスクリーンショットも役立ちます。Gemini のレイアウトを変更する他の拡張機能を使っている場合は、その旨もお知らせください。"
+  },
+  "helpReportIssue": {
+    "message": "問題を報告"
+  },
+  "helpDiagnosticsTitle": {
+    "message": "設定レポート"
+  },
+  "helpDiagnosticsPrivacy": {
+    "message": "レポートを生成し、内容を確認してから、問題の報告に添付するかを選べます。含まれるのは、拡張機能のバージョン、ブラウザのメジャーバージョン、プラットフォーム、レイアウト設定のみです。会話、ページの URL、タイトル、独自のプリセット名は含みません。自動送信は行いません。"
+  },
+  "helpGenerateReport": {
+    "message": "レポートを生成"
+  },
+  "helpReportPreview": {
+    "message": "プレビュー"
+  },
+  "helpCopyReport": {
+    "message": "レポートをコピー"
+  },
+  "helpSupportProject": {
+    "message": "Wider Gemini が役立ったら、プロジェクトに Star を付けたり、率直なレビューを投稿したりしていただけるとうれしいです。"
+  },
+  "helpGitHubLink": {
+    "message": "ソースコード・GitHub で Star"
+  },
+  "helpReviewLink": {
+    "message": "Chrome ウェブストアでレビュー"
+  },
+  "helpReportGenerating": {
+    "message": "設定を読み込んでいます…"
+  },
+  "helpReportReady": {
+    "message": "レポートを生成しました。内容を確認し、共有する場合はコピーしてください。"
+  },
+  "helpReportError": {
+    "message": "設定を読み込めませんでした。拡張機能からヘルプを開き直して、もう一度お試しください。"
+  },
+  "helpReportCopied": {
+    "message": "コピーしました。問題の報告に貼り付けられます。"
+  },
+  "helpReportCopyFallback": {
+    "message": "自動でコピーできませんでした。レポートを選択したので、手動でコピーしてください。"
+  },
+  "taskPresets": {
+    "message": "用途別プリセット"
+  },
+  "taskReading": {
+    "message": "長文を読む"
+  },
+  "taskTable": {
+    "message": "表"
+  },
+  "taskCode": {
+    "message": "コード"
+  },
+  "taskLarge": {
+    "message": "大きな文字"
+  },
+  "taskHint": {
+    "message": "設定済みの幅の範囲内で適用します。「適用前に戻す」は、上の4項目を最後に適用する前の値に戻します。"
+  },
+  "taskApply": {
+    "message": "適用"
+  },
+  "taskRestore": {
+    "message": "適用前に戻す"
+  },
+  "taskPreview": {
+    "message": "幅 {width} · 文字 {font}% · 標準の間隔 · コード折り返し {wrap}"
+  },
+  "taskSaving": {
+    "message": "設定を保存しています…"
+  },
+  "taskApplied": {
+    "message": "適用しました。変更前の設定はこの端末に保存されています。"
+  },
+  "taskRestored": {
+    "message": "適用前の設定に戻しました。"
+  },
+  "taskSaveError": {
+    "message": "設定を保存または読み込めませんでした。ポップアップを開き直して、もう一度お試しください。"
+  },
+  "helpTaskTitle": {
+    "message": "用途別プリセット"
+  },
+  "helpTaskBody": {
+    "message": "「長文を読む」「表」「コード」「大きな文字」から選び、設定を確認してから「適用」をクリックします。変更されるのは幅、文字サイズ、間隔、コードの折り返しです。設定済みの幅の範囲は維持されます。「適用前に戻す」は、この端末で最後に適用した用途別プリセットを元に戻します。ポップアップを閉じた後でも使えますが、その後これらの設定に加えた変更も上書きされます。"
+  },
+  "autoSpacingHint": {
+    "message": "自動では各メッセージの元の間隔に従います。どちらかのスライダーを動かすと、下の2つの値を手動で適用します。"
+  }
+}

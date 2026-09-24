@@ -1,0 +1,17 @@
+# Reading density and font size
+
+Auto density is relative to the native styles of each supported message, rather than a fixed 17px/26px/16px layout. The content script captures font size, numeric line height, margins, and row gap when it first sees a message node. The existing observer captures newly inserted content; ordinary setting changes update root variables without reading computed styles again. Measurements temporarily disable this extension's reading classes in the same synchronous task, so a new reply is not measured using an already compressed ancestor.
+
+- **Auto 0:** keep native paragraph margins and gaps. At 100% font, no reading override is active. A different font size scales each text node's native font size and numeric line height proportionally, without compressing paragraphs.
+- **Auto 1–100:** preserve subpixel values. Positive margins and row gaps scale from 100% to 12.5% of native size. Numeric line height moves continuously toward an 18% reduction, bounded so it does not become tighter than 1.15 times the native font size; an already tighter native line is left unchanged. Font scaling is applied independently afterwards.
+- **Manual:** `messageSpacingCustom: true` uses the stored unitless line height and exact paragraph gap, including 0px. Reset spacing clears the manual flag and returns to Auto at the currently selected density. The two Advanced spacing numbers are manual starting values, not a measurement of every reply's Auto layout.
+
+Existing settings keep their percentage and manual/Auto choice. Nonzero Auto density now has relative semantics, so the appearance can differ from the old absolute curve. Saved explicit manual values are unchanged. The legacy derived line-height/paragraph-spacing fields remain in normalized storage for the existing popup, task presets, and undo format; Auto rendering does not use those absolute numbers. No stored presets, width limits, language, or unrelated settings are migrated.
+
+Only supported message roots and their reading nodes are annotated. Dialogs and menu/overlay descendants are excluded. The width, composer, upload, drag, and overlay-width rules are unchanged. Native `line-height: normal` is left to the browser in Auto because it has no numeric computed baseline; manual line height still applies. Baselines reflect the current page's initial styles and newly inserted nodes, not a general live stylesheet/theme observer. Reload the Gemini page if another extension or a later theme/style change changes the native typography of already measured content.
+
+## Source-level reproduction
+
+Run `node archive/density-layout-probe.js` for the local diagnostic. It loads the current real settings/content JS and CSS in isolated Chrome, with mocked extension APIs and synthetic text. It measures direct/nested paragraphs at density 0/1/50/100 and font 100/125, manual 0px/nonzero spacing, reset, protected dialog text, and a late reply with a different native font/line/gap. It also checks that settings updates do not trigger native-style reads. Its JSON remains in `archive/density-layout-probe-results.json`.
+
+On the observed 17px font / 26px line / 16px gap baseline, the measured Auto gaps after this change are 16 / 15.859375 / 9 / 2px. Font 125 with Auto 0 keeps the 16px gap and uses a 32.5px line. These are synthetic source measurements matching a previously observed native baseline, not acceptance of an already imported older extension in live Gemini. See the dated [compatibility record](compatibility.md).

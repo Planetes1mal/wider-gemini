@@ -4,7 +4,7 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
-## 2.8.0 (2026-09-23)
+## 2.8.0 (2026-09-24)
 
 ### Fixes
 

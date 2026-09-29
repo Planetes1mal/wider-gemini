@@ -42,7 +42,7 @@ function createClassList() {
 }
 
 // 模拟一个 Gemini 页面的扩展隔离世界；readyState 决定内容脚本是等待 DOMContentLoaded 还是立即初始化
-function createPage(readyState, { supported = true, deferStorage = false } = {}) {
+function createPage(readyState, { supported = true, deferStorage = false, stored = {} } = {}) {
     const rootStyles = new Map();
     const rootPriorities = new Map();
     const timers = new Map();
@@ -111,7 +111,8 @@ function createPage(readyState, { supported = true, deferStorage = false } = {})
                         counts.storageGet += 1;
                         const complete = () => callback({
                             chatWidthSetting: { value: 1200, unit: 'px' },
-                            codeWrap: true
+                            codeWrap: true,
+                            ...stored
                         });
                         if (deferStorage) pendingStorage.push(complete);
                         else complete();
@@ -281,6 +282,41 @@ function createPage(readyState, { supported = true, deferStorage = false } = {})
     assert.ok(page.document.body.classList.contains('code-wrap-enabled'), 'late storage still loads unrelated preferences');
     page.send({ action: 'updateWidthEnabled', enabled: true });
     assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1200px', 'late storage retains the saved width');
+}
+
+// 整站暂停：保存的 geminiEnabled:false 优先于早到的宽度消息，所有效果（含默认代码不换行）撤回。
+{
+    const page = createPage('complete', { deferStorage: true, stored: { geminiEnabled: false } });
+    page.runContentScript();
+    page.runTimers(0);
+    page.send({ action: 'updateWidthSetting', setting: { value: 1400, unit: 'px' }, enabled: true });
+    assert.ok(!page.document.documentElement.classList.contains('wider-gemini-active'),
+        'a width message cannot activate before settings load');
+    page.completeStorage();
+    const paused = page.send({ action: 'getLayoutStatus' });
+    assert.strictEqual(paused.status, 'sitePaused');
+    assert.strictEqual(paused.pauseReason, 'site');
+    assert.strictEqual(paused.enabled, true, 'legacy enabled keeps its width-switch meaning');
+    assert.strictEqual(paused.protocolVersion, 2);
+    assert.ok(!page.document.documentElement.classList.contains('wider-gemini-active'));
+    assert.ok(!page.document.documentElement.classList.contains('wider-gemini-width-enabled'));
+    assert.ok(!page.document.body.classList.contains('code-wrap-enabled'), 'saved code wrap stays native while paused');
+    assert.strictEqual(page.rootStyles.has('--gemini-chat-width'), false);
+    assert.strictEqual(page.rootStyles.has('--gemini-font-scale'), false);
+
+    page.change({ geminiEnabled: { newValue: true } });
+    assert.ok(page.document.documentElement.classList.contains('wider-gemini-active'));
+    assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1400px', 'resume applies the latest width');
+    assert.ok(page.document.body.classList.contains('code-wrap-enabled'));
+
+    // 仅关闭宽度：阅读效果与代码换行仍生效。
+    page.change({ widthEnabled: { newValue: false } });
+    assert.ok(page.document.documentElement.classList.contains('wider-gemini-active'));
+    assert.strictEqual(page.rootStyles.get('--gemini-font-scale'), '1');
+    assert.strictEqual(page.send({ action: 'getLayoutStatus' }).pauseReason, 'width');
+
+    const refreshed = page.send({ action: 'updateSiteEnabled' });
+    assert.strictEqual(refreshed.protocolVersion, 2, 'v2 notifications report the protocol version');
 }
 
 console.log('gemini-content lifecycle tests passed');

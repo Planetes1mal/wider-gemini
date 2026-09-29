@@ -19,10 +19,17 @@
     let currentRangeSettings = defaultNormalizedSettings;
     let isInitialized = false;
     let settingsLoaded = false;
-    let settingsRevision = 0;
+    let readToken = 0;
+    // 原始存储值；首次读取完成前到达的变更暂存在 pendingSettingsChanges，读取后覆盖读取结果。
+    let storedSettings = {};
     let pendingSettingsChanges = {};
+    let siteEnabled = true;
+    let siteActive = false;
+    let readingPrepared = false;
     let widthActive = false;
+    const SITE_ROOT_CLASS = 'wider-gemini-active';
     const WIDTH_ROOT_CLASS = 'wider-gemini-width-enabled';
+    const STORAGE_KEYS = settingsUtils.getSiteStorageKeys('gemini');
     const WIDTH_LAYOUT_SELECTOR = '.conversation-container, conversation-container, ' +
         'input-container .input-area-container, input-container input-area-v2';
     const WIDTH_RANGE_KEYS = ['widthMin', 'widthMax', 'widthPercentMin', 'widthPercentMax'];
@@ -63,12 +70,19 @@
         }
     }
 
+    // enabled 保留旧含义（宽度开关），供旧版 popup 使用；新字段区分整站暂停与仅宽度关闭。
     function getLayoutStatus() {
-        const enabled = currentRangeSettings.widthEnabled !== false;
+        const widthEnabled = currentRangeSettings.widthEnabled !== false;
         const supported = !!document.querySelector(WIDTH_LAYOUT_SELECTOR);
-        const status = !enabled ? 'paused' : !isInitialized || !settingsLoaded ? 'loading' :
-            supported ? 'active' : 'unsupported';
-        return { site: 'gemini', enabled, supported, status };
+        const pauseReason = !siteEnabled ? 'site' : !widthEnabled ? 'width' : null;
+        const status = !isInitialized || !settingsLoaded ? (widthEnabled ? 'loading' : 'paused') :
+            pauseReason === 'site' ? 'sitePaused' : pauseReason === 'width' ? 'paused' :
+                supported ? 'active' : 'unsupported';
+        return {
+            site: 'gemini', protocolVersion: settingsUtils.PROTOCOL_VERSION,
+            siteEnabled, widthEnabled, enabled: widthEnabled, supported, status, pauseReason,
+            width: { active: widthActive }, reading: { active: siteActive }
+        };
     }
 
     const READING_ROOT_SELECTOR = [
@@ -84,7 +98,12 @@
     const READING_CLASSES = [
         'wider-gemini-density-enabled', 'wider-gemini-font-enabled', 'wider-gemini-spacing-custom'
     ];
-    const measuredReadingNodes = new WeakSet();
+    const READING_ROOT_PROPERTIES = ['--gemini-density-progress', '--gemini-density-spacing-scale',
+        '--gemini-font-scale', '--gemini-message-line-height', '--gemini-message-paragraph-spacing'];
+    const READING_MARKERS = ['data-wg-typography', 'data-wg-line', 'data-wg-spacing', 'data-wg-gap'];
+    const READING_NODE_PROPERTIES = ['--wg-native-font-size', '--wg-native-line-height', '--wg-line-reduction',
+        '--wg-native-margin-top', '--wg-native-margin-bottom', '--wg-native-row-gap'];
+    let measuredReadingNodes = new WeakSet();
 
     const css_config = [
         { key: '.conversation-container, conversation-container', value: 'max-width: {width}', sleep: 0 },
@@ -216,8 +235,22 @@
         }
     }
 
+    // 暂停时撤回全部阅读标记和采样值；恢复时按当时的原生样式重新采样，避免沿用旧基准。
+    function clearReadingLayout() {
+        document.querySelectorAll(READING_MARKERS.map(name => `[${name}]`).join(', ')).forEach(node => {
+            READING_MARKERS.forEach(name => node.removeAttribute(name));
+            READING_NODE_PROPERTIES.forEach(name => node.style.removeProperty(name));
+        });
+        measuredReadingNodes = new WeakSet();
+    }
+
     function applyDensitySettings(settings) {
         const root = document.documentElement;
+        if (!siteActive) {
+            if (document.body) READING_CLASSES.forEach(name => document.body.classList.remove(name));
+            READING_ROOT_PROPERTIES.forEach(name => root.style.removeProperty(name));
+            return;
+        }
         const progress = settings.messageCompactness / 100;
         root.style.setProperty('--gemini-density-progress', String(progress));
         root.style.setProperty('--gemini-density-spacing-scale', String(1 - 0.875 * progress));
@@ -234,25 +267,13 @@
     function applyCodeWrap(enabled) {
         currentRangeSettings.codeWrap = enabled;
         if (!document.body) return;
-        if (enabled) {
-            document.body.classList.add('code-wrap-enabled');
-            console.log('[Wider Gemini] Code auto wrap enabled');
-        } else {
-            document.body.classList.remove('code-wrap-enabled');
-            console.log('[Wider Gemini] Code auto wrap disabled');
-        }
+        document.body.classList.toggle('code-wrap-enabled', enabled && siteActive);
     }
 
     function applyUserFullWidth(enabled) {
         currentRangeSettings.userFullWidth = enabled;
         if (!document.body) return;
-        if (enabled && widthActive) {
-            document.body.classList.add('wider-gemini-user-full-width');
-            console.log('[Wider Gemini] User message full width enabled');
-        } else {
-            document.body.classList.remove('wider-gemini-user-full-width');
-            console.log('[Wider Gemini] User message full width disabled');
-        }
+        document.body.classList.toggle('wider-gemini-user-full-width', enabled && widthActive);
     }
 
     function updateCurrentRangeSettings(ranges) {
@@ -268,8 +289,7 @@
         const root = document.documentElement;
         const normalized = settingsUtils.normalizeWidthSetting(widthSetting, currentRangeSettings);
         currentRangeSettings.chatWidthSetting = normalized;
-        const layout = getLayoutStatus();
-        widthActive = layout.enabled && layout.supported;
+        widthActive = isWidthEffective();
         root.classList.toggle(WIDTH_ROOT_CLASS, widthActive);
         if (document.body) applyUserFullWidth(currentRangeSettings.userFullWidth);
         restoreWidthStyles(widthActive);
@@ -378,45 +398,57 @@
         }
     }
 
-    function applySettings() {
-        if (!isExtensionContextValid()) {
-            console.log('[Wider Gemini] Extension context invalid, stopping');
-            return;
-        }
+    function isWidthEffective() {
+        return siteActive && currentRangeSettings.widthEnabled !== false &&
+            !!document.querySelector(WIDTH_LAYOUT_SELECTOR);
+    }
 
+    // 首次读取、storage 事件与消息都进入同一个幂等应用路径。
+    function applyAllSettings() {
+        if (!settingsLoaded) return;
+        currentRangeSettings = normalizeAllSettings(storedSettings);
+        siteEnabled = storedSettings[settingsUtils.SITE_ENABLED_KEYS.gemini] !== false;
+        siteActive = Boolean(isExtensionContextValid()) && siteEnabled;
+        document.documentElement.classList.toggle(SITE_ROOT_CLASS, siteActive);
+        if (siteActive && !readingPrepared && document.body) {
+            readingPrepared = true;
+            prepareReadingLayout([document.body]);
+        } else if (!siteActive && readingPrepared) {
+            readingPrepared = false;
+            clearReadingLayout();
+        }
+        applyWidthStyle(currentRangeSettings.chatWidthSetting);
+        applyCodeWrap(currentRangeSettings.codeWrap);
+        applyUserFullWidth(currentRangeSettings.userFullWidth);
+        applyDensitySettings(currentRangeSettings);
+        alignImageCaptions();
+    }
+
+    // 读取期间若收到更新的 storage 事件，旧读取结果作废（事件本身已合并）。
+    function applySettings() {
+        if (!isExtensionContextValid()) return;
+        const token = ++readToken;
         try {
-            const revision = ++settingsRevision;
-            chrome.storage.sync.get([
-                'widthEnabled',
-                'chatWidth',
-                'chatWidthSetting',
-                'codeWrap',
-                'userFullWidth',
-                'widthMin',
-                'widthMax',
-                'widthPercentMin',
-                'widthPercentMax',
-                'messageCompactness',
-                'messageLineHeight',
-                'messageParagraphSpacing',
-                'messageSpacingCustom',
-                'messageFontSize'
-            ], function (result) {
-                if (!isExtensionContextValid() || revision !== settingsRevision) return;
-                // 读存储期间收到的即时设置优先，同时保留尚未加载的其他阅读偏好。
-                const settings = normalizeAllSettings({ ...result, ...pendingSettingsChanges });
+            chrome.storage.sync.get(STORAGE_KEYS, function (result) {
+                if (!isExtensionContextValid() || token !== readToken) return;
+                storedSettings = { ...result, ...pendingSettingsChanges };
                 pendingSettingsChanges = {};
                 settingsLoaded = true;
-                currentRangeSettings = settings;
-                applyWidthStyle(settings.chatWidthSetting, settings);
-                applyCodeWrap(settings.codeWrap);
-                applyUserFullWidth(settings.userFullWidth);
-                applyDensitySettings(settings);
-                alignImageCaptions();
+                applyAllSettings();
             });
         } catch (e) {
             console.log('[Wider Gemini] Failed to get storage:', e.message);
         }
+    }
+
+    // 加载前的变更只暂存，不能单独把不完整的状态标记为已加载。
+    function mergeSettings(values) {
+        if (!settingsLoaded) {
+            Object.assign(pendingSettingsChanges, values);
+            return;
+        }
+        Object.assign(storedSettings, values);
+        applyAllSettings();
     }
 
     if (isExtensionContextValid()) {
@@ -427,49 +459,37 @@
                 sendResponse(getLayoutStatus());
                 return;
             }
-            if (!['updateWidthSetting', 'updateWidth', 'updateWidthEnabled', 'updateCodeWrap',
-                'updateUserFullWidth', 'updateDensity'].includes(request.action)) return;
-            if (request.action === 'updateWidthSetting') {
-                pendingSettingsChanges.chatWidthSetting = request.setting;
-                for (const key of WIDTH_RANGE_KEYS) {
-                    if (request.ranges && Object.hasOwn(request.ranges, key)) {
-                        pendingSettingsChanges[key] = request.ranges[key];
-                    }
-                }
-                if (typeof request.enabled === 'boolean') pendingSettingsChanges.widthEnabled = request.enabled;
-                if (typeof request.enabled === 'boolean') currentRangeSettings.widthEnabled = request.enabled;
-                applyWidthStyle(request.setting, request.ranges);
-                alignImageCaptions();
-                sendResponse({ success: true });
-            } else if (request.action === 'updateWidth') {
-                pendingSettingsChanges.chatWidthSetting = { value: request.width, unit: 'px' };
-                applyWidthStyle({ value: request.width, unit: 'px' });
-                alignImageCaptions();
-                sendResponse({ success: true });
-            } else if (request.action === 'updateWidthEnabled') {
-                if (typeof request.enabled === 'boolean') pendingSettingsChanges.widthEnabled = request.enabled;
-                if (typeof request.enabled === 'boolean') currentRangeSettings.widthEnabled = request.enabled;
-                applyWidthStyle(currentRangeSettings.chatWidthSetting);
-                alignImageCaptions();
-                sendResponse({ success: true });
-            } else if (request.action === 'updateCodeWrap') {
-                pendingSettingsChanges.codeWrap = request.enabled;
-                applyCodeWrap(request.enabled);
-                sendResponse({ success: true });
-            } else if (request.action === 'updateUserFullWidth') {
-                pendingSettingsChanges.userFullWidth = request.enabled;
-                applyUserFullWidth(request.enabled);
-                sendResponse({ success: true });
-            } else if (request.action === 'updateDensity') {
-                const density = {
-                    ...settingsUtils.normalizeDensity(request.settings || {}),
-                    messageFontSize: settingsUtils.normalizeFontSize(request.settings?.messageFontSize)
-                };
-                Object.assign(pendingSettingsChanges, density);
-                Object.assign(currentRangeSettings, density);
-                applyDensitySettings(currentRangeSettings);
-                sendResponse({ success: true });
+            // v2：只通知重新读取已保存的设置，不回放 popup 捕获的旧值。
+            if (['updateSiteEnabled', 'updateReadingSettings', 'refreshSettings'].includes(request.action)) {
+                if (settingsLoaded) applySettings();
+                sendResponse({ success: true, protocolVersion: settingsUtils.PROTOCOL_VERSION });
+                return;
             }
+            // 旧版 popup 的字段消息：只合并各自白名单字段，不影响总开关。
+            const values = {};
+            if (request.action === 'updateWidthSetting') {
+                values.chatWidthSetting = request.setting;
+                for (const key of WIDTH_RANGE_KEYS) {
+                    if (request.ranges && Object.hasOwn(request.ranges, key)) values[key] = request.ranges[key];
+                }
+                if (typeof request.enabled === 'boolean') values.widthEnabled = request.enabled;
+            } else if (request.action === 'updateWidth') {
+                values.chatWidthSetting = { value: request.width, unit: 'px' };
+            } else if (request.action === 'updateWidthEnabled') {
+                if (typeof request.enabled === 'boolean') values.widthEnabled = request.enabled;
+            } else if (request.action === 'updateCodeWrap') {
+                values.codeWrap = request.enabled === true;
+            } else if (request.action === 'updateUserFullWidth') {
+                values.userFullWidth = request.enabled === true;
+            } else if (request.action === 'updateDensity') {
+                Object.assign(values, settingsUtils.normalizeDensity(request.settings || {}), {
+                    messageFontSize: settingsUtils.normalizeFontSize(request.settings?.messageFontSize)
+                });
+            } else {
+                return;
+            }
+            mergeSettings(values);
+            sendResponse({ success: true });
         });
     }
 
@@ -505,7 +525,6 @@
         if (isInitialized) return;
         isInitialized = true;
 
-        prepareReadingLayout([document.body]);
         applySettings();
         observeUrlChanges();
 
@@ -556,10 +575,9 @@
                 }
             });
 
-            prepareReadingLayout(readingScopes);
-            const layout = getLayoutStatus();
-            const shouldEnable = layout.enabled && layout.supported;
-            if (shouldUpdate || widthActive !== shouldEnable) {
+            // 暂停时新插入的内容保持原生，不做排版采样。
+            if (siteActive) prepareReadingLayout(readingScopes);
+            if (settingsLoaded && (shouldUpdate || widthActive !== isWidthEffective())) {
                 applyWidthStyle(currentRangeSettings.chatWidthSetting);
                 alignImageCaptions();
             }
@@ -660,29 +678,19 @@
 
     if (isExtensionContextValid()) {
         chrome.storage.onChanged.addListener(function (changes, namespace) {
-            if (!isExtensionContextValid()) return;
-            if (namespace !== 'sync') return;
-            const keys = ['widthEnabled', 'chatWidthSetting', 'chatWidth', 'widthMin', 'widthMax',
-                'widthPercentMin', 'widthPercentMax', 'codeWrap', 'userFullWidth', 'messageCompactness',
-                'messageLineHeight', 'messageParagraphSpacing', 'messageSpacingCustom', 'messageFontSize'];
-            const changedKeys = keys.filter(key => Object.hasOwn(changes, key));
-            if (!changedKeys.length) return;
-            const next = { ...currentRangeSettings };
-            for (const key of changedKeys) {
-                next[key] = changes[key].newValue;
-                pendingSettingsChanges[key] = changes[key].newValue;
+            if (!isExtensionContextValid() || namespace !== 'sync') return;
+            const values = {};
+            for (const key of STORAGE_KEYS) {
+                if (Object.hasOwn(changes, key)) values[key] = changes[key].newValue;
             }
+            if (!Object.keys(values).length) return;
             if (changes.chatWidth && !changes.chatWidthSetting) {
-                next.chatWidthSetting = { value: changes.chatWidth.newValue, unit: 'px' };
-                pendingSettingsChanges.chatWidthSetting = next.chatWidthSetting;
+                values.chatWidthSetting = { value: changes.chatWidth.newValue, unit: 'px' };
             }
-            // 开关和宽度可能同一次写入，先合并再应用，避免短暂恢复已暂停的拓宽。
-            currentRangeSettings = normalizeAllSettings(next);
-            applyWidthStyle(currentRangeSettings.chatWidthSetting);
-            applyCodeWrap(currentRangeSettings.codeWrap);
-            applyUserFullWidth(currentRangeSettings.userFullWidth);
-            applyDensitySettings(currentRangeSettings);
-            alignImageCaptions();
+            // 更新的事件使进行中的读取作废；开关和宽度可能同一次写入，合并后一次应用。
+            ++readToken;
+            if (!settingsLoaded) applySettings();
+            mergeSettings(values);
         });
     }
 

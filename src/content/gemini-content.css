@@ -430,17 +430,17 @@ body.wider-gemini-spacing-custom [data-wg-gap] {
     row-gap: 0 !important;
 }
 
-/* Code wrap enabled */
-body.code-wrap-enabled pre,
-body.code-wrap-enabled pre code {
+/* Code wrap enabled — every code-wrap branch, including the default nowrap override, requires the site-active class. */
+:where(html.wider-gemini-active) body.code-wrap-enabled pre,
+:where(html.wider-gemini-active) body.code-wrap-enabled pre code {
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
 }
 
-body.code-wrap-enabled .code-container,
-body.code-wrap-enabled .code-container.formatted {
+:where(html.wider-gemini-active) body.code-wrap-enabled .code-container,
+:where(html.wider-gemini-active) body.code-wrap-enabled .code-container.formatted {
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     word-break: break-word !important;
@@ -448,26 +448,26 @@ body.code-wrap-enabled .code-container.formatted {
     overflow-x: visible !important;
 }
 
-body.code-wrap-enabled .code-block pre,
-body.code-wrap-enabled .code-block code {
+:where(html.wider-gemini-active) body.code-wrap-enabled .code-block pre,
+:where(html.wider-gemini-active) body.code-wrap-enabled .code-block code {
     white-space: pre-wrap !important;
     overflow-x: visible !important;
 }
 
-body.code-wrap-enabled .formatted-code-block-internal-container pre,
-body.code-wrap-enabled .formatted-code-block-internal-container code {
+:where(html.wider-gemini-active) body.code-wrap-enabled .formatted-code-block-internal-container pre,
+:where(html.wider-gemini-active) body.code-wrap-enabled .formatted-code-block-internal-container code {
     white-space: pre-wrap !important;
 }
 
 /* Code wrap disabled (default) */
-body:not(.code-wrap-enabled) pre,
-body:not(.code-wrap-enabled) pre code {
+:where(html.wider-gemini-active) body:not(.code-wrap-enabled) pre,
+:where(html.wider-gemini-active) body:not(.code-wrap-enabled) pre code {
     white-space: pre !important;
     overflow-x: auto !important;
 }
 
-body:not(.code-wrap-enabled) .code-container,
-body:not(.code-wrap-enabled) .code-container.formatted {
+:where(html.wider-gemini-active) body:not(.code-wrap-enabled) .code-container,
+:where(html.wider-gemini-active) body:not(.code-wrap-enabled) .code-container.formatted {
     white-space: pre !important;
     overflow-x: auto !important;
 }

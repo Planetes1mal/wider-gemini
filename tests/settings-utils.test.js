@@ -10,6 +10,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(source, sandbox, { filename: 'settings-utils.js' });
 
 const utils = sandbox.widerGeminiSettings;
+const plain = value => JSON.parse(JSON.stringify(value));
 assert.ok(utils, 'settings utils are exposed');
 
 {
@@ -242,6 +243,86 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(invalid.widthMin, 700);
     assert.strictEqual(invalid.widthMax, 2000);
     assert.strictEqual(invalid.presetsByUnit.px.length, 5);
+}
+
+// 总开关与 ChatGPT 阅读设置：旧的宽度关闭不迁移为总开关关闭，新阅读默认值等同原生。
+{
+    const legacy = { widthEnabled: false, messageFontSize: 120, codeWrap: true,
+        [utils.CHATGPT_WIDTH_KEY]: { widthEnabled: false, chatWidthSetting: { value: 1200, unit: 'px' } } };
+    const gemini = utils.normalizeSiteSettings(legacy, 'gemini');
+    const chatgpt = utils.normalizeSiteSettings(legacy, 'chatgpt');
+    assert.strictEqual(gemini.siteEnabled, true);
+    assert.strictEqual(gemini.widthEnabled, false);
+    assert.strictEqual(gemini.messageFontSize, 120);
+    assert.strictEqual(chatgpt.siteEnabled, true);
+    assert.strictEqual(chatgpt.messageFontSize, 100, 'ChatGPT does not inherit Gemini reading values');
+    assert.strictEqual(chatgpt.messageCompactness, 0);
+    assert.strictEqual(chatgpt.messageSpacingCustom, false);
+    assert.strictEqual(chatgpt.userFullWidth, false);
+    assert.strictEqual(chatgpt.codeWrap, undefined, 'ChatGPT has no extension code-wrap field');
+    assert.strictEqual(utils.normalizeSiteSettings({ chatgptEnabled: false }, 'chatgpt').siteEnabled, false);
+    assert.strictEqual(utils.normalizeSiteSettings({ chatgptEnabled: false }, 'gemini').siteEnabled, true);
+    assert.deepStrictEqual(Object.keys(utils.getSiteEnabledPatch('chatgpt', false)), ['chatgptEnabled']);
+
+    // 读→改→写：宽度写入不碰阅读对象，阅读写入保留已存阅读字段并排除 codeWrap。
+    const stored = { ...legacy, [utils.CHATGPT_READING_KEY]: { messageFontSize: 130, userFullWidth: true } };
+    const readingPatch = utils.getSiteReadingPatch(stored, 'chatgpt', { messageCompactness: 40, codeWrap: true });
+    assert.deepStrictEqual(Object.keys(readingPatch), [utils.CHATGPT_READING_KEY]);
+    const reading = readingPatch[utils.CHATGPT_READING_KEY];
+    assert.strictEqual(reading.messageFontSize, 130);
+    assert.strictEqual(reading.userFullWidth, true);
+    assert.strictEqual(reading.messageCompactness, 40);
+    assert.strictEqual(reading.codeWrap, undefined);
+    const widthPatch = utils.getSiteWidthStoragePayload(utils.normalizeSiteSettings(stored, 'chatgpt'), 'chatgpt');
+    const afterWidth = utils.normalizeSiteSettings({ ...stored, ...widthPatch }, 'chatgpt');
+    assert.strictEqual(afterWidth.messageFontSize, 130, 'width writes keep ChatGPT reading values');
+    assert.strictEqual(afterWidth.userFullWidth, true);
+
+    const geminiPatch = utils.getSiteReadingPatch(stored, 'gemini', { messageFontSize: 150 });
+    assert.deepStrictEqual(plain(geminiPatch), { messageFontSize: 150 }, 'partial Gemini edit writes only that field');
+    const densityPatch = utils.getSiteReadingPatch(stored, 'gemini', { messageCompactness: 50 });
+    assert.deepStrictEqual(Object.keys(densityPatch).sort(),
+        ['messageCompactness', 'messageLineHeight', 'messageParagraphSpacing', 'messageSpacingCustom']);
+}
+
+// 任务：预览值即实际写入值；恢复只改受管字段；未完成记录按实际值对账。
+{
+    const stored = {
+        [utils.CHATGPT_WIDTH_KEY]: { widthEnabled: false, widthPercentMax: 80,
+            chatWidthSetting: { value: 800, unit: 'px' } },
+        [utils.CHATGPT_READING_KEY]: { userFullWidth: true, messageFontSize: 90 }
+    };
+    const current = utils.normalizeSiteSettings(stored, 'chatgpt');
+    const values = utils.getTaskValues('chatgpt', 'wide', current);
+    assert.deepStrictEqual(plain(values.chatWidthSetting), { value: 80, unit: 'percent' }, 'task width respects the range');
+    assert.strictEqual(values.codeWrap, undefined);
+    const patch = utils.getTaskPatch(stored, 'chatgpt', values);
+    const applied = utils.normalizeSiteSettings({ ...stored, ...patch }, 'chatgpt');
+    assert.ok(utils.isSameManaged(utils.getTaskManaged(applied, 'chatgpt'), values, 'chatgpt'));
+    assert.strictEqual(applied.widthEnabled, false, 'tasks keep the width switch');
+    assert.strictEqual(applied.userFullWidth, true, 'tasks keep user full width');
+    assert.strictEqual(applied.widthPercentMax, 80, 'tasks keep ranges');
+    assert.deepStrictEqual(Object.keys(utils.TASK_PRESETS.chatgpt), ['reading', 'wide', 'large']);
+    assert.deepStrictEqual(Object.keys(utils.TASK_PRESETS.gemini), ['reading', 'table', 'code', 'large']);
+
+    const snapshot = utils.getTaskManaged(current, 'chatgpt');
+    const restored = utils.normalizeSiteSettings({ ...stored, ...patch,
+        ...utils.getTaskPatch({ ...stored, ...patch }, 'chatgpt', snapshot) }, 'chatgpt');
+    assert.ok(utils.isSameManaged(utils.getTaskManaged(restored, 'chatgpt'), snapshot, 'chatgpt'));
+
+    const legacyUndo = utils.readUndoRecord({ chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 100 });
+    assert.strictEqual(legacyUndo.state, 'ready', 'bare legacy snapshots are ready');
+    const previous = { state: 'ready', snapshot: { ...snapshot, messageFontSize: 120 } };
+    const applying = { state: 'applying', snapshot, previous, pending: { from: snapshot, to: values } };
+    assert.deepStrictEqual(plain(utils.reconcileUndoRecord(applying, values, 'chatgpt').record),
+        plain({ state: 'ready', snapshot }), 'applied task finishes the record');
+    assert.strictEqual(utils.reconcileUndoRecord(applying, snapshot, 'chatgpt').record, previous,
+        'an apply that never reached sync keeps the previous undo');
+    const unknown = utils.reconcileUndoRecord(applying, { ...values, messageFontSize: 175 }, 'chatgpt');
+    assert.strictEqual(unknown.ambiguous, true, 'mismatched pending state is not treated as ready');
+    const restoring = { state: 'restoring', snapshot, pending: { from: values, to: snapshot } };
+    assert.strictEqual(utils.reconcileUndoRecord(restoring, snapshot, 'chatgpt').record, null);
+    assert.strictEqual(utils.reconcileUndoRecord(restoring, values, 'chatgpt').record.state, 'ready');
 }
 
 console.log('settings-utils tests passed');

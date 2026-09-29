@@ -5,6 +5,29 @@
     const UNIT_PERCENT = 'percent';
     const PRESET_COUNT = 5;
     const CHATGPT_WIDTH_KEY = 'chatgptWidthSettings';
+    const CHATGPT_READING_KEY = 'chatgptReadingSettings';
+    const SITE_ENABLED_KEYS = { gemini: 'geminiEnabled', chatgpt: 'chatgptEnabled' };
+    const TASK_UNDO_KEYS = { gemini: 'taskPresetUndo', chatgpt: 'chatgptTaskPresetUndo' };
+    // 内容脚本协议版本：2 起支持总开关、阅读设置刷新与细分状态。
+    const PROTOCOL_VERSION = 2;
+    const DENSITY_KEYS = ['messageCompactness', 'messageSpacingCustom', 'messageLineHeight', 'messageParagraphSpacing'];
+    const READING_KEYS = [...DENSITY_KEYS, 'messageFontSize', 'userFullWidth'];
+    const GEMINI_WIDTH_KEYS = ['widthEnabled', 'chatWidth', 'chatWidthSetting', 'widthMin', 'widthMax',
+        'widthPercentMin', 'widthPercentMax', 'presetsByUnit', 'presets'];
+    const TASK_PRESETS = {
+        gemini: {
+            reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110, codeWrap: true },
+            table: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: false },
+            code: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: true },
+            large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140, codeWrap: true }
+        },
+        // ChatGPT 代码换行由网站原生按钮控制，任务不涉及。
+        chatgpt: {
+            reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110 },
+            wide: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100 },
+            large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140 }
+        }
+    };
     const SITE_MATCHES = {
         gemini: 'https://gemini.google.com/*',
         chatgpt: 'https://chatgpt.com/*'
@@ -312,10 +335,147 @@
         };
     }
 
+    // 阅读设置：Gemini 沿用顶层字段；ChatGPT 使用独立对象，宽度对象整体写入时不会抹掉它。
+    function normalizeReadingSettings(source) {
+        const reading = source && typeof source === 'object' ? source : {};
+        return {
+            ...normalizeDensity(reading),
+            messageFontSize: normalizeFontSize(reading.messageFontSize),
+            userFullWidth: reading.userFullWidth === true
+        };
+    }
+
+    function getReadingSource(stored, site) {
+        const source = stored && typeof stored === 'object' ? stored : {};
+        return site === 'chatgpt' ? source[CHATGPT_READING_KEY] : source;
+    }
+
+    function getSiteStorageKeys(site) {
+        if (site === 'chatgpt') return [SITE_ENABLED_KEYS.chatgpt, CHATGPT_WIDTH_KEY, CHATGPT_READING_KEY];
+        return [SITE_ENABLED_KEYS.gemini, ...GEMINI_WIDTH_KEYS, ...READING_KEYS, 'codeWrap'];
+    }
+
+    /** 一个站点的完整只读视图：总开关、宽度与阅读偏好。缺失字段取原生默认值。 */
+    function normalizeSiteSettings(stored, site) {
+        const source = stored && typeof stored === 'object' ? stored : {};
+        const settings = {
+            site,
+            siteEnabled: source[SITE_ENABLED_KEYS[site]] !== false,
+            ...normalizeSiteWidthSettings(source, site),
+            ...normalizeReadingSettings(getReadingSource(source, site))
+        };
+        if (site === 'gemini') settings.codeWrap = source.codeWrap === true;
+        return settings;
+    }
+
+    function getSiteEnabledPatch(site, enabled) {
+        return { [SITE_ENABLED_KEYS[site]]: enabled === true };
+    }
+
+    /**
+     * 只生成本次编辑涉及的阅读字段。ChatGPT 对象先合并最新已存值再整体替换；
+     * 密度四个字段相互关联，编辑其中任一项时一起写入。
+     */
+    function getSiteReadingPatch(stored, site, edit) {
+        const changed = READING_KEYS.filter(key => Object.hasOwn(edit, key));
+        const next = normalizeReadingSettings({
+            ...normalizeReadingSettings(getReadingSource(stored, site)),
+            ...Object.fromEntries(changed.map(key => [key, edit[key]]))
+        });
+        if (site === 'chatgpt') return { [CHATGPT_READING_KEY]: next };
+
+        const keys = new Set(changed);
+        if (DENSITY_KEYS.some(key => keys.has(key))) DENSITY_KEYS.forEach(key => keys.add(key));
+        const patch = Object.fromEntries([...keys].map(key => [key, next[key]]));
+        if (Object.hasOwn(edit, 'codeWrap')) patch.codeWrap = edit.codeWrap === true;
+        return patch;
+    }
+
+    // 任务预设管理的字段：宽度、字号、间距（Gemini 另含代码换行）。总开关、宽度开关、
+    // 用户消息铺满、范围和命名宽度预设都不属于任务。
+    function getTaskManaged(settings, site) {
+        const managed = {
+            chatWidthSetting: { ...settings.chatWidthSetting },
+            messageFontSize: settings.messageFontSize,
+            ...normalizeDensity(settings)
+        };
+        if (site === 'gemini') managed.codeWrap = settings.codeWrap === true;
+        return managed;
+    }
+
+    function getTaskValues(site, task, ranges) {
+        const preset = TASK_PRESETS[site][task];
+        return getTaskManaged({
+            ...preset,
+            chatWidthSetting: normalizeWidthSetting(preset.chatWidthSetting, ranges),
+            messageFontSize: normalizeFontSize(preset.messageFontSize)
+        }, site);
+    }
+
+    /** 把受管字段写回存储；宽度按当前范围钳制，站点其它设置保持不变。 */
+    function getTaskPatch(stored, site, managed) {
+        const current = normalizeSiteSettings(stored, site);
+        const chatWidthSetting = normalizeWidthSetting(managed.chatWidthSetting, current);
+        const reading = {
+            ...normalizeDensity(managed),
+            messageFontSize: normalizeFontSize(managed.messageFontSize)
+        };
+        if (site === 'chatgpt') {
+            return {
+                ...getSiteWidthStoragePayload({ ...current, chatWidthSetting }, 'chatgpt'),
+                ...getSiteReadingPatch(stored, 'chatgpt', reading)
+            };
+        }
+        return {
+            chatWidthSetting,
+            chatWidth: getLegacyChatWidth(chatWidthSetting),
+            ...reading,
+            codeWrap: managed.codeWrap === true
+        };
+    }
+
+    function isSameManaged(a, b, site) {
+        if (!a || !b) return false;
+        const key = value => JSON.stringify(getTaskManaged({
+            ...value,
+            messageFontSize: normalizeFontSize(value.messageFontSize)
+        }, site));
+        return key(a) === key(b);
+    }
+
+    // 旧版 taskPresetUndo 是直接存放的快照，按已就绪记录读取。
+    function readUndoRecord(value) {
+        if (!value || typeof value !== 'object') return null;
+        if (!value.state) return { state: 'ready', snapshot: value };
+        return value;
+    }
+
+    /**
+     * local 与 sync 不是同一事务。重新打开时按实际已存值判断未完成的操作：
+     * 与目标一致视为已完成，与操作前一致视为未发生，其余情况无法判断。
+     */
+    function reconcileUndoRecord(record, actual, site) {
+        if (!record || record.state === 'ready') return { record };
+        const applying = record.state === 'applying';
+        const { from, to } = record.pending || {};
+        if (isSameManaged(actual, to, site)) {
+            return { record: applying ? { state: 'ready', snapshot: record.snapshot } : null };
+        }
+        if (isSameManaged(actual, from, site)) {
+            return { record: applying ? record.previous || null : { state: 'ready', snapshot: record.snapshot } };
+        }
+        return { record, ambiguous: true };
+    }
+
     global.widerGeminiSettings = {
         UNIT_PX,
         UNIT_PERCENT,
         CHATGPT_WIDTH_KEY,
+        CHATGPT_READING_KEY,
+        SITE_ENABLED_KEYS,
+        TASK_UNDO_KEYS,
+        TASK_PRESETS,
+        PROTOCOL_VERSION,
         SITE_MATCHES,
         PX_RANGE,
         PERCENT_RANGE,
@@ -325,6 +485,17 @@
         normalizeStorage,
         normalizeSiteWidthSettings,
         getSiteWidthStoragePayload,
+        normalizeReadingSettings,
+        normalizeSiteSettings,
+        getSiteStorageKeys,
+        getSiteEnabledPatch,
+        getSiteReadingPatch,
+        getTaskManaged,
+        getTaskValues,
+        getTaskPatch,
+        isSameManaged,
+        readUndoRecord,
+        reconcileUndoRecord,
         normalizeWidthSetting,
         normalizePreset,
         normalizePresets,

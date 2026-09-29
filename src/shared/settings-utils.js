@@ -4,6 +4,11 @@
     const UNIT_PX = 'px';
     const UNIT_PERCENT = 'percent';
     const PRESET_COUNT = 5;
+    const CHATGPT_WIDTH_KEY = 'chatgptWidthSettings';
+    const SITE_MATCHES = {
+        gemini: 'https://gemini.google.com/*',
+        chatgpt: 'https://chatgpt.com/*'
+    };
 
     const PX_RANGE = { min: 300, max: 5000, step: 50 };
     const PERCENT_RANGE = { min: 10, max: 100, step: 1 };
@@ -34,6 +39,7 @@
     };
 
     const DEFAULTS = {
+        widthEnabled: true,
         widthMin: 700,
         widthMax: 2000,
         widthPercentMin: 50,
@@ -133,7 +139,7 @@
         const range = getRangeForUnit(ranges, unit);
         const clamped = clampNumber(value, range.min, range.max);
         return {
-            value: roundForUnit(clamped, unit),
+            value: clampNumber(roundForUnit(clamped, unit), range.min, range.max),
             unit
         };
     }
@@ -269,6 +275,7 @@
 
         return {
             ...ranges,
+            widthEnabled: source.widthEnabled !== false,
             chatWidthSetting,
             legacyChatWidth: getLegacyChatWidth(chatWidthSetting),
             presetsByUnit,
@@ -281,15 +288,43 @@
         };
     }
 
+    function normalizeSiteWidthSettings(result, site) {
+        const source = result && typeof result === 'object' ? result : {};
+        const settings = normalizeStorage(site === 'chatgpt' ? source[CHATGPT_WIDTH_KEY] : source);
+        return {
+            widthEnabled: settings.widthEnabled,
+            chatWidthSetting: settings.chatWidthSetting,
+            widthMin: settings.widthMin,
+            widthMax: settings.widthMax,
+            widthPercentMin: settings.widthPercentMin,
+            widthPercentMax: settings.widthPercentMax,
+            presetsByUnit: settings.presetsByUnit
+        };
+    }
+
+    function getSiteWidthStoragePayload(settings, site) {
+        const widthSettings = normalizeSiteWidthSettings(settings, 'gemini');
+        if (site === 'chatgpt') return { [CHATGPT_WIDTH_KEY]: widthSettings };
+        return {
+            ...widthSettings,
+            chatWidth: getLegacyChatWidth(widthSettings.chatWidthSetting),
+            presets: widthSettings.presetsByUnit[UNIT_PX]
+        };
+    }
+
     global.widerGeminiSettings = {
         UNIT_PX,
         UNIT_PERCENT,
+        CHATGPT_WIDTH_KEY,
+        SITE_MATCHES,
         PX_RANGE,
         PERCENT_RANGE,
         DEFAULTS,
         clampNumber,
         normalizeUnit,
         normalizeStorage,
+        normalizeSiteWidthSettings,
+        getSiteWidthStoragePayload,
         normalizeWidthSetting,
         normalizePreset,
         normalizePresets,

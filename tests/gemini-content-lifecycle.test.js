@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const utilsSource = fs.readFileSync(path.join(__dirname, '..', 'settings-utils.js'), 'utf8');
-const contentSource = fs.readFileSync(path.join(__dirname, '..', 'gemini-content.js'), 'utf8');
+const utilsSource = fs.readFileSync(path.join(__dirname, '..', 'src/shared/settings-utils.js'), 'utf8');
+const contentSource = fs.readFileSync(path.join(__dirname, '..', 'src/content/gemini-content.js'), 'utf8');
 
 function createEventTarget() {
     const listeners = new Map();
@@ -42,27 +42,45 @@ function createClassList() {
 }
 
 // 模拟一个 Gemini 页面的扩展隔离世界；readyState 决定内容脚本是等待 DOMContentLoaded 还是立即初始化
-function createPage(readyState) {
+function createPage(readyState, { supported = true, deferStorage = false } = {}) {
     const rootStyles = new Map();
+    const rootPriorities = new Map();
     const timers = new Map();
     const counts = { storageGet: 0, observerStart: 0, messageListeners: 0, storageChangeListeners: 0 };
+    const pendingStorage = [];
+    let deliverMessage;
+    let deliverStorage;
+    let deliverMutation;
     let nextTimerId = 1;
 
     const document = {
         ...createEventTarget(),
         readyState,
         documentElement: {
+            isConnected: true,
+            classList: createClassList(),
             style: {
-                setProperty(property, value) {
+                setProperty(property, value, priority = '') {
                     rootStyles.set(property, value);
+                    rootPriorities.set(property, priority);
+                },
+                getPropertyValue(property) {
+                    return rootStyles.get(property) || '';
+                },
+                getPropertyPriority(property) {
+                    return rootPriorities.get(property) || '';
+                },
+                removeProperty(property) {
+                    rootStyles.delete(property);
+                    rootPriorities.delete(property);
                 }
             }
         },
         body: {
             classList: createClassList()
         },
-        querySelector() {
-            return null;
+        querySelector(selector) {
+            return supported && selector.includes('input-container input-area-v2') ? {} : null;
         },
         querySelectorAll() {
             return [];
@@ -81,8 +99,9 @@ function createPage(readyState) {
             runtime: {
                 id: 'test-extension',
                 onMessage: {
-                    addListener() {
+                    addListener(listener) {
                         counts.messageListeners += 1;
+                        deliverMessage = listener;
                     }
                 }
             },
@@ -90,20 +109,26 @@ function createPage(readyState) {
                 sync: {
                     get(keys, callback) {
                         counts.storageGet += 1;
-                        callback({
+                        const complete = () => callback({
                             chatWidthSetting: { value: 1200, unit: 'px' },
                             codeWrap: true
                         });
+                        if (deferStorage) pendingStorage.push(complete);
+                        else complete();
                     }
                 },
                 onChanged: {
-                    addListener() {
+                    addListener(listener) {
                         counts.storageChangeListeners += 1;
+                        deliverStorage = listener;
                     }
                 }
             }
         },
         MutationObserver: class {
+            constructor(callback) {
+                deliverMutation = callback;
+            }
             observe() {
                 counts.observerStart += 1;
             }
@@ -148,6 +173,21 @@ function createPage(readyState) {
         document,
         rootStyles,
         counts,
+        send(message) {
+            let response;
+            deliverMessage(message, {}, value => { response = value; });
+            return response;
+        },
+        change(changes) {
+            deliverStorage(changes, 'sync');
+        },
+        setSupported(value) {
+            supported = value;
+            deliverMutation([]);
+        },
+        completeStorage() {
+            pendingStorage.splice(0).forEach(complete => complete());
+        },
         runContentScript() {
             vm.runInContext(contentSource, context, { filename: 'gemini-content.js' });
         },
@@ -203,6 +243,44 @@ function createPage(readyState) {
     assert.strictEqual(page.counts.observerStart, 1, 'late injection starts one mutation observer');
     assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1200px');
     assert.ok(page.document.body.classList.contains('code-wrap-enabled'));
+}
+
+// 暂停/恢复与未知布局不需要重新注入，且不会清掉阅读偏好。
+{
+    const page = createPage('complete');
+    page.runContentScript();
+    page.runTimers(0);
+    assert.strictEqual(page.send({ action: 'getLayoutStatus' }).status, 'active');
+    page.send({ action: 'updateUserFullWidth', enabled: true });
+    page.change({ widthEnabled: { newValue: false }, chatWidthSetting: { newValue: { value: 1400, unit: 'px' } } });
+    assert.strictEqual(page.send({ action: 'getLayoutStatus' }).status, 'paused');
+    assert.strictEqual(page.rootStyles.has('--gemini-chat-width'), false, 'pause removes the owned root width');
+    assert.ok(page.document.body.classList.contains('code-wrap-enabled'), 'pause retains code wrap');
+    assert.ok(!page.document.body.classList.contains('wider-gemini-user-full-width'), 'pause disables stretched bubbles');
+    page.send({ action: 'updateWidthSetting', setting: { value: 1500, unit: 'px' } });
+    assert.strictEqual(page.send({ action: 'getLayoutStatus' }).status, 'paused', 'legacy width messages do not re-enable');
+    page.send({ action: 'updateWidthEnabled', enabled: true });
+    assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1500px', 'resume uses the retained width');
+    assert.ok(page.document.body.classList.contains('wider-gemini-user-full-width'), 'resume restores bubble preference');
+    page.setSupported(false);
+    assert.strictEqual(page.send({ action: 'getLayoutStatus' }).status, 'unsupported');
+    assert.strictEqual(page.rootStyles.has('--gemini-chat-width'), false, 'unknown layouts keep native width');
+    page.setSupported(true);
+    assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1500px', 'known layouts resume after SPA navigation');
+}
+
+// 慢 storage 回调不能把用户刚暂停的拓宽重新打开。
+{
+    const page = createPage('complete', { deferStorage: true });
+    page.runContentScript();
+    page.runTimers(0);
+    page.send({ action: 'updateWidthEnabled', enabled: false });
+    page.completeStorage();
+    assert.strictEqual(page.send({ action: 'getLayoutStatus' }).status, 'paused');
+    assert.strictEqual(page.rootStyles.has('--gemini-chat-width'), false);
+    assert.ok(page.document.body.classList.contains('code-wrap-enabled'), 'late storage still loads unrelated preferences');
+    page.send({ action: 'updateWidthEnabled', enabled: true });
+    assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1200px', 'late storage retains the saved width');
 }
 
 console.log('gemini-content lifecycle tests passed');

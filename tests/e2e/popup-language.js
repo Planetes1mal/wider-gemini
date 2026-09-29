@@ -10,6 +10,7 @@
     const { spawn } = require('child_process');
     assert(process.argv[2] && process.argv[3], 'Provide the extension and screenshot directories');
     const extension = path.resolve(process.argv[2]);
+    const manifest = JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'), 'utf8'));
     const screenshots = path.resolve(process.argv[3]);
     fs.mkdirSync(screenshots, { recursive: true });
     const dictionaries = Object.fromEntries(['en', 'zh_CN', 'zh_TW', 'ko', 'ja', 'es'].map(locale => [locale,
@@ -60,7 +61,9 @@
         try {
             const { id } = await send('Extensions.loadUnpacked', { path: extension });
             assert(id, 'Chrome accepts the extension source');
-            const { targetId } = await send('Target.createTarget', { url: `chrome-extension://${id}/popup.html` });
+            const { targetId } = await send('Target.createTarget', {
+                url: `chrome-extension://${id}/${manifest.action.default_popup}`
+            });
             const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
             await send('Emulation.setDeviceMetricsOverride', {
                 width: 400, height: 620, deviceScaleFactor: 1, mobile: false
@@ -102,7 +105,9 @@
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 assert(state, `Popup loads for ${selection}`);
-                assert.strictEqual(state.browser, browserLanguage, 'Actual Chrome UI language matches the test profile');
+                // Chrome may canonicalize a profile language (for example es-ES to es).
+                assert.strictEqual(state.browser.split('-')[0], browserLanguage.split('-')[0],
+                    'Actual Chrome UI language matches the test profile language');
                 assert.strictEqual(state.selected, selection);
                 assert.strictEqual(state.stored, selection, 'Language preference persists after popup reload');
                 assert.strictEqual(state.lang, dictionary.localeCode.message);

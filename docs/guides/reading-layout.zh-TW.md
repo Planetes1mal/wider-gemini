@@ -80,4 +80,4 @@
 
 「**還原套用前設定**」會還原此裝置上最近一次套用任務前的寬度、字級、間距與程式碼換行。只保留一層快照，關閉後重開彈出視窗仍可還原；還原也會覆蓋後來手動修改的這四類設定，並非多步驟歷史紀錄。這些捷徑屬於尚未發布的內部工作，商店安裝版本可能還看不到。
 
-維護參考：[設定預設值與正規化](../../settings-utils.js)、[版面樣式](../../gemini-content.css)、[內容程式行為](../../gemini-content.js)、[診斷報告欄位](../../help.js)。
+維護參考：[設定預設值與正規化](../../src/shared/settings-utils.js)、[版面樣式](../../src/content/gemini-content.css)、[內容程式行為](../../src/content/gemini-content.js)、[診斷報告欄位](../../src/help/help.js)。

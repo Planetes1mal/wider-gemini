@@ -80,4 +80,4 @@ Every task sets density to 0 and clears custom spacing. Actual width respects yo
 
 **Restore previous settings** restores the width, font, spacing, and code-wrapping settings saved immediately before the latest task application on this device. The single saved snapshot survives closing the popup. Restoring also replaces any later manual changes to those four setting groups; it is not a multi-step history. These task shortcuts are internal, unreleased work, so a store-installed version may not show them.
 
-Maintainer references: [settings defaults and normalization](../../settings-utils.js), [layout rules](../../gemini-content.css), [content behavior](../../gemini-content.js), and [diagnostic report fields](../../help.js).
+Maintainer references: [settings defaults and normalization](../../src/shared/settings-utils.js), [layout rules](../../src/content/gemini-content.css), [content behavior](../../src/content/gemini-content.js), and [diagnostic report fields](../../src/help/help.js).

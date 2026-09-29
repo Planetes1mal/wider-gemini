@@ -18,6 +18,58 @@
     const defaultNormalizedSettings = settingsUtils.normalizeStorage({});
     let currentRangeSettings = defaultNormalizedSettings;
     let isInitialized = false;
+    let settingsLoaded = false;
+    let settingsRevision = 0;
+    let pendingSettingsChanges = {};
+    let widthActive = false;
+    const WIDTH_ROOT_CLASS = 'wider-gemini-width-enabled';
+    const WIDTH_LAYOUT_SELECTOR = '.conversation-container, conversation-container, ' +
+        'input-container .input-area-container, input-container input-area-v2';
+    const WIDTH_RANGE_KEYS = ['widthMin', 'widthMax', 'widthPercentMin', 'widthPercentMax'];
+    const widthStyleChanges = new Map();
+
+    // 只撤回仍由本扩展持有的值；网站后来写入的 inline 样式不能被暂停操作覆盖。
+    function setWidthProperty(element, property, value, priority = 'important') {
+        let properties = widthStyleChanges.get(element);
+        if (!properties) {
+            properties = new Map();
+            widthStyleChanges.set(element, properties);
+        }
+        let previous = properties.get(property);
+        const currentValue = element.style.getPropertyValue(property);
+        const currentPriority = element.style.getPropertyPriority(property);
+        if (!previous || currentValue !== previous.applied || currentPriority !== previous.appliedPriority) {
+            previous = { value: currentValue, priority: currentPriority };
+            properties.set(property, previous);
+        }
+        element.style.setProperty(property, value, priority);
+        previous.applied = element.style.getPropertyValue(property);
+        previous.appliedPriority = element.style.getPropertyPriority(property);
+    }
+
+    function restoreWidthProperty(element, property, previous) {
+        if (element.style.getPropertyValue(property) === previous.applied &&
+            element.style.getPropertyPriority(property) === previous.appliedPriority) {
+            if (previous.value) element.style.setProperty(property, previous.value, previous.priority);
+            else element.style.removeProperty(property);
+        }
+    }
+
+    function restoreWidthStyles(onlyDetached = false) {
+        for (const [element, properties] of widthStyleChanges) {
+            if (onlyDetached && element.isConnected) continue;
+            for (const [property, previous] of properties) restoreWidthProperty(element, property, previous);
+            widthStyleChanges.delete(element);
+        }
+    }
+
+    function getLayoutStatus() {
+        const enabled = currentRangeSettings.widthEnabled !== false;
+        const supported = !!document.querySelector(WIDTH_LAYOUT_SELECTOR);
+        const status = !enabled ? 'paused' : !isInitialized || !settingsLoaded ? 'loading' :
+            supported ? 'active' : 'unsupported';
+        return { site: 'gemini', enabled, supported, status };
+    }
 
     const READING_ROOT_SELECTOR = [
         ':is(model-response, .model-response, response-container, .response-container, .presented-response-container,',
@@ -60,7 +112,7 @@
         styles.forEach(style => {
             const [property, value] = style.split(':').map(s => s.trim());
             if (property && value) {
-                element.style.setProperty(property, value, 'important');
+                setWidthProperty(element, property, value);
             }
         });
     }
@@ -172,6 +224,7 @@
         root.style.setProperty('--gemini-font-scale', String(settings.messageFontSize / 100));
         root.style.setProperty('--gemini-message-line-height', String(settings.messageLineHeight));
         root.style.setProperty('--gemini-message-paragraph-spacing', `${settings.messageParagraphSpacing}px`);
+        if (!document.body) return;
         document.body.classList.toggle('wider-gemini-density-enabled',
             settings.messageSpacingCustom || settings.messageCompactness > 0);
         document.body.classList.toggle('wider-gemini-spacing-custom', settings.messageSpacingCustom);
@@ -179,6 +232,8 @@
     }
 
     function applyCodeWrap(enabled) {
+        currentRangeSettings.codeWrap = enabled;
+        if (!document.body) return;
         if (enabled) {
             document.body.classList.add('code-wrap-enabled');
             console.log('[Wider Gemini] Code auto wrap enabled');
@@ -189,7 +244,9 @@
     }
 
     function applyUserFullWidth(enabled) {
-        if (enabled) {
+        currentRangeSettings.userFullWidth = enabled;
+        if (!document.body) return;
+        if (enabled && widthActive) {
             document.body.classList.add('wider-gemini-user-full-width');
             console.log('[Wider Gemini] User message full width enabled');
         } else {
@@ -200,16 +257,23 @@
 
     function updateCurrentRangeSettings(ranges) {
         if (!ranges || typeof ranges !== 'object') return;
-        currentRangeSettings = settingsUtils.normalizeStorage({
-            ...currentRangeSettings,
-            ...ranges
-        });
+        for (const key of WIDTH_RANGE_KEYS) {
+            if (Object.hasOwn(ranges, key)) currentRangeSettings[key] = ranges[key];
+        }
+        currentRangeSettings = settingsUtils.normalizeStorage(currentRangeSettings);
     }
 
     function applyWidthStyle(widthSetting, ranges) {
         updateCurrentRangeSettings(ranges);
         const root = document.documentElement;
         const normalized = settingsUtils.normalizeWidthSetting(widthSetting, currentRangeSettings);
+        currentRangeSettings.chatWidthSetting = normalized;
+        const layout = getLayoutStatus();
+        widthActive = layout.enabled && layout.supported;
+        root.classList.toggle(WIDTH_ROOT_CLASS, widthActive);
+        if (document.body) applyUserFullWidth(currentRangeSettings.userFullWidth);
+        restoreWidthStyles(widthActive);
+        if (!widthActive) return;
         let widthCssValue = settingsUtils.getWidthCssValue(normalized);
 
         const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
@@ -218,13 +282,14 @@
             widthCssValue = '1600px';
         }
 
-        root.style.setProperty('--gemini-chat-width', widthCssValue);
+        setWidthProperty(root, '--gemini-chat-width', widthCssValue, '');
         modifyElementStyles(widthCssValue);
         applyDragDropStyles();
         console.log(`[Wider Gemini] Applied width ${widthCssValue}`);
     }
 
     function applyDragDropStyles() {
+        if (!widthActive) return;
         const possibleSelectors = [
             '[class*="drop"]',
             '[class*="drag"]',
@@ -256,7 +321,7 @@
                     );
 
                     if (isLikelyDropZone) {
-                        element.style.setProperty('max-width', '100%', 'important');
+                        setWidthProperty(element, 'max-width', '100%');
                         processedElements.add(element);
                     }
                 });
@@ -267,7 +332,7 @@
 
         const chatContainer = document.querySelector('.chat-container.xap-drag-in-progress');
         if (chatContainer) {
-            chatContainer.style.setProperty('max-width', '100%', 'important');
+            setWidthProperty(chatContainer, 'max-width', '100%');
 
             const dragChildren = chatContainer.querySelectorAll('*');
             dragChildren.forEach(child => {
@@ -278,7 +343,7 @@
                 const childStyle = window.getComputedStyle(child);
                 if (childStyle.display !== 'none' &&
                     parseInt(childStyle.width) > 100) {
-                    child.style.setProperty('max-width', '100%', 'important');
+                    setWidthProperty(child, 'max-width', '100%');
                 }
             });
         }
@@ -289,16 +354,23 @@
     // 直接测量 img 与说明行的实际渲染位置，给说明行设置等量左内边距。
     // 幂等：每次先移除旧值再测量，可安全重复调用。
     function alignImageCaptions() {
+        if (!widthActive) return;
         try {
             document.querySelectorAll('single-image').forEach(host => {
                 const img = host.querySelector('.image-button img');
                 const captionRow = host.querySelector('.hero-caption-row');
                 if (!img || !captionRow) return;
 
-                captionRow.style.removeProperty('padding-left');
+                const properties = widthStyleChanges.get(captionRow);
+                const previous = properties && properties.get('padding-left');
+                if (previous) {
+                    restoreWidthProperty(captionRow, 'padding-left', previous);
+                    properties.delete('padding-left');
+                    if (!properties.size) widthStyleChanges.delete(captionRow);
+                }
                 const delta = img.getBoundingClientRect().left - captionRow.getBoundingClientRect().left;
                 if (delta > 1) {
-                    captionRow.style.setProperty('padding-left', `${Math.round(delta)}px`, 'important');
+                    setWidthProperty(captionRow, 'padding-left', `${Math.round(delta)}px`);
                 }
             });
         } catch (e) {
@@ -313,7 +385,9 @@
         }
 
         try {
+            const revision = ++settingsRevision;
             chrome.storage.sync.get([
+                'widthEnabled',
                 'chatWidth',
                 'chatWidthSetting',
                 'codeWrap',
@@ -328,8 +402,11 @@
                 'messageSpacingCustom',
                 'messageFontSize'
             ], function (result) {
-                if (!isExtensionContextValid()) return;
-                const settings = normalizeAllSettings(result);
+                if (!isExtensionContextValid() || revision !== settingsRevision) return;
+                // 读存储期间收到的即时设置优先，同时保留尚未加载的其他阅读偏好。
+                const settings = normalizeAllSettings({ ...result, ...pendingSettingsChanges });
+                pendingSettingsChanges = {};
+                settingsLoaded = true;
                 currentRangeSettings = settings;
                 applyWidthStyle(settings.chatWidthSetting, settings);
                 applyCodeWrap(settings.codeWrap);
@@ -346,22 +423,51 @@
         chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             if (!isExtensionContextValid()) return;
 
+            if (request.action === 'getLayoutStatus') {
+                sendResponse(getLayoutStatus());
+                return;
+            }
+            if (!['updateWidthSetting', 'updateWidth', 'updateWidthEnabled', 'updateCodeWrap',
+                'updateUserFullWidth', 'updateDensity'].includes(request.action)) return;
             if (request.action === 'updateWidthSetting') {
+                pendingSettingsChanges.chatWidthSetting = request.setting;
+                for (const key of WIDTH_RANGE_KEYS) {
+                    if (request.ranges && Object.hasOwn(request.ranges, key)) {
+                        pendingSettingsChanges[key] = request.ranges[key];
+                    }
+                }
+                if (typeof request.enabled === 'boolean') pendingSettingsChanges.widthEnabled = request.enabled;
+                if (typeof request.enabled === 'boolean') currentRangeSettings.widthEnabled = request.enabled;
                 applyWidthStyle(request.setting, request.ranges);
                 alignImageCaptions();
                 sendResponse({ success: true });
             } else if (request.action === 'updateWidth') {
+                pendingSettingsChanges.chatWidthSetting = { value: request.width, unit: 'px' };
                 applyWidthStyle({ value: request.width, unit: 'px' });
                 alignImageCaptions();
                 sendResponse({ success: true });
+            } else if (request.action === 'updateWidthEnabled') {
+                if (typeof request.enabled === 'boolean') pendingSettingsChanges.widthEnabled = request.enabled;
+                if (typeof request.enabled === 'boolean') currentRangeSettings.widthEnabled = request.enabled;
+                applyWidthStyle(currentRangeSettings.chatWidthSetting);
+                alignImageCaptions();
+                sendResponse({ success: true });
             } else if (request.action === 'updateCodeWrap') {
+                pendingSettingsChanges.codeWrap = request.enabled;
                 applyCodeWrap(request.enabled);
                 sendResponse({ success: true });
             } else if (request.action === 'updateUserFullWidth') {
+                pendingSettingsChanges.userFullWidth = request.enabled;
                 applyUserFullWidth(request.enabled);
                 sendResponse({ success: true });
             } else if (request.action === 'updateDensity') {
-                applyDensitySettings(settingsUtils.normalizeStorage(request.settings || {}));
+                const density = {
+                    ...settingsUtils.normalizeDensity(request.settings || {}),
+                    messageFontSize: settingsUtils.normalizeFontSize(request.settings?.messageFontSize)
+                };
+                Object.assign(pendingSettingsChanges, density);
+                Object.assign(currentRangeSettings, density);
+                applyDensitySettings(currentRangeSettings);
                 sendResponse({ success: true });
             }
         });
@@ -451,8 +557,11 @@
             });
 
             prepareReadingLayout(readingScopes);
-            if (shouldUpdate) {
-                applySettings();
+            const layout = getLayoutStatus();
+            const shouldEnable = layout.enabled && layout.supported;
+            if (shouldUpdate || widthActive !== shouldEnable) {
+                applyWidthStyle(currentRangeSettings.chatWidthSetting);
+                alignImageCaptions();
             }
         });
 
@@ -467,11 +576,11 @@
         let isDragging = false;
 
         const startDragCheck = () => {
-            if (dragCheckFrame) return;
+            if (dragCheckFrame || !widthActive) return;
             isDragging = true;
 
             const checkDragElements = () => {
-                if (!isDragging) {
+                if (!isDragging || !widthActive) {
                     dragCheckFrame = null;
                     return;
                 }
@@ -480,7 +589,7 @@
 
                 const chatContainer = document.querySelector('.chat-container');
                 if (chatContainer && chatContainer.classList.contains('xap-drag-in-progress')) {
-                    applySettings();
+                    modifyElementStyles(getCurrentWidthCssValue());
                 }
 
                 dragCheckFrame = requestAnimationFrame(checkDragElements);
@@ -552,44 +661,28 @@
     if (isExtensionContextValid()) {
         chrome.storage.onChanged.addListener(function (changes, namespace) {
             if (!isExtensionContextValid()) return;
-
-            if (namespace === 'sync') {
-                if (
-                    changes.widthMin ||
-                    changes.widthMax ||
-                    changes.widthPercentMin ||
-                    changes.widthPercentMax
-                ) {
-                    applySettings();
-                    return;
-                }
-
-                if (changes.chatWidthSetting) {
-                    applyWidthStyle(changes.chatWidthSetting.newValue);
-                    alignImageCaptions();
-                } else if (changes.chatWidth) {
-                    applyWidthStyle({ value: changes.chatWidth.newValue, unit: 'px' });
-                    alignImageCaptions();
-                }
-
-                if (changes.codeWrap) {
-                    applyCodeWrap(changes.codeWrap.newValue);
-                }
-
-                if (changes.userFullWidth) {
-                    applyUserFullWidth(changes.userFullWidth.newValue);
-                }
-
-                if (
-                    changes.messageCompactness ||
-                    changes.messageLineHeight ||
-                    changes.messageParagraphSpacing ||
-                    changes.messageSpacingCustom ||
-                    changes.messageFontSize
-                ) {
-                    applySettings();
-                }
+            if (namespace !== 'sync') return;
+            const keys = ['widthEnabled', 'chatWidthSetting', 'chatWidth', 'widthMin', 'widthMax',
+                'widthPercentMin', 'widthPercentMax', 'codeWrap', 'userFullWidth', 'messageCompactness',
+                'messageLineHeight', 'messageParagraphSpacing', 'messageSpacingCustom', 'messageFontSize'];
+            const changedKeys = keys.filter(key => Object.hasOwn(changes, key));
+            if (!changedKeys.length) return;
+            const next = { ...currentRangeSettings };
+            for (const key of changedKeys) {
+                next[key] = changes[key].newValue;
+                pendingSettingsChanges[key] = changes[key].newValue;
             }
+            if (changes.chatWidth && !changes.chatWidthSetting) {
+                next.chatWidthSetting = { value: changes.chatWidth.newValue, unit: 'px' };
+                pendingSettingsChanges.chatWidthSetting = next.chatWidthSetting;
+            }
+            // 开关和宽度可能同一次写入，先合并再应用，避免短暂恢复已暂停的拓宽。
+            currentRangeSettings = normalizeAllSettings(next);
+            applyWidthStyle(currentRangeSettings.chatWidthSetting);
+            applyCodeWrap(currentRangeSettings.codeWrap);
+            applyUserFullWidth(currentRangeSettings.userFullWidth);
+            applyDensitySettings(currentRangeSettings);
+            alignImageCaptions();
         });
     }
 

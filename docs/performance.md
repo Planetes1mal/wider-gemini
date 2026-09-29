@@ -67,4 +67,4 @@ Width updates delivered by runtime messages or storage changes now remeasure the
 
 No CSS selectors or width constraints were changed. In particular, the PR #10/macOS compatibility rules, protected overlays, and existing drag RAF behavior are retained. Real Gemini layouts and macOS still require manual verification; this baseline does not replace it.
 
-Source and checks: [performance.js](../tests/e2e/performance.js), [message-width.js](../tests/e2e/message-width.js), [gemini-content.js](../gemini-content.js).
+Source and checks: [performance.js](../tests/e2e/performance.js), [message-width.js](../tests/e2e/message-width.js), [gemini-content.js](../src/content/gemini-content.js).

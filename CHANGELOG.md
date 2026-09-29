@@ -4,7 +4,21 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
-## Unreleased
+## 3.0.0-rc.1 (2026-09-29)
+
+Internal candidate for manual installation. This is not a stable Chrome Web Store release. Chrome uses numeric version `3.0.0`; later candidates and the final `3.0.0` build require manually replacing the files and reloading the extension.
+
+### Features
+
+- Added ChatGPT conversation and input width controls, with separate width, unit, limits, and presets for each site. Existing Gemini settings are preserved.
+- Added Gemini / ChatGPT tabs to the popup, with width controls first, collapsible advanced settings, and consistent styling for dropdowns, inputs, and toggles. Reading style, code wrapping, full-width user messages, and task presets remain Gemini-only.
+- Added a separate widening switch for each site. Pausing restores the site's original width without deleting saved values or presets. Unrecognized layouts retain their original width and show a current-page notice in the popup.
+- Extended startup injection to ChatGPT pages and added ChatGPT width and range values to the optional local diagnostic report. Custom preset names and page content remain excluded.
+
+### Refactor
+
+- Organized runtime files under `src/`, separating shared settings, site content scripts, popup, and help. The manifest stays at the repository root, and loading or packaging the extension still requires no build step.
+- Removed repetitive guidance from the popup while retaining actionable page-status and error notices.
 
 ### Other
 

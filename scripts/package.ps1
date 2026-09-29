@@ -45,9 +45,11 @@ $releaseNotes = $sections[0].Groups[1].Value.Trim()
 
 # Explicit allowlist: source docs, tests, scripts, and promotional images stay outside the ZIP.
 $files = @(
-    'manifest.json', 'popup.html', 'popup.js', 'popup.css', 'settings-utils.js',
-    'help.html', 'help.css', 'help.js',
-    'gemini-content.js', 'gemini-content.css', 'background.js', 'LICENSE',
+    'manifest.json', 'LICENSE', 'src/background.js', 'src/shared/settings-utils.js',
+    'src/popup/popup.html', 'src/popup/popup.js', 'src/popup/popup.css',
+    'src/help/help.html', 'src/help/help.css', 'src/help/help.js',
+    'src/content/gemini-content.js', 'src/content/gemini-content.css',
+    'src/content/chatgpt-content.js', 'src/content/chatgpt-content.css',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
     '_locales/en/messages.json', '_locales/zh_CN/messages.json', '_locales/zh_TW/messages.json',
     '_locales/ko/messages.json', '_locales/ja/messages.json', '_locales/es/messages.json'

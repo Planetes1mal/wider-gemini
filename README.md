@@ -2,10 +2,10 @@ English | [简体中文](./README.zh-CN.md) | [繁體中文](./docs/i18n/README.
 
 # Wider Gemini
 
-A Chrome extension for adjusting the width of Gemini conversations. Use the slider or pick a preset to fit the conversation to your screen.
+A Chrome extension for adjusting the width of Gemini and ChatGPT conversations. Each site remembers its own width and presets.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
-[![GitHub Release 2.8.0](https://img.shields.io/badge/release-v2.8.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.8.0)
+[![Internal candidate 3.0.0-rc.1](https://img.shields.io/badge/internal-3.0.0--rc.1-orange)](./CHANGELOG.md)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Wider Gemini.
@@ -14,49 +14,50 @@ The same full Gemini conversation at the same window size, with the conversation
 
 ![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)
 
+This branch is the internal **3.0.0-rc.1** candidate, including ChatGPT support and the site-tab popup. It requires manual installation and has not been published as a stable Chrome Web Store release.
+
 ## Features
 
-- **Adjust the width**: Set it in pixels (`px`) or as a percentage of the window (`%`), and save your own presets.
-- **Adjust text size and spacing**: Scale text from 75% to 200%, with separate controls for line height and paragraph spacing.
-- **Wrap code**: Keep long lines of code within the conversation area.
+- **Adjust the width**: Select Gemini or ChatGPT, set pixels (`px`) or a percentage of the window (`%`), and save separate limits and presets for each site.
+- **Pause by site**: Turn off widening for either site to restore its original width while keeping saved values and presets. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
+- **Adjust Gemini text size and spacing**: Scale text from 75% to 200%, with separate controls for line height and paragraph spacing.
+- **Wrap Gemini code**: Keep long lines of code within the conversation area.
 - **Full-width user messages**: Left-align your messages and give them the full conversation width, just like Gemini's replies.
 - **Interface languages**: English, Simplified Chinese, Traditional Chinese, Korean, Japanese, and Spanish. Follow your browser's language or choose one manually. Korean, Japanese, and Spanish translations are machine-assisted; native-speaker improvements are welcome.
 
-Settings are saved automatically, and changes apply immediately to open Gemini pages.
+Settings are saved automatically, and changes apply to open pages for the selected site. ChatGPT keeps its native text size, spacing, code formatting, and user-message layout.
 
 ## Installation
 
-Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and click **Add to Chrome**.
-
-GitHub releases and Chrome Web Store updates can follow different schedules. For version 2.8.0, use the matching GitHub release below.
+For **3.0.0-rc.1**, use the manual steps below. The [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and [stable GitHub releases](https://github.com/Planetes1mal/wider-gemini/releases) are separate distribution channels; installing from them does not install this internal candidate.
 
 <details>
 <summary>Manual installation</summary>
 
-1. Download `wider-gemini-*.zip` from the latest stable release on [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases).
-2. Extract it to a folder you intend to keep. Make sure the folder contains `manifest.json`.
+1. Use a local checkout of this branch, or extract a provided `wider-gemini-3.0.0-rc.1.zip` candidate.
+2. Keep the complete folder containing `manifest.json`, `src/`, `_locales/`, and `icons/`.
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.
 
-If you manually installed a 2.8.0 release candidate, replace its files and reload the extension to use the stable build; it will not automatically upgrade from the candidate.
+To update a manually installed candidate, replace its files and reload the extension. Chrome compares the numeric version (`3.0.0`), so later candidates and the final `3.0.0` build also require manual replacement and reload.
 
 </details>
 
 ## Usage
 
-1. Open [Gemini](https://gemini.google.com/) and click the Wider Gemini icon in your browser toolbar.
-2. Choose `px` or `%`, then move the width slider or click a preset.
-3. Adjust the font size and reading density, or turn on code wrapping as needed.
+1. Open [Gemini](https://gemini.google.com/) or [ChatGPT](https://chatgpt.com/) and click the Wider Gemini icon in your browser toolbar.
+2. Select the site tab, choose `px` or `%`, then move the width slider or click a preset.
+3. On Gemini, expand **Reading & typography** to adjust the font size and reading density, or turn on code wrapping as needed.
 
-Use **Manage presets** to edit preset names and widths. `px` and `%` each have their own set of presets. The language selector is at the bottom of the popup.
+Expand **Range & presets** for width limits and **Manage presets**. Each site and unit has its own presets. The language selector is at the bottom of the popup.
 
-Use **Task presets** for long reading, tables, code, and large text. Preview the settings, then apply them; **Restore previous settings** restores the previous layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
+On Gemini, use **Task presets** for long reading, tables, code, and large text. Preview the settings, then apply them; **Restore previous settings** restores the previous Gemini layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
 
-Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Wider Gemini works on Gemini webpages and Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel.
+Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Wider Gemini targets Gemini and ChatGPT webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. See the [compatibility record](./docs/compatibility.md) for the flows actually verified.
 
 ## Privacy
 
-The extension only adjusts page styles on `gemini.google.com`. It does not collect or upload conversations, and it has no analytics or tracking services.
+The extension requests access to `gemini.google.com` and `chatgpt.com` to adjust page styles, plus `storage` for preferences and `scripting` to restore missing content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
 
 Preferences are saved in Chrome's extension storage. Whether they sync across devices depends on your browser's sync settings. See the [privacy policy](./docs/PRIVACY.md) for details.
 
@@ -68,7 +69,7 @@ The project uses vanilla JavaScript, HTML, and CSS. No dependencies or build ste
 git clone https://github.com/Planetes1mal/wider-gemini.git
 ```
 
-Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the repository folder. After changing the code, reload the extension and refresh Gemini.
+Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the repository folder. After changing the code, reload the extension and refresh the affected Gemini or ChatGPT page.
 
 For internal iterations, run `node scripts/test.js --skip-packaging` for the existing unit checks without creating a ZIP. See [Contributing](./CONTRIBUTING.md) for browser and release checks and [Engineering and compatibility](./docs/engineering.md) for layout boundaries.
 

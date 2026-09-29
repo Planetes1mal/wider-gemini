@@ -2,9 +2,9 @@
     'use strict';
 
     const SETTINGS_KEYS = [
-        'chatWidth', 'chatWidthSetting', 'widthMin', 'widthMax', 'widthPercentMin', 'widthPercentMax',
+        'widthEnabled', 'chatWidth', 'chatWidthSetting', 'widthMin', 'widthMax', 'widthPercentMin', 'widthPercentMax',
         'messageCompactness', 'messageLineHeight', 'messageParagraphSpacing', 'messageSpacingCustom',
-        'messageFontSize', 'codeWrap', 'userFullWidth', 'uiLanguage'
+        'messageFontSize', 'codeWrap', 'userFullWidth', 'uiLanguage', 'chatgptWidthSettings'
     ];
     const generateButton = document.getElementById('generateReport');
     const preview = document.getElementById('reportPreview');
@@ -60,6 +60,7 @@
                 chrome.runtime.getPlatformInfo()
             ]);
             const settings = window.widerGeminiSettings.normalizeStorage(stored);
+            const chatgpt = window.widerGeminiSettings.normalizeSiteWidthSettings(stored, 'chatgpt');
             const manifest = chrome.runtime.getManifest();
             // 逐项构造报告，避免把未来新增设置或用户自定义名称带入诊断。
             const diagnostics = {
@@ -68,6 +69,7 @@
                 platform: platform.os,
                 settings: {
                     uiLanguage: settings.uiLanguage,
+                    widthEnabled: settings.widthEnabled,
                     chatWidthSetting: settings.chatWidthSetting,
                     widthMin: settings.widthMin,
                     widthMax: settings.widthMax,
@@ -79,7 +81,18 @@
                     messageSpacingCustom: settings.messageSpacingCustom,
                     messageFontSize: settings.messageFontSize,
                     codeWrap: settings.codeWrap,
-                    userFullWidth: settings.userFullWidth
+                    userFullWidth: settings.userFullWidth,
+                    chatgptWidthSettings: {
+                        widthEnabled: chatgpt.widthEnabled,
+                        chatWidthSetting: {
+                            value: chatgpt.chatWidthSetting.value,
+                            unit: chatgpt.chatWidthSetting.unit
+                        },
+                        widthMin: chatgpt.widthMin,
+                        widthMax: chatgpt.widthMax,
+                        widthPercentMin: chatgpt.widthPercentMin,
+                        widthPercentMax: chatgpt.widthPercentMax
+                    }
                 }
             };
             report.value = JSON.stringify(diagnostics, null, 2);

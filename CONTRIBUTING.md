@@ -7,9 +7,11 @@ Bug reports, translations, and focused fixes are welcome. Start with a reproduci
 1. Clone this repository.
 2. Open `chrome://extensions/` in Chrome and enable **Developer mode**.
 3. Choose **Load unpacked** and select the repository folder.
-4. Open [Gemini](https://gemini.google.com/). After changing extension files, reload the extension and then reload the page.
+4. Open [Gemini](https://gemini.google.com/) or [ChatGPT](https://chatgpt.com/). After changing extension files, reload the extension and then reload the affected page.
 
 The extension uses vanilla JavaScript, HTML, and CSS. There is no build step or npm install.
+
+Runtime files live under `src/`: `background.js` handles startup injection; `shared/` contains settings normalization; `content/` contains each site's JS and CSS; `popup/` and `help/` contain their HTML, JS, and CSS. `manifest.json`, `_locales/`, and `icons/` remain at the repository root. Load that root folder, not `src/`; the release ZIP preserves the same layout.
 
 ## Run the existing checks
 
@@ -42,7 +44,7 @@ node tests/e2e/popup-language.js . archive/popup-language-check
 
 These use isolated browser profiles. Despite its name, `package-load.js` accepts any unpacked extension directory, including the source tree; the language check stores diagnostic screenshots under the ignored archive. Neither command builds a ZIP.
 
-For layout changes, also try the affected flow on the real Gemini website. Record your browser, OS, extension version, and steps in the PR. Synthetic fixtures do not establish compatibility with every live Gemini rollout or with macOS. See [engineering and compatibility notes](docs/engineering.md) for the supported boundaries and manual scenarios.
+For layout changes, also try the affected flow on the real Gemini or ChatGPT website. Record the site, browser, OS, extension version, and steps in the PR. The existing Gemini fixtures do not establish ChatGPT compatibility, compatibility with every live site rollout, or macOS acceptance. See [engineering and compatibility notes](docs/engineering.md) for the supported boundaries and manual scenarios.
 
 For focused examples, read the [startup injection case study](docs/engineering/pwa-cold-start.md) and the [Drive overlay layout case study](docs/engineering/drive-overlay-width.md). Each links the existing source and tests, explains what the checks establish, and separates fixture evidence from manual verification.
 
@@ -51,6 +53,7 @@ For focused examples, read the [startup injection case study](docs/engineering/p
 - Follow the existing four-space JavaScript indentation and semicolon style.
 - Keep runtime code dependency-free. Preserve live settings updates and idempotent content-script initialization.
 - Keep overlays and dialogs outside conversation width overrides. Preserve the input, upload, and sidenav boundaries described in the engineering notes.
+- Preserve independent site widths and legacy Gemini settings. ChatGPT width changes must not alter native attachment, menu, preview, or Canvas layouts.
 - Reuse the existing checks. Add a regression case when a reproduced behavior needs one; routine wording and documentation changes do not need new tests.
 - In a PR, explain the user-visible change, link its issue when applicable, and report which existing checks and manual flows you ran. Include before/after images for visible layout changes, with personal content removed.
 

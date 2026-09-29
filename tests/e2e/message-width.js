@@ -22,7 +22,8 @@
         const limit = node => name === node ? 'style="max-width:760px"' : '';
         const tag = name === 'tag-only' ? 'conversation-container' : 'div';
         return `<section data-case="${name}" style="width:${name === 'limited-parent' ? 900 : 1800}px">
-            <${tag} ${tag === 'div' ? 'class="conversation-container"' : ''}>
+            <${tag} ${tag === 'div' ? 'class="conversation-container"' : ''}
+                ${name === 'baseline' ? 'style="max-width:755px !important;color:rgb(1, 2, 3)"' : ''}>
                 <user-query><div class="user-query-container"><user-query-content>
                     <div class="user-query-bubble-with-background">A short question</div>
                 </user-query-content></div></user-query>
@@ -46,7 +47,8 @@
                 </div></message-content></div></div></structured-content-container>
                 </div></div></div></div></response-container></div></model-response>
             </${tag}>
-            <input-container><button data-sources>Sources</button><input-area-v2>Composer</input-area-v2>
+            <input-container><button data-sources>Sources</button><input-area-v2>Composer
+                <div class="upload-card" style="max-width:321px !important;width:500px">Attachment</div></input-area-v2>
             </input-container></section>`;
     };
     const html = `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -62,13 +64,13 @@
         img { display:block; max-width:100%; }
         pre { margin:0; }
         table { min-width:3000px; }
-    </style><style>${read('gemini-content.css')}</style></head><body>
+    </style><style>${read('src/content/gemini-content.css')}</style></head><body>
         ${cases.map(fixture).join('')}
         <div class="conversation-container" data-captions style="width:100%;margin:auto">
             <model-response><single-image style="display:block"><div class="image-button">
                 <img width="240" height="1" alt="" style="display:block;margin:auto"
                     src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='1'/%3E">
-            </div><div class="hero-caption-row" style="width:100%;box-sizing:border-box">
+            </div><div class="hero-caption-row" style="width:100%;box-sizing:border-box;padding-left:13px !important">
                 <span class="caption">Image caption</span>
             </div></single-image></model-response>
         </div>
@@ -82,7 +84,7 @@
                 runtime:{id:'width-regression',onMessage:{addListener(fn){window.deliver=fn;}}},
                 storage:{sync:{get(keys,cb){cb(window.settings);}},onChanged:{addListener(fn){window.deliverStorage=fn;}}}
             };
-        `)}${script(read('settings-utils.js'))}${script(read('gemini-content.js'))}
+        `)}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/gemini-content.js'))}
         ${script(`
             window.addEventListener('load', async () => {
                 const width = node => node.getBoundingClientRect().width;
@@ -160,9 +162,34 @@
                 const host = document.querySelector('[data-captions]');
                 captions.push({value:1200,via:'storage-only',image:host.querySelector('img').getBoundingClientRect().left,
                     caption:host.querySelector('.caption').getBoundingClientRect().left});
+                const baseline = document.querySelector('[data-case="baseline"]');
+                const conversation = baseline.querySelector('.conversation-container');
+                const drop = baseline.querySelector('.upload-card');
+                const captionRow = host.querySelector('.hero-caption-row');
+                send({action:'updateDensity',settings:{messageCompactness:30,messageFontSize:125}});
+                send({action:'updateWidthEnabled',enabled:false});
+                const paused = {
+                    conversation:width(conversation), max:conversation.style.getPropertyValue('max-width'),
+                    priority:conversation.style.getPropertyPriority('max-width'), color:conversation.style.color,
+                    drop:drop.style.getPropertyValue('max-width'), dropPriority:drop.style.getPropertyPriority('max-width'),
+                    captionPadding:captionRow.style.getPropertyValue('padding-left'),
+                    captionPriority:captionRow.style.getPropertyPriority('padding-left'),
+                    overflowX:getComputedStyle(document.documentElement).overflowX,
+                    bubble:width(baseline.querySelector('.user-query-bubble-with-background')),
+                    codeWrap:document.body.classList.contains('code-wrap-enabled'),
+                    density:document.body.classList.contains('wider-gemini-density-enabled'),
+                    font:document.body.classList.contains('wider-gemini-font-enabled')
+                };
+                send({action:'updateWidthSetting',enabled:true,setting:{value:900,unit:'px'}});
+                const resumed = {conversation:width(conversation),
+                    bubble:width(baseline.querySelector('.user-query-bubble-with-background'))};
+                // 网站在扩展写入之后改变的值，应由网站继续持有。
+                conversation.style.setProperty('max-width','810px','important');
+                send({action:'updateWidthEnabled',enabled:false});
+                const siteOwned = conversation.style.getPropertyValue('max-width');
                 const output=document.createElement('pre');
                 output.id='results';
-                output.textContent=JSON.stringify({rows,pageProtected,pageOverlayContent,captions});
+                output.textContent=JSON.stringify({rows,pageProtected,pageOverlayContent,captions,paused,resumed,siteOwned});
                 document.body.appendChild(output);
             });
         `)}</body></html>`;
@@ -219,6 +246,13 @@
         assert(Math.abs(caption.image - caption.caption) <= 1,
             `Image caption misaligned after ${caption.via} at ${caption.value}px`);
     }
+    assert.deepStrictEqual(report.paused, {
+        conversation:755, max:'755px', priority:'important', color:'rgb(1, 2, 3)',
+        drop:'321px', dropPriority:'important', captionPadding:'13px', captionPriority:'important',
+        overflowX:'visible', bubble:280, codeWrap:true, density:true, font:true
+    }, 'pause must restore native styles and priorities while retaining reading settings');
+    assert.deepStrictEqual(report.resumed, {conversation:900,bubble:900}, 'resume restores width and bubble preference');
+    assert.strictEqual(report.siteOwned, '810px', 'pause must not overwrite a newer native inline value');
     assert.strictEqual(failures.length, 0, `Width regressions:\n${failures.join('\n')}`);
-    console.log(`Passed ${report.rows.length} message-width scenarios including protected content.`);
+    console.log(`Passed ${report.rows.length} message-width scenarios, plus pause/resume and inline restoration.`);
 })();

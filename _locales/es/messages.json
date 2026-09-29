@@ -3,7 +3,7 @@
     "message": "Wider Gemini"
   },
   "appDesc": {
-    "message": "Amplía Google Gemini y ajusta la densidad de lectura y el ajuste de línea del código para leer con más comodidad."
+    "message": "Amplía Gemini y ChatGPT por separado. Ajusta también el tamaño del texto, la densidad y el ajuste de línea del código en Gemini."
   },
   "headerSubtitle": {
     "message": "Conversaciones más amplias y cómodas de leer"
@@ -65,12 +65,6 @@
   "statusOff": {
     "message": "Desactivado"
   },
-  "infoText1": {
-    "message": "Arrastra el control deslizante o elige un preajuste para cambiar el ancho"
-  },
-  "infoText2": {
-    "message": "Los ajustes se guardan automáticamente y se aplican a todas las pestañas de Gemini"
-  },
   "refreshing": {
     "message": "Recargando la página…"
   },
@@ -130,31 +124,31 @@
     "message": "Ayuda y comentarios"
   },
   "helpGettingStarted": {
-    "message": "Adapta Gemini a tu pantalla"
+    "message": "Adapta Gemini y ChatGPT a tu pantalla"
   },
   "helpOpenPopup": {
-    "message": "Abre Gemini y haz clic en el icono de Wider Gemini de la barra de herramientas para cambiar los ajustes."
+    "message": "Abre Gemini o ChatGPT y haz clic en el icono de Wider Gemini en la barra de herramientas. Elige el sitio que quieres ajustar con los botones superiores."
   },
   "helpWidthTitle": {
     "message": "Ancho de la conversación"
   },
   "helpWidthBody": {
-    "message": "Elige px para un ancho fijo o % para adaptarlo al tamaño de la ventana. Mueve el control deslizante o elige un preajuste; cada unidad tiene sus propios preajustes."
+    "message": "Elige px para un ancho fijo o % para adaptarlo a la ventana. Mueve el control o elige un ajuste predefinido. Gemini y ChatGPT guardan por separado el ancho, los límites y los ajustes, también por unidad. Abre Rango y ajustes predefinidos para editarlos. El interruptor junto al título del ancho pausa la ampliación de ese sitio y restaura su ancho original. Se conservan los valores y ajustes; las opciones de lectura de Gemini siguen activas."
   },
   "helpCodeTitle": {
     "message": "Ajuste de línea del código"
   },
   "helpCodeBody": {
-    "message": "Activa el ajuste de línea del código para leer líneas largas con menos desplazamiento horizontal. Desactívalo para mostrarlas sin dividirlas en varias líneas visuales."
+    "message": "Solo en Gemini: Activa el ajuste de línea del código para leer líneas largas con menos desplazamiento horizontal. Desactívalo para mostrarlas sin dividirlas en varias líneas visuales."
   },
   "helpReadingTitle": {
     "message": "Tamaño del texto y espaciado"
   },
   "helpReadingBody": {
-    "message": "Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página. Con densidad 0 en Auto se conservan las separaciones entre párrafos y la proporción original de la altura de línea. Una mayor densidad reduce el espaciado gradualmente. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual."
+    "message": "Solo en Gemini: Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página. Con densidad 0 en Auto se conservan las separaciones entre párrafos y la proporción original de la altura de línea. Una mayor densidad reduce el espaciado gradualmente. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual."
   },
   "helpLiveSettings": {
-    "message": "Los cambios se aplican a las pestañas abiertas de Gemini y se guardan automáticamente. La sincronización entre dispositivos depende de los ajustes de sincronización del navegador."
+    "message": "Los cambios se guardan automáticamente y se aplican al instante a las pestañas abiertas del sitio seleccionado. Los ajustes de cada sitio son independientes; el idioma de la extensión es compartido. La sincronización entre dispositivos depende de los ajustes del navegador."
   },
   "helpOpenGemini": {
     "message": "Abrir Gemini"
@@ -163,13 +157,13 @@
     "message": "¿Algo no se ve bien?"
   },
   "helpTroubleshootPage": {
-    "message": "Comprueba que estás en gemini.google.com y que Wider Gemini está activado. También funciona con este sitio instalado como aplicación de Chrome (PWA). Las aplicaciones de escritorio nativas de Google no son compatibles."
+    "message": "Comprueba que estás en gemini.google.com o chatgpt.com y que Wider Gemini está activado y tiene acceso al sitio. Las aplicaciones web instaladas desde Chrome (PWA) usan las mismas páginas. No se admiten las aplicaciones de escritorio nativas ni el panel de Gemini integrado en Chrome."
   },
   "helpTroubleshootRefresh": {
-    "message": "Si un ajuste no se refleja después de instalar o actualizar la extensión, recarga la página de Gemini una vez e inténtalo de nuevo."
+    "message": "Si los ajustes no aparecen tras instalar o actualizar la extensión, recarga la página una vez. Si aparece un aviso de diseño no compatible, no se amplía la página actual y se conserva su ancho original. También puedes pausar la ampliación solo para ese sitio con su interruptor de ancho."
   },
   "helpTroubleshootReport": {
-    "message": "Si el problema continúa, anota los pasos para reproducirlo y el tamaño de la ventana. Una captura sin contenido privado puede ayudar; indica si usas otras extensiones que modifican el diseño de Gemini."
+    "message": "Si el problema continúa, indica el sitio, los pasos para reproducirlo y el tamaño de la ventana. Puedes adjuntar una captura sin contenido privado; menciona otras extensiones que cambien el diseño de la página."
   },
   "helpReportIssue": {
     "message": "Informar de un problema"
@@ -178,7 +172,7 @@
     "message": "Informe de ajustes"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "Genera un informe y revísalo antes de compartirlo al informar de un problema. Solo incluye la versión de la extensión, la versión principal del navegador, la plataforma y los ajustes de diseño. No contiene conversaciones, URL de páginas, títulos ni nombres de preajustes personalizados. No se envía nada automáticamente."
+    "message": "Genera un informe y revísalo antes de compartirlo al informar de un problema. Solo incluye la versión de la extensión, la versión principal del navegador, la plataforma, los ajustes de diseño de Gemini y los ajustes de ancho de ChatGPT. No contiene conversaciones, URL de páginas, títulos ni nombres de preajustes personalizados. No se envía nada automáticamente."
   },
   "helpGenerateReport": {
     "message": "Generar informe"
@@ -229,7 +223,7 @@
     "message": "Texto grande"
   },
   "taskHint": {
-    "message": "Respeta tus límites de ancho. Restaurar devuelve los cuatro ajustes anteriores a los valores que tenían antes de la última aplicación."
+    "message": "Respeta tus límites de ancho. Restaurar devuelve el ancho, el tamaño del texto, el espaciado y el ajuste de línea del código a los valores anteriores a la última aplicación."
   },
   "taskApply": {
     "message": "Aplicar"
@@ -256,9 +250,42 @@
     "message": "Preajustes por tarea"
   },
   "helpTaskBody": {
-    "message": "Elige Lectura larga, Tablas, Código o Texto grande, revisa los ajustes y haz clic en Aplicar. Se cambian el ancho, el tamaño del texto, el espaciado y el ajuste de línea del código. Se respetan tus límites de ancho. Restaurar ajustes anteriores deshace el último preajuste por tarea aplicado en este dispositivo, incluso después de cerrar la ventana de la extensión; también reemplaza los cambios posteriores en esos ajustes."
+    "message": "Solo en Gemini: Elige Lectura larga, Tablas, Código o Texto grande, revisa los ajustes y haz clic en Aplicar. Se cambian el ancho, el tamaño del texto, el espaciado y el ajuste de línea del código. Se respetan tus límites de ancho. Restaurar ajustes anteriores deshace el último preajuste por tarea aplicado en este dispositivo, incluso después de cerrar la ventana de la extensión; también reemplaza los cambios posteriores en esos ajustes."
   },
   "autoSpacingHint": {
     "message": "Auto respeta el espaciado original de cada mensaje. Al mover cualquier control, se aplican manualmente los dos valores siguientes."
+  },
+  "settingsSite": {
+    "message": "Sitio web"
+  },
+  "currentSite": {
+    "message": "Actual"
+  },
+  "chatgptWidthOnly": {
+    "message": "ChatGPT permite ajustar el ancho por ahora."
+  },
+  "widthOptions": {
+    "message": "Límites y preajustes"
+  },
+  "readingSettings": {
+    "message": "Lectura y tipografía"
+  },
+  "settingsSaveError": {
+    "message": "No se guardaron los ajustes. Vuelve a abrir la ventana de la extensión e inténtalo de nuevo."
+  },
+  "widthEnabled": {
+    "message": "Activar ampliación"
+  },
+  "widthPaused": {
+    "message": "La ampliación está pausada. Se conservan el ancho y los ajustes predefinidos."
+  },
+  "layoutUnsupported": {
+    "message": "Este diseño de página aún no es compatible. Se conserva el ancho original."
+  },
+  "layoutLoading": {
+    "message": "La página se está cargando. Vuelve a abrir los ajustes cuando termine."
+  },
+  "layoutUnavailable": {
+    "message": "No se puede consultar el estado. Recarga la página e inténtalo de nuevo."
   }
 }

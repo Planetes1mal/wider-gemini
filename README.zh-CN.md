@@ -2,10 +2,10 @@
 
 # Wider Gemini
 
-一个用来调整 Gemini 对话宽度的 Chrome 扩展。拖动滑块或点选预设，就能把对话区调到适合自己屏幕的大小。
+一个用来调整 Gemini 和 ChatGPT 对话宽度的 Chrome 扩展。两个网站分别记住宽度和预设。
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-安装-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)
-[![GitHub Release 2.8.0](https://img.shields.io/badge/release-v2.8.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.8.0)
+[![内部候选版 3.0.0-rc.1](https://img.shields.io/badge/internal-3.0.0--rc.1-orange)](./CHANGELOG.md)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 同一段完整的 Gemini 对话、同样的窗口大小：使用 Wider Gemini 将对话宽度分别设为 700px 和 1200px。
@@ -14,49 +14,50 @@
 
 ![1200px 宽度的同一完整 Gemini 对话页面](./docs/images/conversation-after.png)
 
+此分支为内部候选版 **3.0.0-rc.1**，包含 ChatGPT 支持和带站点标签的新弹窗。需要手动安装，尚未作为正式版上架 Chrome 应用商店。
+
 ## 功能
 
-- **调整宽度**：按像素（`px`）或窗口比例（`%`）设置，也可以保存常用预设。
-- **调整字号和间距**：字号支持 75%–200%，行高和段落间距可以单独设置。
-- **代码自动换行**：长代码在对话区内折行显示。
+- **调整宽度**：选择 Gemini 或 ChatGPT，按像素（`px`）或窗口比例（`%`）设置；两个网站分别保存范围和预设。
+- **单站暂停**：分别关闭某个网站的拓宽，恢复原站宽度并保留数值和预设；遇到尚未识别的布局时保留原站宽度，并在弹窗中提示当前页未适配。
+- **调整 Gemini 字号和间距**：字号支持 75%–200%，行高和段落间距可以单独设置。
+- **Gemini 代码自动换行**：长代码在对话区内折行显示。
 - **用户消息铺满宽度**：让自己的消息和 Gemini 的回答一样，左对齐并使用完整的对话宽度。
 - **界面语言**：英文、简体中文、繁体中文、韩语、日语和西班牙语。默认跟随浏览器，也能手动选择。韩语、日语和西班牙语采用机器辅助翻译，欢迎母语者改进。
 
-设置会自动保存，调整后立即应用到已打开的 Gemini 页面。
+设置会自动保存，并应用到所选网站的已打开页面。ChatGPT 保留原生字号、间距、代码格式和用户消息样式。
 
 ## 安装
 
-在 [Chrome 应用商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)点击 **添加至 Chrome** 即可安装。
-
-GitHub 版本与 Chrome 应用商店的更新时间可能不同。若要使用 2.8.0，请按下方方式安装对应的 GitHub 正式版。
+使用 **3.0.0-rc.1** 请按下方步骤手动安装。[Chrome 应用商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)和 [GitHub 正式版](https://github.com/Planetes1mal/wider-gemini/releases)是独立的分发渠道，从那里安装不会获得这个内部候选版。
 
 <details>
 <summary>手动安装</summary>
 
-1. 到 [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases) 下载最新正式版的 `wider-gemini-*.zip`。
-2. 解压到一个固定位置，确认文件夹里有 `manifest.json`。
+1. 使用此分支的本地仓库，或解压收到的 `wider-gemini-3.0.0-rc.1.zip` 候选包。
+2. 保留完整文件夹，确认其中包含 `manifest.json`、`src/`、`_locales/` 和 `icons/`。
 3. 打开 `chrome://extensions/`，开启右上角的 **开发者模式**。
 4. 点击 **加载已解压的扩展程序**，选择刚才解压的文件夹。
 
-若曾手动安装 2.8.0 候选版，请替换文件并重新加载扩展，以使用正式版；候选版不会自动升级为此版本。
+更新手动安装的候选版时，需要替换文件并重新加载扩展。Chrome 比较的是数字版本（`3.0.0`），因此后续候选版和最终 `3.0.0` 正式版也需要手动替换、重新加载。
 
 </details>
 
 ## 使用
 
-1. 打开 [Gemini](https://gemini.google.com/)，点击浏览器工具栏里的 Wider Gemini 图标。
-2. 选择 `px` 或 `%`，拖动宽度滑块，也可以直接点一个预设。
-3. 根据需要调整字号、阅读密度，或开启代码自动换行。
+1. 打开 [Gemini](https://gemini.google.com/) 或 [ChatGPT](https://chatgpt.com/)，点击浏览器工具栏里的 Wider Gemini 图标。
+2. 选择站点标签和 `px` 或 `%`，拖动宽度滑块，也可以直接点一个预设。
+3. 在 Gemini 标签中，展开 **阅读与排版** 还可以调整字号、阅读密度，或开启代码自动换行。
 
-在 **管理预设** 中可以修改预设名称和宽度；`px` 和 `%` 各有一组独立预设。界面语言在弹窗底部切换。
+展开 **范围与预设** 可以调整宽度范围和 **管理预设**；每个网站的 `px` 和 `%` 各有一组独立预设。界面语言在弹窗底部切换。
 
-使用长文阅读、表格、代码和大字四种**任务预设**时，先查看设置摘要，再点击应用；**恢复之前的设置**可以在本机恢复应用前的版式，关闭弹窗后仍可使用。具体数值及恢复范围见[阅读指南](./docs/guides/reading-layout.md)。
+在 Gemini 中使用长文阅读、表格、代码和大字四种**任务预设**时，先查看设置摘要，再点击应用；**恢复之前的设置**可以在本机恢复应用前的 Gemini 版式，关闭弹窗后仍可使用。具体数值及恢复范围见[阅读指南](./docs/guides/reading-layout.md)。
 
-弹窗底部的 **帮助与反馈** 提供排查说明，也可以预览并复制诊断设置。扩展支持 Gemini 网页和通过 Chrome 安装的网站应用窗口，不会修改原生桌面应用或 Chrome 内置的 Gemini 面板。
+弹窗底部的 **帮助与反馈** 提供排查说明，也可以预览并复制诊断设置。扩展作用于 Gemini、ChatGPT 网页及通过 Chrome 安装的网站应用窗口，不会修改原生桌面应用或 Chrome 内置的 Gemini 面板。已实际验证的操作见[兼容性记录](./docs/compatibility.md)。
 
 ## 隐私
 
-扩展只在 `gemini.google.com` 上调整页面样式，不收集或上传对话内容，也没有统计或追踪服务。
+扩展申请 `gemini.google.com` 和 `chatgpt.com` 的访问权限来调整页面样式，使用 `storage` 保存偏好、`scripting` 补注入未加载的内容脚本。不收集或上传对话内容，也没有统计或追踪服务。
 
 偏好设置通过 Chrome 的扩展存储保存；是否跨设备同步取决于你的浏览器同步设置。详见[隐私说明](./docs/PRIVACY.md)。
 
@@ -68,7 +69,7 @@ GitHub 版本与 Chrome 应用商店的更新时间可能不同。若要使用 2
 git clone https://github.com/Planetes1mal/wider-gemini.git
 ```
 
-在 `chrome://extensions/` 开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择仓库文件夹。修改代码后，重新加载扩展并刷新 Gemini 页面。
+在 `chrome://extensions/` 开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择仓库文件夹。修改代码后，重新加载扩展并刷新受影响的 Gemini 或 ChatGPT 页面。
 
 内部迭代可运行 `node scripts/test.js --skip-packaging`，执行已有单元检查而不生成 ZIP。浏览器与发布检查见[贡献指南](./CONTRIBUTING.md)，版式规则见[工程与兼容性说明](./docs/engineering.md)。
 

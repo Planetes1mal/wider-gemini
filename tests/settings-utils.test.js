@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const utilsPath = path.join(__dirname, '..', 'settings-utils.js');
+const utilsPath = path.join(__dirname, '..', 'src/shared/settings-utils.js');
 const source = fs.readFileSync(utilsPath, 'utf8');
 const sandbox = { console, Object, Array, Number, Math, parseInt, parseFloat, isFinite: Number.isFinite };
 sandbox.globalThis = sandbox;
@@ -45,6 +45,10 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(normalized.chatWidthSetting.unit, 'percent');
     assert.strictEqual(utils.getWidthCssValue(normalized.chatWidthSetting), '95vw');
     assert.strictEqual(normalized.legacyChatWidth, 1000);
+    assert.strictEqual(utils.normalizeWidthSetting({ value: 2000, unit: 'px' }, {
+        ...utils.DEFAULTS,
+        widthMax: 1425
+    }).value, 1425, 'rounding must not exceed a custom range limit');
 }
 
 {
@@ -143,6 +147,10 @@ assert.ok(utils, 'settings utils are exposed');
 }
 
 {
+    assert.strictEqual(utils.normalizeStorage({}).widthEnabled, true, 'existing installs remain enabled');
+    assert.strictEqual(utils.normalizeStorage({ widthEnabled: false }).widthEnabled, false);
+    assert.strictEqual(utils.normalizeStorage({ widthEnabled: 'false' }).widthEnabled, true);
+    assert.strictEqual(utils.normalizeStorage({ widthEnabled: 0 }).widthEnabled, true);
     assert.strictEqual(utils.normalizeStorage({}).userFullWidth, false);
     assert.strictEqual(utils.normalizeStorage({ userFullWidth: true }).userFullWidth, true);
     assert.strictEqual(utils.normalizeStorage({ userFullWidth: 'yes' }).userFullWidth, false);
@@ -177,6 +185,63 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'ja' }).uiLanguage, 'ja');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'es' }).uiLanguage, 'es');
     assert.strictEqual(utils.normalizeStorage({ uiLanguage: 'fr' }).uiLanguage, 'auto');
+}
+
+{
+    const stored = {
+        widthEnabled: false,
+        chatWidth: 1350,
+        widthMin: 900,
+        widthMax: 1800,
+        presets: utils.getDefaultPresetsForUnit('px').map(preset => ({ ...preset, name: 'Gemini preset' }))
+    };
+    const gemini = utils.normalizeSiteWidthSettings(stored, 'gemini');
+    const chatgpt = utils.normalizeSiteWidthSettings(stored, 'chatgpt');
+    assert.strictEqual(gemini.chatWidthSetting.value, 1350, 'Gemini keeps its legacy width');
+    assert.strictEqual(gemini.widthEnabled, false);
+    assert.strictEqual(chatgpt.widthEnabled, true, 'Gemini pause must not disable ChatGPT');
+    assert.strictEqual(gemini.presetsByUnit.px[0].name, 'Gemini preset');
+    assert.strictEqual(chatgpt.chatWidthSetting.value, 1000, 'ChatGPT starts independently');
+    assert.strictEqual(chatgpt.widthMin, 700);
+    assert.strictEqual(chatgpt.presetsByUnit.px[0].name, undefined);
+
+    const payload = utils.getSiteWidthStoragePayload({
+        ...chatgpt,
+        widthEnabled: false,
+        chatWidthSetting: { value: 95, unit: 'percent' },
+        widthPercentMin: 40,
+        widthPercentMax: 90,
+        presetsByUnit: {
+            ...chatgpt.presetsByUnit,
+            percent: chatgpt.presetsByUnit.percent.map(preset => ({ ...preset, name: 'ChatGPT preset' }))
+        },
+        codeWrap: true,
+        uiLanguage: 'ja'
+    }, 'chatgpt');
+    assert.deepStrictEqual(Object.keys(payload), [utils.CHATGPT_WIDTH_KEY]);
+    const updated = utils.normalizeSiteWidthSettings({ ...stored, ...payload }, 'chatgpt');
+    assert.strictEqual(updated.chatWidthSetting.value, 90, 'ChatGPT uses its own range');
+    assert.strictEqual(updated.widthEnabled, false, 'ChatGPT pause survives width normalization');
+    assert.strictEqual(payload[utils.CHATGPT_WIDTH_KEY].widthEnabled, false);
+    assert.strictEqual(updated.presetsByUnit.percent[0].name, 'ChatGPT preset');
+    assert.strictEqual(updated.presetsByUnit.percent[4].value, 90);
+    assert.strictEqual(payload[utils.CHATGPT_WIDTH_KEY].codeWrap, undefined);
+    assert.strictEqual(payload[utils.CHATGPT_WIDTH_KEY].uiLanguage, undefined);
+    assert.strictEqual(payload[utils.CHATGPT_WIDTH_KEY].chatWidth, undefined);
+    assert.strictEqual(payload[utils.CHATGPT_WIDTH_KEY].presets, undefined);
+    assert.strictEqual(utils.normalizeSiteWidthSettings({ ...stored, ...payload }, 'gemini').chatWidthSetting.value, 1350);
+
+    const legacyPayload = utils.getSiteWidthStoragePayload(gemini, 'gemini');
+    assert.strictEqual(legacyPayload.widthEnabled, false);
+    assert.strictEqual(legacyPayload.chatWidth, 1350);
+    assert.strictEqual(legacyPayload.presets[0].name, 'Gemini preset');
+    assert.strictEqual(legacyPayload[utils.CHATGPT_WIDTH_KEY], undefined);
+    const invalid = utils.normalizeSiteWidthSettings({
+        [utils.CHATGPT_WIDTH_KEY]: { widthMin: 1800, widthMax: 900, presetsByUnit: { px: [] } }
+    }, 'chatgpt');
+    assert.strictEqual(invalid.widthMin, 700);
+    assert.strictEqual(invalid.widthMax, 2000);
+    assert.strictEqual(invalid.presetsByUnit.px.length, 5);
 }
 
 console.log('settings-utils tests passed');

@@ -1,5 +1,77 @@
 # Compatibility record
 
+## Source organization and internal candidate — September 29, 2026
+
+The current working version is `3.0.0-rc.1` (`version: 3.0.0`). Runtime files have moved into `src/shared/`, `src/content/`, `src/popup/`, and `src/help/`, with the service worker at `src/background.js`. The manifest remains at the repository root; unpacked loading and release packaging keep that root and preserve the `src/` paths. Repetitive popup guidance has been removed while page-status and error notices remain.
+
+The following checks passed for this directory change and candidate version:
+
+| Area | Evidence and outcome | Limit |
+| --- | --- | --- |
+| Existing regression suite | All five unit/packaging groups passed, including 15 packaging checks. The real-Chrome synthetic Gemini fixture passed all 73 scenarios and pause/resume assertions | Synthetic markup and mocked extension APIs; not live-site or macOS acceptance |
+| Actual candidate package | Built and extracted `wider-gemini-3.0.0-rc.1.zip`, then loaded the extracted extension with the enhanced package-load check. It confirmed the candidate version, 400px popup, shared script, CSS, and the relative help link | Isolated Windows Chrome; not Chrome Web Store publication |
+| Packaged languages and menu | The extracted package passed all six interface-language checks with 96 matching keys, plus native dropdown opening and keyboard selection | Loading and interaction checks do not establish native-speaker translation quality |
+| Popup cleanup | Three disposable checks passed against the extracted package: independent site switches and pause/resume; removed guidance with no empty placeholder or horizontal overflow; a controlled storage failure still displayed the save-error notice without changing saved width. Simplified Chinese screenshots cover both sites | Isolated Chrome with controlled settings; no live page-status transport |
+| Paths and package contents | All 10 unique manifest runtime/icon references and all seven HTML local-resource references resolved. All 23 ZIP files matched current-source hashes; the archive retained `src/` paths and excluded research, tests, and docs. All 92 checked local documentation links resolved | File/path and artifact checks, not website-layout verification |
+
+Package and validation evidence is retained under ignored `.scratch/builds/3.0.0-rc.1/`. This round adds no macOS, actual system PWA cold-start, or authenticated upload acceptance. Earlier in-app-browser observations of a cached extension version do not verify this candidate; the dated records below retain their original scope.
+
+This is an internal manual-install candidate, not a stable release or Chrome Web Store publication. Subsequent candidates and the final numeric `3.0.0` build require manual replacement and reload.
+
+## Per-site pause and layout fallback scope — September 29, 2026
+
+The user has confirmed macOS Chrome and Chrome-installed site app windows (PWA) as the target for this continuation. Safari packaging and native desktop applications are outside this round. This is an implementation and acceptance target, not evidence of testing on a Mac.
+
+The working branch adds an independent widening switch for Gemini and ChatGPT. Pausing retains each site's width, range, and presets while restoring its native width; Gemini reading settings remain separately available. Unrecognized page layouts retain native width. The popup checks page status only when its selected site matches the current tab, and shows an unsupported-layout notice there rather than adding a banner to the webpage. The optional diagnostic report adds only each site's normalized `widthEnabled` boolean; it does not collect DOM, URLs, conversations, or custom preset names.
+
+Current-source checks for this continuation passed:
+
+| Area | Evidence and outcome | Limit |
+| --- | --- | --- |
+| Unit, packaging, and source loading | `node scripts/test.js` passed all five groups, including 15 packaging checks. `node tests/e2e/package-load.js .` loaded the current source and confirmed manifest version `2.8.0` | Local source validation; no release or store publication |
+| Gemini width and restoration | The existing real-Chrome synthetic fixture passed all 73 layout scenarios and the added pause/resume assertions | Synthetic Gemini markup on Windows; not live Gemini or macOS acceptance |
+| ChatGPT pause and layout detection | A disposable real-Chrome probe passed seven groups covering the initial storage-read race, saved changes while paused, restoration of original inline values and priorities, unknown DOM, removal of owner/scroll-area markers, a late-mounted home composer followed by loss of its native width class, and preservation of inline properties subsequently changed by the site | Synthetic DOM with mocked extension APIs; no live upload, drag-and-drop, or Mac behavior established |
+| Popup pause and status | Five groups passed with the real unpacked extension and storage: pending slider changes survived immediate pause; per-site values and reading settings persisted; Gemini task Apply/Restore kept widening paused; status messages reflected the current site; delayed responses were discarded after site/tab switches | Isolated Windows Chrome; tab/status responses were controlled, not obtained from an authenticated website |
+| Six interface languages and menus | All six dictionaries passed 100-key parity, with native dropdown light/dark presentation and keyboard interaction checks | Loading and interaction checks do not establish native-speaker translation quality |
+| Authenticated ChatGPT pause/resume | **Pending.** Comparing the installed content script with `Debugger.getScriptSource` showed that the in-app browser still runs the previous cached version, without `widthEnabled` or the width activation gate. A webpage refresh did not update that extension source | The latest pause behavior is verified only in isolated Chrome. Reloading or re-importing the extension is required before live acceptance; the content-script context did not expose `runtime.reload`. User settings were not changed |
+
+Disposable ChatGPT and popup probes and results remain under ignored `.scratch/chatgpt-width/`, including `production-qa/chatgpt-pause-results.json` and `production-qa/popup-pause-results.json`. They are local diagnostics, not new formal test files or public prerequisites. Focused assertions were added to existing tests.
+
+A final ChatGPT adjustment keeps widening inactive until the initial saved settings have loaded, avoiding a brief width change on an already-paused site. The seven-group disposable probe passed again with the added initial-loading/native-width assertions. The authenticated-page source check is recorded in `production-qa/chatgpt-live-pause-status.json` under the same ignored diagnostic directory.
+
+**Still unverified in this continuation:** macOS Chrome, actual system PWA cold start, and authenticated upload/drag flows. No Mac or PWA pass is claimed. The earlier checks below remain dated evidence of the preceding implementation and do not certify these new changes.
+
+## ChatGPT support and popup implementation — September 29, 2026
+
+The development branch adds separate ChatGPT width settings and site-specific content injection. The popup uses the selected Gemini / ChatGPT tab design, with width first, collapsible range/preset and Gemini reading controls, and styled dropdowns. Gemini's existing reading and task-preset settings remain separate from ChatGPT width settings. The optional local diagnostic report adds only normalized ChatGPT width and numeric ranges, excluding custom preset names and page content. The manifest remains `2.8.0`; this work has not been released.
+
+ChatGPT's final implementation locally overrides `--thread-content-responsive-max-width`, retaining the native content/body width and padding calculation. It measures the actual transcript parent for the footer's available-width limit to account for the scroll area's stable gutter. See [layout boundaries](engineering.md#layout-boundaries) for the observer scope.
+
+Local isolated-check environment: Windows 11; Node.js `24.19.0`; Google Chrome `154.0.8037.58`. The following current-source checks passed:
+
+| Area | Evidence and outcome | Limit |
+| --- | --- | --- |
+| Popup integration | Seven groups passed in an isolated Chrome profile with the real unpacked extension: legacy Gemini values preserved; pending slider input followed by a site switch saved to the originating site; independent ChatGPT px/% values, ranges, and named presets persisted; language reload retained site/width; Gemini task Apply/Restore stayed isolated; language and task dropdowns opened in light/dark mode and accepted keyboard selection | Extension page at 400 × 620px; native browser-toolbar popup opening and authenticated website layout were not exercised |
+| Six interface languages | All six dictionaries passed the 95-key parity and existing language-selection checks | Loading and interaction checks do not establish native-speaker translation quality |
+| Gemini layout regression | The existing real-Chrome synthetic fixture passed all 73 scenarios | Synthetic markup; no new live-Gemini, macOS, or system PWA cold-start acceptance |
+| Unit, packaging, and extension loading | All five existing test scripts passed, including 15 packaging checks; the source-load smoke check also passed. The full suite and source-load smoke check passed again after live-site verification | Mocked lifecycle/settings checks, package validation, and isolated extension loading; not a new release or store publication |
+| ChatGPT native-width regression | Six source-driven synthetic cases passed: overlarge width, 700px, ignored Gemini settings, 80vw, a narrowed column, and replaced transcript nodes. Reply/input widths and left edges aligned, stayed within the available column, and protected dialog/upload-menu fixtures retained their 300px width. Repeated injection left one message listener and one storage listener | Real Chrome with mocked extension APIs and synthetic DOM based on the observed gutter mismatch; no real upload, preview, or Canvas flow |
+
+Local evidence is retained under ignored `.scratch/chatgpt-width/`: `production-qa/popup-integration-results.json`, dropdown screenshots, `chatgpt-layout-probe.json`, and the disposable `check-chatgpt-layout.cjs` probe. These are diagnostic artifacts, not additional shipped tests or public prerequisites.
+
+**Live ChatGPT follow-up:** after the Codex in-app browser connection recovered, the loaded Wider Gemini manifest contained separate site-injection entries. The running `chatgpt-content.js`, retrieved with `Debugger.getScriptSource`, matched the workspace source after line-ending normalization. Reloading the page confirmed the local responsive → content → body variable chain in computed CSS. These observations concern the loaded extension on authenticated ChatGPT, rather than the earlier temporary CSS experiment.
+
+| Live flow | Observed outcome | Limit |
+| --- | --- | --- |
+| Fixed and percentage widths | At a 1600px viewport, 1000px, 700px, and 80vw produced matching reply/input widths of 1000px, 700px, and 1280px. At 480px, 80vw produced 384px for both. Left edges matched, with no page-level horizontal overflow in the recorded cases | Current observed ChatGPT layout and tested viewports |
+| Multiline input, navigation, and sidebar | At the default 759px viewport, multiline input grew to 232px tall while reply/input widths stayed aligned at about 706.4px. Returning from home to the conversation retained the saved 1000px preference. The narrow-screen sidebar opened and closed as a popover | Does not establish attachment-driven composer growth or every sidebar mode |
+| Model menu, attachment menu, and table preview | The model menu measured 254px and the attachment menu about 706.4px; neither received the overridden native-width variable. The table preview occupied the full viewport and also remained outside that override | Menu opening and table preview only; attachment selection and file/image previews were not completed |
+| Writing editor beside the conversation | Open editor displayed the actual writing editor alongside chat. At the 759px viewport, reply/input widths both reduced to about 299.21px; the editor measured about 366.39px and did not receive the overridden native-width variable. A 1600px editor-open measurement also kept reply/input aligned. Closing the editor restored available chat width and alignment | This verifies the writing editor supplied by the current UI, not every Canvas variant or classic Canvas |
+
+Live measurements are saved in `.scratch/chatgpt-width/production-qa/chatgpt-live-layout-results.json`. Screenshots in the same directory are `chatgpt-live-final.png`, `chatgpt-table-preview-live.png`, `chatgpt-editor-live.png`, and `chatgpt-editor-wide-live.png`. They remain local diagnostic artifacts. The original 1000px preference and viewport were restored, and the draft was cleared.
+
+**Still unverified:** file selection timed out twice while waiting for the file chooser, and no file was uploaded. Attachment upload/removal, multiple files, drag-and-drop, upload-source selection, file/image previews, and classic Canvas therefore remain open. The displayed writing editor is the verified surface; generated chat text about feature availability is not evidence of the product's capabilities. These results do not add live-Gemini, macOS, or system PWA cold-start acceptance. Earlier Gemini records below remain dated historical evidence.
+
 ## CI runner correction — September 23, 2026
 
 The first [main Tests run](https://github.com/Planetes1mal/wider-gemini/actions/runs/35953083191) and [v2.8.0 Release run](https://github.com/Planetes1mal/wider-gemini/actions/runs/35953084940) used Ubuntu 24.04.5, Node 24.20.0, and Chrome for Testing stable 154.0.8037.57. All five test scripts passed, including the 15 packaging checks, but Chrome aborted with `SIGABRT` before the synthetic layout fixture returned its browser report (`No browser report (null)`). This was a browser-startup failure, not a failed layout assertion; the available stderr tail does not establish its underlying cause. The dependent release job was skipped and these runs did not create a GitHub Release.

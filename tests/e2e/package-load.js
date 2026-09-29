@@ -45,34 +45,57 @@
         });
     }
 
+    async function waitForPage(sessionId, expression, message) {
+        // createTarget returns before navigation finishes; the initial document may be about:blank.
+        for (let attempt = 0; attempt < 50; attempt++) {
+            const result = await send('Runtime.evaluate', { expression, returnByValue: true }, sessionId);
+            assert(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
+            if (result.result.value) return result.result.value;
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        assert.fail(message);
+    }
+
     (async () => {
         try {
             const { id } = await send('Extensions.loadUnpacked', { path: extension });
             assert(id, 'Chrome should accept the release manifest and files');
-            const { targetId } = await send('Target.createTarget', { url: `chrome-extension://${id}/popup.html` });
+            const { targetId } = await send('Target.createTarget', {
+                url: `chrome-extension://${id}/${expected.action.default_popup}`
+            });
             const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
-            let state;
-            // createTarget returns before navigation finishes; the initial document may be about:blank.
-            for (let attempt = 0; attempt < 50; attempt++) {
-                const result = await send('Runtime.evaluate', {
-                    expression: `(() => {
-                        if (document.readyState !== 'complete' || !globalThis.chrome?.runtime?.id) return null;
-                        const manifest = chrome.runtime.getManifest();
-                        return { version:manifest.version, versionName:manifest.version_name,
-                            slider:!!document.getElementById('widthSlider'), name:manifest.name };
-                    })()`, returnByValue: true
-                }, sessionId);
-                assert(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
-                state = result.result.value;
-                if (state) break;
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            assert(state, 'Packaged popup should load in the extension context');
+            const state = await waitForPage(sessionId, `(() => {
+                const controls = document.getElementById('settingsControls');
+                if (document.readyState !== 'complete' || !globalThis.chrome?.runtime?.id ||
+                    !globalThis.widerGeminiSettings || !controls || controls.disabled) return null;
+                const manifest = chrome.runtime.getManifest();
+                return { version:manifest.version, versionName:manifest.version_name,
+                    slider:!!document.getElementById('widthSlider'), name:manifest.name,
+                    width:getComputedStyle(document.body).width,
+                    styles:[...document.styleSheets].some(sheet => sheet.href && sheet.cssRules.length > 0),
+                    helpUrl:document.getElementById('i18n-helpLink').href };
+            })()`, 'Packaged popup scripts should initialize and enable its controls');
             assert.strictEqual(state.version, expected.version);
             assert.strictEqual(state.versionName, expected.version_name);
             assert.strictEqual(state.slider, true);
+            assert.strictEqual(state.width, '400px', 'Packaged popup CSS should apply');
+            assert.strictEqual(state.styles, true, 'Packaged popup stylesheet should load');
             assert(!state.name.startsWith('__MSG_'), 'Manifest localization should resolve');
+            assert(state.helpUrl.startsWith(`chrome-extension://${id}/`), 'Help must point into this extension');
+            const helpTarget = await send('Target.createTarget', { url: state.helpUrl });
+            const helpSession = await send('Target.attachToTarget', { targetId: helpTarget.targetId, flatten: true });
+            const help = await waitForPage(helpSession.sessionId, `(() => {
+                if (document.readyState !== 'complete' || !globalThis.widerGeminiSettings) return null;
+                const version = document.getElementById('extensionVersion')?.textContent;
+                if (!version) return null;
+                return { version, shared:typeof widerGeminiSettings.normalizeStorage === 'function',
+                    styles:[...document.styleSheets].some(sheet => sheet.href && sheet.cssRules.length > 0) };
+            })()`, 'The popup help link should load its shared helper and help script');
+            assert.strictEqual(help.version, `v${expected.version_name || expected.version}`);
+            assert.strictEqual(help.shared, true);
+            assert.strictEqual(help.styles, true, 'Packaged help stylesheet should load');
             console.log('Packaged extension loaded in Chrome:', JSON.stringify(state));
+            console.log('Packaged help loaded through the popup link:', JSON.stringify(help));
         } catch (error) {
             console.error(error.stack);
             process.exitCode = 1;

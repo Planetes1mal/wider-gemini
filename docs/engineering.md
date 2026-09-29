@@ -1,6 +1,6 @@
 # Engineering and compatibility
 
-Wider Gemini adjusts the reading layout of `gemini.google.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
+Wider Gemini adjusts the reading layout of `gemini.google.com` and the conversation width of `chatgpt.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
 
 ## Implementation case studies
 
@@ -20,9 +20,9 @@ The dated [compatibility record](./compatibility.md) lists what was actually che
 flowchart TD
     Popup[Popup controls] --> Normalize[settings-utils.js]
     Normalize --> Storage[chrome.storage.sync]
-    Popup --> Message[Message each open Gemini tab]
+    Popup --> Message[Message open tabs for the selected site]
     Storage --> Change[storage.onChanged]
-    Message --> Content[gemini-content.js]
+    Message --> Content[Site-specific content script]
     Change --> Content
     Content --> Layout[CSS variables and scoped layout styles]
     Manifest[Manifest content_scripts] --> Content
@@ -31,11 +31,15 @@ flowchart TD
     Inject --> Content
 ```
 
-`settings-utils.js` normalizes stored widths, units, presets, density, text size, and language. The popup persists settings and sends updates to open Gemini tabs; the content script also observes storage changes. Both paths can deliver the same setting, so applying a setting must be harmless when repeated. A page reload is a fallback for a tab without a receiving content script.
+[settings-utils.js](../src/shared/settings-utils.js) normalizes stored widths, units, presets, density, text size, and language. Gemini keeps its existing top-level storage fields; ChatGPT's width, unit, ranges, and presets live in `chatgptWidthSettings`. Each site's `widthEnabled` defaults to true; only an explicit false pauses widening. `normalizeSiteWidthSettings(stored, site)` reads the selected site's width fields. Gemini's reading, code-wrap, user-message, and task-preset controls do not apply to ChatGPT.
 
-Normally Chrome injects the manifest's content scripts on navigation. During browser or installed-site app startup, a page can be ready before the extension. `background.js` checks `window.widerGeminiContentLoaded` in the extension's isolated world and injects the manifest's CSS and JS only when missing. Discarded tabs are skipped. The content script guards both re-execution and initialization, so a repeated injection or a second load event does not install duplicate observers.
+The popup persists settings and sends updates only to the selected site's open tabs; each content script also observes its storage fields. Both paths can deliver the same setting, so applying a setting must be harmless when repeated. A page reload is a fallback for a tab without a receiving content script.
 
-The extension requests `storage`, `scripting`, and access to `gemini.google.com`; startup injection does not require the browsing-history `tabs` permission. See [manifest.json](../manifest.json), [background.js](../background.js), and [gemini-content.js](../gemini-content.js).
+The popup asks `getLayoutStatus` on opening, site selection, and pause/resume. It displays a page-status notice only when the current tab belongs to the selected site; delayed replies are checked against the current site and tab before display. Unsupported or still-loading pages are not presented as successfully widened. This status describes recognized layout structure, not acceptance of every page feature or platform. No notice is inserted into the webpage.
+
+Normally Chrome injects the manifest's content scripts on navigation. During browser or installed-site app startup, a page can be ready before the extension. `background.js` processes each site's manifest entry and checks its isolated-world loaded flag (`widerGeminiContentLoaded` or `widerChatgptContentLoaded`). It injects only that entry's CSS and JS when missing. Discarded tabs are skipped. Content-script guards keep repeated injection from installing duplicate listeners or observers.
+
+The extension requests `storage`, `scripting`, and access to `gemini.google.com` and `chatgpt.com`; startup injection does not require the browsing-history `tabs` permission. See [manifest.json](../manifest.json), [background.js](../src/background.js), [gemini-content.js](../src/content/gemini-content.js), and [chatgpt-content.js](../src/content/chatgpt-content.js).
 
 ## Layout boundaries
 
@@ -48,6 +52,14 @@ Gemini can limit width at several nested message containers. Changing the outer 
 - Retain the response-container compatibility selectors introduced for Gemini's updated layouts. An unverified synthetic structure alone is not grounds to remove a fix that users need.
 
 The [2.5.0 release](../CHANGELOG.md) documents the startup and duplicate-initialization fixes. [PR #10](https://github.com/Planetes1mal/wider-gemini/pull/10) and the 2.6.0 release document the later message-width compatibility work.
+
+Width styles are enabled only after saved settings have loaded, widening is on, and the site's known layout structure is present. Gemini recognizes its conversation or inner-input containers; ChatGPT requires the observed native width-owner class plus the transcript/footer pair or home composer. Unknown structures keep their native width rather than falling back to broad selectors. Pausing removes the width activation class and restores inline properties still owned by the extension, including their prior priorities. It preserves values subsequently written by the site. Saved width settings and presets are retained, and Gemini reading settings remain independent.
+
+ChatGPT uses separate content-script files. Its CSS overrides `--thread-content-responsive-max-width` only on identified conversation and composer width owners under `main`. This reuses ChatGPT's native `--thread-content-max-width` → `--thread-body-max-width` calculation and inline padding. The requested content width is capped to the available parent width minus that padding; native width variables are not overridden on `:root` or `body`.
+
+The transcript scroll area can reserve a stable scrollbar gutter while its absolutely positioned footer spans the gutter. A `ResizeObserver` watches the actual transcript parent and supplies its measured width to the matching footer through `--wg-chatgpt-available-width`, keeping their available-width limits aligned. A filtered `MutationObserver` rechecks known containers when they are added, removed, or replaced, or when their identifying classes/data attributes change. Losing a required marker deactivates widening; a later recognized mount can resume it. These observers do not restyle attachments or drag-and-drop overlays.
+
+Keep native attachment, menu, preview, Canvas, and floating-composer layouts outside those overrides. Do not add global native-variable changes or generic `form`, `section`, table, dialog, or overlay width rules. A new live DOM variant needs observed evidence before adding another selector.
 
 ## Reproduce the automated checks
 
@@ -98,5 +110,14 @@ For a layout release, record the date, extension version, browser version, OS, a
 | Deep Research | The existing 1600px override still applies |
 | Settings changes in multiple tabs | Changes apply without a reload; values persist after reload |
 | Chrome-installed Gemini site app after quitting Chrome | Layout applies on cold start without a manual refresh |
+| ChatGPT conversation, new chat, and editing a message | Conversation and composer width adjust within the available chat column |
+| ChatGPT attachments, multiple files, multiline input, and drag-and-drop | Attachments and controls remain reachable; composer growth stays within native flow |
+| ChatGPT upload sources, file/image previews, model and tool menus | Menus and previews retain native size and scrolling |
+| ChatGPT sidebar and Canvas | Chat width fits the remaining column without widening the side panel |
+| ChatGPT code, tables, and tool cards | Native wrapping, scrolling, and embedded component sizes are preserved |
+| Site tabs, width units, limits, and custom presets | Each site's values persist independently; Gemini task presets do not change ChatGPT |
+| Pause and resume widening for one site | Native width returns while paused; saved values and presets survive; the other site and Gemini reading settings are unchanged |
+| Unrecognized layout or delayed page mounting | Unknown layouts keep native width; the popup reports the current page's status without adding a page banner |
+| Popup selects and disclosures | Unit and preset-editor selects, language menu, focus, keyboard operation, and advanced sections remain usable at popup size |
 
-The Chrome-installed site app is a PWA window. It is distinct from Google's native desktop Gemini applications and Chrome's built-in Gemini panel; the manifest only targets Gemini webpages. Synthetic checks cannot prove compatibility with a new live DOM rollout, so useful reports include the page type and a minimal reproduction using non-sensitive sample content.
+Chrome-installed site apps use the same supported webpages. Native desktop applications and Chrome's built-in Gemini panel are outside the manifest's scope. Synthetic checks cannot prove compatibility with a new live DOM rollout, so useful reports include the site, page type, and a minimal reproduction using non-sensitive sample content. The existing Gemini fixture does not establish ChatGPT acceptance; record each live ChatGPT flow actually exercised.

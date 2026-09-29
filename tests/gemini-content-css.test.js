@@ -2,7 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-const cssPath = path.join(__dirname, '..', 'gemini-content.css');
+const cssPath = path.join(__dirname, '..', 'src/content/gemini-content.css');
 const css = fs.readFileSync(cssPath, 'utf8');
 
 // 阅读排版只作用于内容脚本从受支持消息中标记的节点；字号与间距各自启用。

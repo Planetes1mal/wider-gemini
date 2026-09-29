@@ -2,10 +2,10 @@
 
 # Wider Gemini
 
-用來調整 Gemini 對話寬度的 Chrome 擴充功能。拖曳滑桿或點選預設，就能把對話區調到適合自己螢幕的大小。
+用來調整 Gemini 和 ChatGPT 對話寬度的 Chrome 擴充功能。兩個網站分別記住寬度和預設。
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-安裝-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)
-[![GitHub Release 2.8.0](https://img.shields.io/badge/release-v2.8.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v2.8.0)
+[![內部候選版 3.0.0-rc.1](https://img.shields.io/badge/internal-3.0.0--rc.1-orange)](../../CHANGELOG.md)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 
 同一段完整的 Gemini 對話、相同的視窗大小：使用 Wider Gemini 將對話寬度分別設為 700px 和 1200px。
@@ -14,49 +14,50 @@
 
 ![1200px 寬度的同一完整 Gemini 對話頁面](../images/conversation-after.png)
 
+此分支為內部候選版 **3.0.0-rc.1**，包含 ChatGPT 支援和帶有網站頁籤的新彈出視窗。需要手動安裝，尚未作為正式版上架 Chrome 線上應用程式商店。
+
 ## 功能
 
-- **調整寬度**：以像素（`px`）或視窗比例（`%`）設定，也可以儲存常用預設。
-- **調整字型大小和間距**：字型大小支援 75%–200%，行高和段落間距可以分別設定。
-- **程式碼自動換行**：較長的程式碼會在對話區內換行顯示。
+- **調整寬度**：選擇 Gemini 或 ChatGPT，以像素（`px`）或視窗比例（`%`）設定；兩個網站分別儲存範圍和預設。
+- **單站暫停**：分別關閉某個網站的加寬，恢復原站寬度並保留數值與預設；遇到尚未辨識的版面時保留原站寬度，並在彈出視窗中提示目前頁面尚未支援。
+- **調整 Gemini 字型大小和間距**：字型大小支援 75%–200%，行高和段落間距可以分別設定。
+- **Gemini 程式碼自動換行**：較長的程式碼會在對話區內換行顯示。
 - **使用者訊息填滿寬度**：讓自己的訊息和 Gemini 的回覆一樣，靠左對齊並使用完整的對話寬度。
 - **介面語言**：英文、簡體中文、繁體中文、韓語、日語和西班牙語。預設跟隨瀏覽器，也能手動選擇。韓語、日語和西班牙語採用機器輔助翻譯，歡迎母語者改進。
 
-設定會自動儲存，調整後立即套用至已開啟的 Gemini 頁面。
+設定會自動儲存，並套用至所選網站已開啟的頁面。ChatGPT 保留原生字型大小、間距、程式碼格式和使用者訊息樣式。
 
 ## 安裝
 
-在 [Chrome 線上應用程式商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)點選 **加到 Chrome** 即可安裝。
-
-GitHub 版本與 Chrome 線上應用程式商店的更新時間可能不同。若要使用 2.8.0，請依下方方式安裝對應的 GitHub 正式版。
+使用 **3.0.0-rc.1** 請依下方步驟手動安裝。[Chrome 線上應用程式商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)和 [GitHub 正式版](https://github.com/Planetes1mal/wider-gemini/releases)是獨立的發佈管道，從那裡安裝不會取得這個內部候選版。
 
 <details>
 <summary>手動安裝</summary>
 
-1. 到 [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases) 下載最新正式版的 `wider-gemini-*.zip`。
-2. 解壓縮至固定位置，確認資料夾內有 `manifest.json`。
+1. 使用此分支的本機儲存庫，或解壓縮收到的 `wider-gemini-3.0.0-rc.1.zip` 候選套件。
+2. 保留完整資料夾，確認其中包含 `manifest.json`、`src/`、`_locales/` 和 `icons/`。
 3. 開啟 `chrome://extensions/`，開啟右上角的 **開發人員模式**。
 4. 點選 **載入未封裝項目**，選取剛才解壓縮的資料夾。
 
-若曾手動安裝 2.8.0 候選版，請替換檔案並重新載入擴充功能，以使用正式版；候選版不會自動升級為此版本。
+更新手動安裝的候選版時，需要替換檔案並重新載入擴充功能。Chrome 比較的是數字版本（`3.0.0`），因此後續候選版和最終 `3.0.0` 正式版也需要手動替換、重新載入。
 
 </details>
 
 ## 使用
 
-1. 開啟 [Gemini](https://gemini.google.com/)，點選瀏覽器工具列中的 Wider Gemini 圖示。
-2. 選擇 `px` 或 `%`，拖曳寬度滑桿，也可以直接點選預設。
-3. 視需要調整字型大小、閱讀密度，或開啟程式碼自動換行。
+1. 開啟 [Gemini](https://gemini.google.com/) 或 [ChatGPT](https://chatgpt.com/)，點選瀏覽器工具列中的 Wider Gemini 圖示。
+2. 選擇網站頁籤和 `px` 或 `%`，拖曳寬度滑桿，也可以直接點選預設。
+3. 在 Gemini 頁籤中，展開 **閱讀與排版** 還可以調整字型大小、閱讀密度，或開啟程式碼自動換行。
 
-在 **管理預設** 中可以修改預設名稱和寬度；`px` 和 `%` 各有一組獨立預設。介面語言可在彈出視窗底部切換。
+展開 **範圍與預設** 可以調整寬度範圍和 **管理預設**；每個網站的 `px` 和 `%` 各有一組獨立預設。介面語言可在彈出視窗底部切換。
 
-使用長文閱讀、表格、程式碼和大字四種**任務預設**時，先查看設定摘要，再點選套用；**還原先前設定**可在本機恢復套用前的版面，關閉彈出視窗後仍可使用。具體數值及還原範圍見[閱讀指南](../guides/reading-layout.zh-TW.md)。
+在 Gemini 中使用長文閱讀、表格、程式碼和大字四種**任務預設**時，先查看設定摘要，再點選套用；**還原先前設定**可在本機恢復套用前的 Gemini 版面，關閉彈出視窗後仍可使用。具體數值及還原範圍見[閱讀指南](../guides/reading-layout.zh-TW.md)。
 
-彈出視窗底部的 **說明與回報** 提供疑難排解，也可以預覽並複製診斷設定。擴充功能支援 Gemini 網頁和透過 Chrome 安裝的網站應用程式視窗，不會修改原生桌面應用程式或 Chrome 內建的 Gemini 面板。
+彈出視窗底部的 **說明與回報** 提供疑難排解，也可以預覽並複製診斷設定。擴充功能作用於 Gemini、ChatGPT 網頁及透過 Chrome 安裝的網站應用程式視窗，不會修改原生桌面應用程式或 Chrome 內建的 Gemini 面板。已實際驗證的操作見[相容性記錄](../compatibility.md)。
 
 ## 隱私權
 
-擴充功能只在 `gemini.google.com` 上調整頁面樣式，不收集或上傳對話內容，也沒有統計或追蹤服務。
+擴充功能申請 `gemini.google.com` 和 `chatgpt.com` 的存取權限來調整頁面樣式，使用 `storage` 儲存偏好、`scripting` 補注入未載入的內容指令碼。不收集或上傳對話內容，也沒有統計或追蹤服務。
 
 偏好設定透過 Chrome 的擴充功能儲存空間保存；是否跨裝置同步取決於你的瀏覽器同步設定。詳見[隱私權說明](../PRIVACY.md)。
 
@@ -68,7 +69,7 @@ GitHub 版本與 Chrome 線上應用程式商店的更新時間可能不同。�
 git clone https://github.com/Planetes1mal/wider-gemini.git
 ```
 
-在 `chrome://extensions/` 開啟 **開發人員模式**，點選 **載入未封裝項目**，選取儲存庫資料夾。修改程式碼後，重新載入擴充功能並重新整理 Gemini 頁面。
+在 `chrome://extensions/` 開啟 **開發人員模式**，點選 **載入未封裝項目**，選取儲存庫資料夾。修改程式碼後，重新載入擴充功能並重新整理受影響的 Gemini 或 ChatGPT 頁面。
 
 內部迭代可執行 `node scripts/test.js --skip-packaging`，執行現有單元檢查而不產生 ZIP。瀏覽器與發佈檢查見[貢獻指南](../../CONTRIBUTING.md)，版面規則見[工程與相容性說明](../engineering.md)。
 

@@ -34,7 +34,7 @@
             input-area-v2{height:60px}p{margin:8px 0}pre{overflow:auto}table{border-collapse:collapse}td{padding:4px 16px}
             single-image{display:block}.image-button img{display:block;width:240px;height:100px;margin:auto}
             .hero-caption-row{box-sizing:border-box;width:100%}.caption{display:inline-block}
-        </style>${enabled ? `<style>${read('gemini-content.css')}</style>` : ''}</head><body>
+        </style>${enabled ? `<style>${read('src/content/gemini-content.css')}</style>` : ''}</head><body>
         <div class="chat-container"><div class="conversation-container" id="conversation">
         ${Array.from({ length: count }, (_, index) => turn(index)).join('')}
         <model-response><single-image><div class="image-button"><img alt="Synthetic image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='100'/%3E"></div>
@@ -51,7 +51,7 @@
                 storage:{sync:{get(keys,callback){window.__counts.storageReads++;queueMicrotask(()=>callback(window.__settings));}},
                 onChanged:{addListener(){}}}};
             window.__frames=async count=>{for(let i=0;i<count;i++)await new Promise(requestAnimationFrame);};
-        `)}${enabled ? script(read('settings-utils.js')) + script(read('gemini-content.js')) : ''}
+        `)}${enabled ? script(read('src/shared/settings-utils.js')) + script(read('src/content/gemini-content.js')) : ''}
         ${script(`
             addEventListener('load',async()=>{await window.__frames(2);window.__firstSettledMs=performance.now();window.__ready=true;});
             window.__append=async()=>{

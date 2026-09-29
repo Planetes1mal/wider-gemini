@@ -3,7 +3,7 @@
     "message": "Wider Gemini"
   },
   "appDesc": {
-    "message": "讓 Google Gemini 的對話區域更寬，支援百分比寬度、閱讀密度調整與程式碼自動換行，提升大螢幕閱讀體驗。"
+    "message": "分別拓寬 Gemini 與 ChatGPT 的對話區域，支援像素與百分比寬度；Gemini 還可調整字級、閱讀密度及程式碼換行。"
   },
   "headerSubtitle": {
     "message": "讓對話介面更寬、更舒適"
@@ -65,12 +65,6 @@
   "statusOff": {
     "message": "停用"
   },
-  "infoText1": {
-    "message": "拖曳滑桿或點選預設按鈕來調整寬度"
-  },
-  "infoText2": {
-    "message": "設定會自動儲存並套用至所有 Gemini 分頁"
-  },
   "refreshing": {
     "message": "正在重新整理頁面..."
   },
@@ -130,31 +124,31 @@
     "message": "使用說明與意見回饋"
   },
   "helpGettingStarted": {
-    "message": "讓 Gemini 更適合你的螢幕"
+    "message": "讓 Gemini 與 ChatGPT 適合你的螢幕"
   },
   "helpOpenPopup": {
-    "message": "開啟 Gemini，點擊瀏覽器工具列中的 Wider Gemini 圖示，即可調整設定。"
+    "message": "開啟 Gemini 或 ChatGPT，點選工具列上的 Wider Gemini 圖示，再透過頂端的網站按鈕選擇要調整的網站。"
   },
   "helpWidthTitle": {
     "message": "訊息區域寬度"
   },
   "helpWidthBody": {
-    "message": "選擇 px 設定固定寬度，或選擇 % 隨視窗大小變化。拖曳滑桿或選擇預設組合；兩種單位各有獨立的預設組合。"
+    "message": "選擇 px 使用固定寬度，選擇 % 跟隨視窗大小。拖曳滑桿或點選預設。Gemini 和 ChatGPT 分別儲存寬度、範圍與預設，每種單位也有獨立預設。展開「範圍與預設」即可編輯。寬度標題旁的開關可以單獨暫停該網站的加寬並恢復原站寬度，已儲存的數值與預設會保留，Gemini 閱讀設定仍然有效。"
   },
   "helpCodeTitle": {
     "message": "程式碼換行"
   },
   "helpCodeBody": {
-    "message": "開啟「程式碼自動換行」，減少閱讀長程式碼時的橫向捲動。關閉後保留不折行的程式碼顯示。"
+    "message": "僅適用於 Gemini：開啟「程式碼自動換行」，減少閱讀長程式碼時的橫向捲動。關閉後保留不折行的程式碼顯示。"
   },
   "helpReadingTitle": {
     "message": "字級與間距"
   },
   "helpReadingBody": {
-    "message": "字級可在75%至200%之間調整，不必縮放整個頁面。自動密度為0時保留原生段距和行高比例，提高密度會逐漸收緊原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。"
+    "message": "僅適用於 Gemini：字級可在75%至200%之間調整，不必縮放整個頁面。自動密度為0時保留原生段距和行高比例，提高密度會逐漸收緊原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。"
   },
   "helpLiveSettings": {
-    "message": "變更會即時套用至已開啟的 Gemini 分頁並自動儲存。是否跨裝置同步取決於瀏覽器的同步設定。"
+    "message": "設定會自動儲存並即時套用至所選網站已開啟的分頁。兩個網站的設定互相獨立，彈出視窗語言共用。跨裝置同步取決於瀏覽器的同步設定。"
   },
   "helpOpenGemini": {
     "message": "開啟 Gemini"
@@ -163,13 +157,13 @@
     "message": "顯示不如預期？"
   },
   "helpTroubleshootPage": {
-    "message": "確認你正在使用 gemini.google.com，且已啟用 Wider Gemini。透過 Chrome 將該網站安裝為應用程式（PWA）也受支援；不支援 Google 原生桌面應用程式。"
+    "message": "確認目前網站是 gemini.google.com 或 chatgpt.com，且 Wider Gemini 已啟用並獲准存取該網站。透過 Chrome 安裝的網頁應用程式（PWA）使用同一網頁。不支援原生桌面應用程式或 Chrome 內建的 Gemini 面板。"
   },
   "helpTroubleshootRefresh": {
-    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理一次 Gemini 頁面再試。"
+    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理對應頁面一次。出現版面尚未支援的提示時，目前頁面不會套用加寬，會保留原站寬度。你也可以透過寬度開關單獨暫停該網站的加寬。"
   },
   "helpTroubleshootReport": {
-    "message": "若問題仍在，請記錄重現步驟與視窗大小。可附上已移除私人內容的螢幕擷取畫面，並說明是否使用了其他修改 Gemini 版面的擴充功能。"
+    "message": "如果問題持續，請記錄網站、重現步驟與視窗大小。可附上已移除私人內容的螢幕截圖，並說明其他會調整網頁版面的擴充功能。"
   },
   "helpReportIssue": {
     "message": "回報問題"
@@ -178,7 +172,7 @@
     "message": "設定診斷報告"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器主版本、平台與版面設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
+    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器主版本、平台、Gemini 版面設定與 ChatGPT 寬度設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
   },
   "helpGenerateReport": {
     "message": "產生報告"
@@ -229,7 +223,7 @@
     "message": "大字"
   },
   "taskHint": {
-    "message": "遵守自訂寬度範圍。還原會將以上四類設定恢復至最近一次套用之前。"
+    "message": "遵守自訂寬度範圍。還原會將寬度、字級、間距及程式碼換行恢復至最近一次套用之前。"
   },
   "taskApply": {
     "message": "套用"
@@ -256,9 +250,42 @@
     "message": "任務預設"
   },
   "helpTaskBody": {
-    "message": "選擇長文閱讀、表格、程式碼或大字，查看設定摘要後點選套用。預設只調整寬度、字級、間距和程式碼換行，並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這四類設定的調整。"
+    "message": "僅適用於 Gemini：選擇長文閱讀、表格、程式碼或大字，查看設定摘要後點選套用。預設只調整寬度、字級、間距和程式碼換行，並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這四類設定的調整。"
   },
   "autoSpacingHint": {
     "message": "自動模式跟隨各則訊息的原生間距。移動任一滑桿後，將手動套用下方兩項數值。"
+  },
+  "settingsSite": {
+    "message": "設定網站"
+  },
+  "currentSite": {
+    "message": "目前網頁"
+  },
+  "chatgptWidthOnly": {
+    "message": "ChatGPT 目前支援調整對話寬度。"
+  },
+  "widthOptions": {
+    "message": "範圍與預設"
+  },
+  "readingSettings": {
+    "message": "閱讀與排版"
+  },
+  "settingsSaveError": {
+    "message": "無法儲存設定，請重新開啟彈出視窗後再試。"
+  },
+  "widthEnabled": {
+    "message": "啟用加寬"
+  },
+  "widthPaused": {
+    "message": "已暫停加寬，寬度與預設已保留。"
+  },
+  "layoutUnsupported": {
+    "message": "尚未支援目前的頁面版面，已保留原站寬度。"
+  },
+  "layoutLoading": {
+    "message": "頁面正在載入，請待頁面就緒後重新開啟設定。"
+  },
+  "layoutUnavailable": {
+    "message": "暫時無法讀取頁面狀態，請重新整理頁面後再試。"
   }
 }

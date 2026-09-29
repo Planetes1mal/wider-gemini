@@ -16,9 +16,10 @@ const manifestPath = path.join(fixtureRoot, 'manifest.json');
 const changelogPath = path.join(fixtureRoot, 'CHANGELOG.md');
 const runnerPath = path.join(tempRoot, 'run-package.ps1');
 const files = [
-    'manifest.json', 'popup.html', 'popup.js', 'popup.css', 'settings-utils.js',
-    'help.html', 'help.css', 'help.js',
-    'gemini-content.js', 'gemini-content.css', 'background.js', 'LICENSE',
+    'manifest.json', 'src/popup/popup.html', 'src/popup/popup.js', 'src/popup/popup.css',
+    'src/shared/settings-utils.js', 'src/help/help.html', 'src/help/help.css', 'src/help/help.js',
+    'src/content/gemini-content.js', 'src/content/gemini-content.css', 'src/background.js', 'LICENSE',
+    'src/content/chatgpt-content.js', 'src/content/chatgpt-content.css',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
     '_locales/en/messages.json', '_locales/zh_CN/messages.json', '_locales/zh_TW/messages.json',
     '_locales/ko/messages.json', '_locales/ja/messages.json', '_locales/es/messages.json'
@@ -143,10 +144,10 @@ Write-Output ('RESULT:' + ($report | ConvertTo-Json -Depth 5 -Compress))
     }
 
     writeManifest();
-    const missingFile = path.join(fixtureRoot, 'background.js');
+    const missingFile = path.join(fixtureRoot, baseManifest.background.service_worker);
     fs.unlinkSync(missingFile);
     expectFailure(/Missing package file/);
-    fs.copyFileSync(path.join(sourceRoot, 'background.js'), missingFile);
+    fs.copyFileSync(path.join(sourceRoot, baseManifest.background.service_worker), missingFile);
 
     fs.writeFileSync(changelogPath, '## 2.6.0-rc.10 (2026-09-08)\n\nOnly rc.10 exists.\n');
     expectFailure(/Expected exactly one nonempty dated CHANGELOG section/);

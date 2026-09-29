@@ -1,14 +1,14 @@
 # Recovering a missed content-script injection at browser startup
 
-A Gemini tab can already be open when Wider Gemini becomes available. The same timing matters for a Chrome-installed Gemini site app: the page and extension do not necessarily become ready in the order a navigation-only setup expects. The recovery path lives in [background.js](../../background.js), while [gemini-content.js](../../gemini-content.js) makes re-execution safe.
+A Gemini tab can already be open when Wider Gemini becomes available. The same timing matters for a Chrome-installed Gemini site app: the page and extension do not necessarily become ready in the order a navigation-only setup expects. The recovery path lives in [background.js](../../src/background.js), while [gemini-content.js](../../src/content/gemini-content.js) makes re-execution safe.
 
 This article explains the current repository implementation and how to exercise its existing checks. It does not report a new macOS or live-Gemini cold-start verification.
 
 ## Two entry paths into the same page
 
-The [manifest](../../manifest.json) declares `settings-utils.js`, then `gemini-content.js`, plus `gemini-content.css`, for `https://gemini.google.com/*` at `document_start`. That is the normal navigation path.
+The [manifest](../../manifest.json) declares `src/shared/settings-utils.js`, then `src/content/gemini-content.js`, plus `src/content/gemini-content.css`, for `https://gemini.google.com/*` at `document_start`. That is the normal navigation path.
 
-The service worker registers `injectIntoOpenGeminiTabs` for both `chrome.runtime.onStartup` and `chrome.runtime.onInstalled`. It reads the content-script declaration from the manifest instead of maintaining a second file list. Its recovery sequence is:
+The service worker registers `injectIntoOpenTabs` for both `chrome.runtime.onStartup` and `chrome.runtime.onInstalled`. It reads each site's content-script declaration from the manifest instead of maintaining a second file list. For Gemini, its recovery sequence is:
 
 1. Query tabs matching the manifest's Gemini URL patterns.
 2. Skip tabs without an ID and discarded tabs.
@@ -18,7 +18,7 @@ The service worker registers `injectIntoOpenGeminiTabs` for both `chrome.runtime
 
 Reading the manifest in one place preserves the dependency order: settings normalization must exist before the content script reads `window.widerGeminiSettings`. The worker does not duplicate the settings-loading or layout logic; it gets the same content script onto the page.
 
-The manifest lists `storage`, `scripting`, and Gemini host access. It does not list the `tabs` permission. The [background test](../../tests/background.test.js) checks those manifest properties and that recovery queries only the declared URL patterns.
+The manifest lists `storage`, `scripting`, and Gemini and ChatGPT host access. It does not list the `tabs` permission. The [background test](../../tests/background.test.js) checks those manifest properties and that recovery queries only the declared URL patterns.
 
 ## Re-injection needs two guards
 

@@ -3,7 +3,7 @@
     "message": "Wider Gemini"
   },
   "appDesc": {
-    "message": "Make Google Gemini wider, denser, and easier to read with responsive width, reading density controls, and code wrapping."
+    "message": "Widen Gemini and ChatGPT with separate width settings. Adjust reading density, font size, and code wrapping in Gemini."
   },
   "headerSubtitle": {
     "message": "Make the conversation interface wider and more comfortable"
@@ -65,12 +65,6 @@
   "statusOff": {
     "message": "Off"
   },
-  "infoText1": {
-    "message": "Drag the slider or click preset buttons to adjust width"
-  },
-  "infoText2": {
-    "message": "Settings are automatically saved and applied to all Gemini tabs"
-  },
   "refreshing": {
     "message": "Refreshing page..."
   },
@@ -130,31 +124,31 @@
     "message": "Help & feedback"
   },
   "helpGettingStarted": {
-    "message": "Make Gemini fit your screen"
+    "message": "Make Gemini and ChatGPT fit your screen"
   },
   "helpOpenPopup": {
-    "message": "Open Gemini, then click the Wider Gemini toolbar icon to adjust your settings."
+    "message": "Open Gemini or ChatGPT, then click the Wider Gemini toolbar icon. Use the site buttons to choose which website to adjust."
   },
   "helpWidthTitle": {
     "message": "Conversation width"
   },
   "helpWidthBody": {
-    "message": "Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset; each unit has its own presets."
+    "message": "Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Gemini and ChatGPT save width, limits, and presets separately; each unit has its own presets. Expand Range & presets to edit them. The switch beside the width title pauses widening for that site and restores its original width. Your saved values and presets are kept; Gemini reading settings remain active."
   },
   "helpCodeTitle": {
     "message": "Code wrapping"
   },
   "helpCodeBody": {
-    "message": "Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. Turn it off to preserve unbroken code lines."
+    "message": "Gemini only: Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. Turn it off to preserve unbroken code lines."
   },
   "helpReadingTitle": {
     "message": "Text size & spacing"
   },
   "helpReadingBody": {
-    "message": "Adjust font size from 75% to 200% without zooming the whole page. At Auto density 0, native paragraph gaps and line-height proportions are preserved. Higher density gradually reduces native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density."
+    "message": "Gemini only: Adjust font size from 75% to 200% without zooming the whole page. At Auto density 0, native paragraph gaps and line-height proportions are preserved. Higher density gradually reduces native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density."
   },
   "helpLiveSettings": {
-    "message": "Changes apply to open Gemini tabs and are saved automatically. Sync across devices depends on your browser's sync settings."
+    "message": "Changes are saved automatically and apply live to open tabs of the selected website. The two websites keep separate settings; the popup language is shared. Sync across devices depends on your browser’s sync settings."
   },
   "helpOpenGemini": {
     "message": "Open Gemini"
@@ -163,13 +157,13 @@
     "message": "Something looks wrong?"
   },
   "helpTroubleshootPage": {
-    "message": "Check that you are on gemini.google.com and Wider Gemini is enabled. It also works with this website installed as a Chrome app (PWA). Google's native desktop apps are not supported."
+    "message": "Check that you are on gemini.google.com or chatgpt.com and Wider Gemini is enabled with access to that site. Chrome-installed web apps (PWAs) use the same webpages. Native desktop apps and Chrome’s built-in Gemini panel are not supported."
   },
   "helpTroubleshootRefresh": {
-    "message": "If a setting does not appear after installing or updating the extension, reload the Gemini page once and try again."
+    "message": "If a setting does not appear after installing or updating the extension, reload the affected page once. An unsupported-layout notice means widening is not applied to the current page, so its original width is preserved. You can also pause widening for just that site using its width switch."
   },
   "helpTroubleshootReport": {
-    "message": "If the problem continues, note the steps to reproduce it and your window size. A screenshot with private content removed can help; mention any other extensions that change Gemini's layout."
+    "message": "If the problem continues, note the website, steps to reproduce it, and window size. A screenshot with private content removed can help; mention other extensions that change the page layout."
   },
   "helpReportIssue": {
     "message": "Report a problem"
@@ -178,7 +172,7 @@
     "message": "Settings report"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser major version, platform, and layout settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
+    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser major version, platform, Gemini layout settings, and ChatGPT width settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
   },
   "helpGenerateReport": {
     "message": "Generate report"
@@ -229,7 +223,7 @@
     "message": "Large text"
   },
   "taskHint": {
-    "message": "Uses your width limits. Restore returns the four settings above to their values before the last Apply."
+    "message": "Uses your width limits. Restore returns width, font size, spacing, and code wrapping to their values before the last Apply."
   },
   "taskApply": {
     "message": "Apply"
@@ -256,9 +250,42 @@
     "message": "Task presets"
   },
   "helpTaskBody": {
-    "message": "Choose Long reading, Tables, Code, or Large text, review the settings, then click Apply. These change width, font size, spacing, and code wrapping. Your width limits still apply. Restore previous settings undoes the most recent task preset on this device, even after closing the popup; it replaces any later changes to those settings."
+    "message": "Gemini only: Choose Long reading, Tables, Code, or Large text, review the settings, then click Apply. These change width, font size, spacing, and code wrapping. Your width limits still apply. Restore previous settings undoes the most recent task preset on this device, even after closing the popup; it replaces any later changes to those settings."
   },
   "autoSpacingHint": {
     "message": "Auto follows each message's native spacing. Moving either slider applies both values below manually."
+  },
+  "settingsSite": {
+    "message": "Website settings"
+  },
+  "currentSite": {
+    "message": "Current"
+  },
+  "chatgptWidthOnly": {
+    "message": "ChatGPT currently supports width adjustment."
+  },
+  "widthOptions": {
+    "message": "Range & presets"
+  },
+  "readingSettings": {
+    "message": "Reading & typography"
+  },
+  "settingsSaveError": {
+    "message": "Could not save settings. Reopen the popup and try again."
+  },
+  "widthEnabled": {
+    "message": "Enable widening"
+  },
+  "widthPaused": {
+    "message": "Widening is paused. Your width and presets are saved."
+  },
+  "layoutUnsupported": {
+    "message": "This page layout is not supported yet. Original page width is preserved."
+  },
+  "layoutLoading": {
+    "message": "The page is loading. Reopen these settings when it is ready."
+  },
+  "layoutUnavailable": {
+    "message": "Page status unavailable. Refresh the page and try again."
   }
 }

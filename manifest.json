@@ -1,7 +1,8 @@
 {
     "manifest_version": 3,
     "name": "__MSG_appName__",
-    "version": "2.8.0",
+    "version": "3.0.0",
+    "version_name": "3.0.0-rc.1",
     "description": "__MSG_appDesc__",
     "default_locale": "en",
     "author": "Wider Gemini",
@@ -10,13 +11,14 @@
         "scripting"
     ],
     "host_permissions": [
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*"
     ],
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "src/background.js"
     },
     "action": {
-        "default_popup": "popup.html",
+        "default_popup": "src/popup/popup.html",
         "default_icon": {
             "16": "icons/icon16.png",
             "48": "icons/icon48.png",
@@ -34,11 +36,24 @@
                 "https://gemini.google.com/*"
             ],
             "js": [
-                "settings-utils.js",
-                "gemini-content.js"
+                "src/shared/settings-utils.js",
+                "src/content/gemini-content.js"
             ],
             "css": [
-                "gemini-content.css"
+                "src/content/gemini-content.css"
+            ],
+            "run_at": "document_start"
+        },
+        {
+            "matches": [
+                "https://chatgpt.com/*"
+            ],
+            "js": [
+                "src/shared/settings-utils.js",
+                "src/content/chatgpt-content.js"
+            ],
+            "css": [
+                "src/content/chatgpt-content.css"
             ],
             "run_at": "document_start"
         }

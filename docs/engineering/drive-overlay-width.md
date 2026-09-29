@@ -2,7 +2,7 @@
 
 A conversation-width extension needs to widen the reading surface without resizing every interface that happens to appear above it. Wider Gemini previously applied the conversation limit to generic overlay and dialog containers. The repository records the Drive-picker correction in commit `9029e1c` (`Fix Drive picker layout with custom width`).
 
-The useful engineering lesson is the boundary: an upload picker owns its own layout, while the conversation setting belongs to messages and the inner composer. This article follows the current [CSS](../../gemini-content.css), [content script](../../gemini-content.js), and [browser fixture](../../tests/e2e/message-width.js). It does not claim a new live Drive or macOS verification.
+The useful engineering lesson is the boundary: an upload picker owns its own layout, while the conversation setting belongs to messages and the inner composer. This article follows the current [CSS](../../src/content/gemini-content.css), [content script](../../src/content/gemini-content.js), and [browser fixture](../../tests/e2e/message-width.js). It does not claim a new live Drive or macOS verification.
 
 ## How a width rule reached the wrong interface
 

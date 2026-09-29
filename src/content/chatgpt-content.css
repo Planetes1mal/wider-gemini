@@ -1,0 +1,13 @@
+/* 沿用 ChatGPT 的原生 content -> body 宽度与 padding 计算链。
+   只在实际宽度拥有者覆盖变量，不改 :root/body、全局 form、表格或浮层。 */
+:where(html.wider-chatgpt-width-active) :where(main) :is(
+    [data-thread-user-message-navigation-content][class~="max-w-(--thread-body-max-width)"],
+    [data-pip-obstacle="thread-footer"][class~="max-w-(--thread-body-max-width)"],
+    [class~="max-w-(--thread-body-max-width)"]:has(form[data-chatgpt-composer][data-composer-placement="home"])
+):not(
+    :where([role="dialog"], [role="menu"], dialog, [data-composer-overlay-floating-ui]),
+    :where([role="dialog"], [role="menu"], dialog, [data-composer-overlay-floating-ui]) *
+) {
+    --thread-content-responsive-max-width: min(var(--wg-chatgpt-width, 1000px),
+        calc(var(--wg-chatgpt-available-width, 100%) - var(--thread-body-inline-padding, 0px) * 2)) !important;
+}

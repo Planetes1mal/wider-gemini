@@ -31,3 +31,4 @@ jobs:
           Write-Host "Google Chrome $chromeVersion ($chromePath)"
           $env:WG_CHROME = $chromePath
           node tests/e2e/message-width.js
+          node tests/e2e/chatgpt-reading.js

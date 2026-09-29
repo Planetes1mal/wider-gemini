@@ -11,3 +11,51 @@
     --thread-content-responsive-max-width: min(var(--wg-chatgpt-width, 1000px),
         calc(var(--wg-chatgpt-available-width, 100%) - var(--thread-body-inline-padding, 0px) * 2)) !important;
 }
+
+/* 阅读排版：内容脚本为消息正文里的文字拥有者记录原生字号、行高与外边距，
+   这里只按比例改写。html 上没有 data-wgc-reading 时（默认值或暂停）完全保持原生。 */
+:where(html[data-wgc-reading~="font"]) [data-wgc-font] {
+    font-size: calc(var(--wgc-font) * var(--wgc-font-scale, 1)) !important;
+}
+
+/* 代码行与表格行只随字号等比缩放，不参与密度压缩；显式行高也挡住父级覆盖的继承。 */
+:where(html:is([data-wgc-reading~="font"], [data-wgc-reading~="line"], [data-wgc-reading~="custom"]))
+    [data-wgc-line="fixed"] {
+    line-height: calc(var(--wgc-line) * var(--wgc-font-scale, 1)) !important;
+}
+
+:where(html[data-wgc-reading~="line"]) [data-wgc-line="prose"] {
+    line-height: calc((var(--wgc-line) - var(--wgc-line-cut, 0px) * var(--wgc-density, 0)) *
+        var(--wgc-font-scale, 1)) !important;
+}
+
+/* 只缩小正的原生间距，保留有意为之的负外边距。 */
+:where(html[data-wgc-reading~="space"]) [data-wgc-space] {
+    margin-top: min(var(--wgc-mt), calc(var(--wgc-mt) * var(--wgc-space-scale, 1))) !important;
+    margin-bottom: min(var(--wgc-mb), calc(var(--wgc-mb) * var(--wgc-space-scale, 1))) !important;
+}
+
+/* 手动间距优先于自动密度；0px 段距有效。 */
+:where(html[data-wgc-reading~="custom"]) [data-wgc-line="prose"] {
+    line-height: var(--wgc-manual-line) !important;
+}
+
+:where(html[data-wgc-reading~="custom"]) [data-wgc-space] {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+:where(html[data-wgc-reading~="custom"]) [data-wgc-space="after"] {
+    margin-top: var(--wgc-manual-gap) !important;
+}
+
+/* 用户消息铺满对话列：仅在宽度生效时，保留原生气泡外观与复制/编辑按钮；
+   编辑中的消息、图片与附件保持原生。 */
+:where(html.wider-chatgpt-width-active[data-wgc-full]) [data-message-author-role="user"]
+    [class*="max-w-(--user-chat-width"]:has(.user-message-bubble-color):not(:has(textarea)),
+:where(html.wider-chatgpt-width-active[data-wgc-full]) [data-message-author-role="user"]
+    .user-message-bubble-color:not(:has(textarea)) {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: start !important;
+}

@@ -5,21 +5,46 @@
     window.widerChatgptContentLoaded = true;
 
     const settingsUtils = window.widerGeminiSettings;
-    const storageKey = settingsUtils.CHATGPT_WIDTH_KEY;
+    const WIDTH_KEY = settingsUtils.CHATGPT_WIDTH_KEY;
+    const STORAGE_KEYS = settingsUtils.getSiteStorageKeys('chatgpt');
     const ACTIVE_CLASS = 'wider-chatgpt-width-active';
     const NATIVE_WIDTH = '[class~="max-w-(--thread-body-max-width)"]';
     const HOME_OWNER = `${NATIVE_WIDTH}:has(form[data-chatgpt-composer][data-composer-placement="home"])`;
     const WIDTH_OWNER = '[data-thread-user-message-navigation-content], ' +
         '[data-pip-obstacle="thread-footer"], form[data-chatgpt-composer], ' + HOME_OWNER;
     const EXCLUDED = '[role="dialog"], [role="menu"], dialog, [data-composer-overlay-floating-ui]';
-    let settings = settingsUtils.normalizeSiteWidthSettings({}, 'chatgpt');
+
+    // 阅读排版只作用于消息正文里的文字拥有者，不给 .markdown 根设字号，
+    // 以免 font: inherit 的复制/展开按钮、引用标签跟着变大。
+    const USER_TEXT = '[data-message-author-role="user"] .whitespace-pre-wrap';
+    const MESSAGE_ROOT = `:is([data-message-author-role="assistant"] .markdown, ${USER_TEXT})`;
+    const FONT_TARGET = `p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre code, ${USER_TEXT}`;
+    // 密度只压缩正文行框；代码、表格行保持原生行高，只随字号等比缩放。
+    const PROSE_LINE = `p, li, h1, h2, h3, h4, h5, h6, blockquote, ${USER_TEXT}`;
+    const FIXED_LINE = 'pre, td, th';
+    const BLOCK_SPACING = 'p, ul, ol, blockquote, h1, h2, h3, h4, h5, h6, hr';
+    const READING_TARGET = `${FONT_TARGET}, ${FIXED_LINE}, ${BLOCK_SPACING}`;
+    const READING_EXCLUDED = `${EXCLUDED}, form, button, textarea, [contenteditable], .katex, svg, canvas, iframe`;
+    const READING_ATTR = 'data-wgc-reading';
+    const FULL_ATTR = 'data-wgc-full';
+    const NODE_MARKERS = ['data-wgc-font', 'data-wgc-line', 'data-wgc-space'];
+    const NODE_PROPERTIES = ['--wgc-font', '--wgc-line', '--wgc-line-cut', '--wgc-mt', '--wgc-mb'];
+    const ROOT_PROPERTIES = ['--wgc-font-scale', '--wgc-density', '--wgc-space-scale',
+        '--wgc-manual-line', '--wgc-manual-gap'];
+
+    let settings = settingsUtils.normalizeSiteSettings({}, 'chatgpt');
+    let storedSettings = {};
+    let pendingSettingsChanges = {};
     let settingsLoaded = false;
-    let revision = 0;
+    let readToken = 0;
+    let siteActive = false;
     let supported = false;
     let measuredParent = null;
     let footerProperty = null;
     let rootProperty = null;
     let layoutFrame = null;
+    let readingObserver = null;
+    let measuredNodes = new WeakSet();
 
     function isExtensionContextValid() {
         try {
@@ -64,7 +89,7 @@
         const footer = scrollArea && findVisibleOwner('[data-pip-obstacle="thread-footer"]', scrollArea);
         const home = findVisibleOwner(`main ${HOME_OWNER}`);
         supported = Boolean((transcript && footer) || home);
-        const active = isExtensionContextValid() && settingsLoaded && settings.widthEnabled !== false && supported;
+        const active = siteActive && settings.widthEnabled !== false && supported;
         if (root.classList.contains(ACTIVE_CLASS) !== active) root.classList.toggle(ACTIVE_CLASS, active);
 
         const parent = active && footer ? transcript.parentElement : null;
@@ -100,6 +125,7 @@
 
     function observeLayout() {
         syncLayout();
+        applyReading();
         const hasOwner = node => node.nodeType === 1 && (node.matches(WIDTH_OWNER) || node.querySelector(WIDTH_OWNER));
         new MutationObserver(function (mutations) {
             const changedOwner = mutations.some(mutation => mutation.type === 'attributes'
@@ -114,51 +140,218 @@
         });
     }
 
-    function getLayoutStatus() {
-        syncLayout();
-        const enabled = settings.widthEnabled !== false;
-        const status = !settingsLoaded ? 'loading' : !enabled ? 'paused' : supported ? 'active'
-            : document.readyState === 'loading' ? 'loading' : 'unsupported';
-        return { site: 'chatgpt', enabled, supported, status };
+    // ---- 阅读排版 ----
+
+    function collectReadingNodes(scopes) {
+        const nodes = new Set();
+        const add = node => {
+            if (node && node.nodeType === 1 && node.isConnected && node.matches(READING_TARGET) &&
+                node.closest(MESSAGE_ROOT) && !node.closest(READING_EXCLUDED)) nodes.add(node);
+        };
+        for (const scope of scopes) {
+            if (!scope || scope.nodeType !== 1 || !scope.isConnected) continue;
+            const inside = scope.closest(MESSAGE_ROOT);
+            add(scope);
+            scope.querySelectorAll(inside ? READING_TARGET : `${MESSAGE_ROOT}, ${MESSAGE_ROOT} :is(${READING_TARGET})`)
+                .forEach(add);
+            // 新增或移除段落会改变相邻块的 :first-child / :last-child 原生外边距。
+            if (inside) {
+                for (const sibling of [scope.previousElementSibling, scope.nextElementSibling]) {
+                    if (sibling) measuredNodes.delete(sibling);
+                    add(sibling);
+                }
+            }
+        }
+        return [...nodes].filter(node => !measuredNodes.has(node));
     }
 
-    function updateSettings(stored) {
-        revision++;
-        settingsLoaded = true;
-        settings = settingsUtils.normalizeSiteWidthSettings({ [storageKey]: stored }, 'chatgpt');
+    // 采样前临时撤下本扩展的排版规则，同一任务内恢复；先批量读取再批量写入。
+    function measureReading(scopes) {
+        const pending = collectReadingNodes(scopes);
+        if (!pending.length) return;
+        const root = document.documentElement;
+        const tokens = root.getAttribute(READING_ATTR);
+        if (tokens !== null) root.removeAttribute(READING_ATTR);
+        let metrics;
+        try {
+            metrics = pending.map(node => {
+                const style = getComputedStyle(node);
+                return {
+                    node, display: style.display,
+                    font: parseFloat(style.fontSize), line: parseFloat(style.lineHeight),
+                    top: parseFloat(style.marginTop), bottom: parseFloat(style.marginBottom)
+                };
+            });
+        } finally {
+            if (tokens !== null) root.setAttribute(READING_ATTR, tokens);
+        }
+        for (const { node, display, font, line, top, bottom } of metrics) {
+            if (node.matches(FONT_TARGET) && font > 0) {
+                node.style.setProperty('--wgc-font', `${font}px`);
+                node.setAttribute('data-wgc-font', '');
+            }
+            if (line > 0 && node.matches(`${PROSE_LINE}, ${FIXED_LINE}`)) {
+                const prose = node.matches(PROSE_LINE);
+                node.style.setProperty('--wgc-line', `${line}px`);
+                if (prose) node.style.setProperty('--wgc-line-cut', `${line - Math.min(line, Math.max(font * 1.15, line * 0.82))}px`);
+                node.setAttribute('data-wgc-line', prose ? 'prose' : 'fixed');
+            }
+            if (node.matches(BLOCK_SPACING) && display !== 'inline' && display !== 'contents' &&
+                Number.isFinite(top) && Number.isFinite(bottom)) {
+                node.style.setProperty('--wgc-mt', `${top}px`);
+                node.style.setProperty('--wgc-mb', `${bottom}px`);
+                node.setAttribute('data-wgc-space', node.previousElementSibling ? 'after' : 'first');
+            }
+            measuredNodes.add(node);
+        }
+    }
+
+    function startReading() {
+        if (readingObserver || !document.body) return;
+        measureReading([document.body]);
+        // 流式输出主要追加文本节点；只处理新增/移除的元素所在范围，不整页重扫。
+        // 在观察回调里同步采样，新块在首次绘制前即获得设置（后台标签页也不依赖 rAF）。
+        readingObserver = new MutationObserver(function (mutations) {
+            if (!siteActive) return;
+            const scopes = [];
+            for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) if (node.nodeType === 1) scopes.push(node);
+                if (mutation.removedNodes.length && mutation.target.nodeType === 1) {
+                    for (const child of mutation.target.children) measuredNodes.delete(child);
+                    scopes.push(mutation.target);
+                }
+            }
+            if (scopes.length) measureReading(scopes);
+        });
+        readingObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // 暂停时撤回所有标记与采样值，释放节点记录；恢复时重新按原生样式采样。
+    function stopReading() {
+        if (readingObserver) readingObserver.disconnect();
+        readingObserver = null;
+        const root = document.documentElement;
+        root.removeAttribute(READING_ATTR);
+        root.removeAttribute(FULL_ATTR);
+        ROOT_PROPERTIES.forEach(name => root.style.removeProperty(name));
+        document.querySelectorAll(NODE_MARKERS.map(name => `[${name}]`).join(', ')).forEach(node => {
+            NODE_MARKERS.forEach(name => node.removeAttribute(name));
+            NODE_PROPERTIES.forEach(name => node.style.removeProperty(name));
+        });
+        measuredNodes = new WeakSet();
+    }
+
+    function applyReading() {
+        const root = document.documentElement;
+        if (!root) return;
+        if (!siteActive) {
+            stopReading();
+            return;
+        }
+        startReading();
+        const progress = settings.messageCompactness / 100;
+        const custom = settings.messageSpacingCustom;
+        const tokens = [];
+        if (settings.messageFontSize !== 100) tokens.push('font');
+        if (custom) tokens.push('custom');
+        else if (progress > 0) tokens.push('line', 'space');
+        else if (settings.messageFontSize !== 100) tokens.push('line');
+        // 默认值（100%、自动 0、手动关闭）不产生任何排版覆盖。
+        root.style.setProperty('--wgc-font-scale', String(settings.messageFontSize / 100));
+        root.style.setProperty('--wgc-density', String(progress));
+        root.style.setProperty('--wgc-space-scale', String(1 - 0.875 * progress));
+        root.style.setProperty('--wgc-manual-line', String(settings.messageLineHeight));
+        root.style.setProperty('--wgc-manual-gap', `${settings.messageParagraphSpacing}px`);
+        if (tokens.length) root.setAttribute(READING_ATTR, tokens.join(' '));
+        else root.removeAttribute(READING_ATTR);
+        // 用户消息铺满还依赖有效宽度（CSS 同时要求宽度生效类）。
+        if (settings.userFullWidth) root.setAttribute(FULL_ATTR, '');
+        else root.removeAttribute(FULL_ATTR);
+    }
+
+    // ---- 设置与协议 ----
+
+    function applyAllSettings() {
+        if (!settingsLoaded) return;
+        settings = settingsUtils.normalizeSiteSettings(storedSettings, 'chatgpt');
+        siteActive = isExtensionContextValid() && settings.siteEnabled;
         syncLayout();
+        if (document.readyState !== 'loading') applyReading();
+    }
+
+    // 读取期间收到更新的 storage 事件时，旧读取结果作废。
+    function readSettings() {
+        if (!isExtensionContextValid()) return;
+        const token = ++readToken;
+        chrome.storage.sync.get(STORAGE_KEYS, function (result) {
+            if (!isExtensionContextValid() || chrome.runtime.lastError || token !== readToken) return;
+            storedSettings = { ...result, ...pendingSettingsChanges };
+            pendingSettingsChanges = {};
+            settingsLoaded = true;
+            applyAllSettings();
+        });
+    }
+
+    // enabled 保留旧含义（宽度开关）；pauseReason 区分整站暂停与仅宽度关闭。
+    function getLayoutStatus() {
+        syncLayout();
+        const widthEnabled = settings.widthEnabled !== false;
+        const pauseReason = !settings.siteEnabled ? 'site' : !widthEnabled ? 'width' : null;
+        const status = !settingsLoaded ? 'loading' : pauseReason === 'site' ? 'sitePaused'
+            : pauseReason === 'width' ? 'paused' : supported ? 'active'
+                : document.readyState === 'loading' ? 'loading' : 'unsupported';
+        return {
+            site: 'chatgpt', protocolVersion: settingsUtils.PROTOCOL_VERSION,
+            siteEnabled: settings.siteEnabled, widthEnabled, enabled: widthEnabled, supported, status, pauseReason,
+            width: { active: document.documentElement.classList.contains(ACTIVE_CLASS) },
+            reading: { active: siteActive, messages: siteActive && !!document.querySelector(MESSAGE_ROOT) }
+        };
     }
 
     if (!isExtensionContextValid()) return;
 
     chrome.storage.onChanged.addListener(function (changes, area) {
-        if (area === 'sync' && changes[storageKey] && isExtensionContextValid()) {
-            updateSettings(changes[storageKey].newValue);
+        if (area !== 'sync' || !isExtensionContextValid()) return;
+        const values = {};
+        for (const key of STORAGE_KEYS) {
+            if (Object.hasOwn(changes, key)) values[key] = changes[key].newValue;
         }
+        if (!Object.keys(values).length) return;
+        ++readToken;
+        if (!settingsLoaded) {
+            Object.assign(pendingSettingsChanges, values);
+            readSettings();
+            return;
+        }
+        Object.assign(storedSettings, values);
+        applyAllSettings();
     });
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (!isExtensionContextValid()) return;
         if (request.action === 'getLayoutStatus') {
             sendResponse(getLayoutStatus());
-        } else if (request.action === 'updateWidthEnabled') {
-            updateSettings({ ...settings, widthEnabled: request.enabled !== false });
-            sendResponse({ success: true });
-        } else if (request.action === 'updateWidthSetting') {
-            updateSettings({
-                ...settings, ...request.ranges, chatWidthSetting: request.setting,
-                widthEnabled: typeof request.enabled === 'boolean' ? request.enabled : settings.widthEnabled
-            });
+        } else if (['updateSiteEnabled', 'updateReadingSettings', 'refreshSettings'].includes(request.action)) {
+            // v2：重新读取已保存设置，而不是回放 popup 捕获的值。
+            if (settingsLoaded) readSettings();
+            sendResponse({ success: true, protocolVersion: settingsUtils.PROTOCOL_VERSION });
+        } else if (request.action === 'updateWidthEnabled' || request.action === 'updateWidthSetting') {
+            // 旧版 popup：只合并宽度字段；未加载前由 storage 事件与首次读取负责，不能提前标记已加载。
+            if (settingsLoaded) {
+                const width = settingsUtils.normalizeSiteWidthSettings(storedSettings, 'chatgpt');
+                if (typeof request.enabled === 'boolean') width.widthEnabled = request.enabled;
+                if (request.action === 'updateWidthSetting') {
+                    Object.assign(width, request.ranges, { chatWidthSetting: request.setting });
+                }
+                storedSettings[WIDTH_KEY] = width;
+                applyAllSettings();
+            }
             sendResponse({ success: true });
         }
     });
 
-    // 未识别结构时不启用 CSS；后续 SPA 挂载或替换已知容器会重新识别。
+    // 未识别结构时不启用宽度 CSS；后续 SPA 挂载或替换已知容器会重新识别。
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observeLayout, { once: true });
     else observeLayout();
-    const readRevision = revision;
-    chrome.storage.sync.get([storageKey], function (stored) {
-        if (!isExtensionContextValid() || chrome.runtime.lastError || revision !== readRevision) return;
-        updateSettings(stored[storageKey]);
-    });
+    readSettings();
 })();

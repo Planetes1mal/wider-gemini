@@ -11,9 +11,12 @@ Internal candidate for manual installation. This is not a stable Chrome Web Stor
 ### Features
 
 - Added ChatGPT conversation and input width controls, with separate width, unit, limits, and presets for each site. Existing Gemini settings are preserved.
-- Added Gemini / ChatGPT tabs to the popup, with width controls first, collapsible advanced settings, and consistent styling for dropdowns, inputs, and toggles. Reading style, code wrapping, full-width user messages, and task presets remain Gemini-only.
-- Added a separate widening switch for each site. Pausing restores the site's original width without deleting saved values or presets. Unrecognized layouts retain their original width and show a current-page notice in the popup.
-- Extended startup injection to ChatGPT pages and added ChatGPT width and range values to the optional local diagnostic report. Custom preset names and page content remain excluded.
+- Added Gemini / ChatGPT tabs to the popup, with width controls first, collapsible advanced settings, and consistent styling for dropdowns, inputs, and toggles.
+- Added ChatGPT reading controls: font size, reading density, manual line height and paragraph spacing, and full-width user messages. Headings, code, and tables keep their proportions; code lines, table rows, formulas, message toolbars, and the composer keep native spacing. At their defaults nothing changes, and ChatGPT's own code-wrap button is left untouched.
+- Added ChatGPT task presets (Long reading, Wide for tables and code, Large text). Each site keeps its own one-step Restore, which survives reopening the popup and reports interrupted saves instead of restoring stale values.
+- Added an Enable switch for each site below the site tabs. Turning it off pauses every extension effect on that site, including Gemini's code-wrap and reading styles, while all settings remain editable and saved; editing or applying a task never re-enables the site. The separate width switch still turns off only widening. Unrecognized layouts retain their original width and show a current-page notice in the popup.
+- The popup reports when an open page still runs an older extension version instead of reloading it.
+- Extended startup injection to ChatGPT pages and added each site's Enable switch and ChatGPT width, range, and reading values to the optional local diagnostic report. Custom preset names and page content remain excluded.
 
 ### Refactor
 

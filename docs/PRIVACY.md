@@ -10,7 +10,7 @@ This policy describes how the **Wider Gemini** browser extension (“Extension�
 
 ### 1. Who we are
 
-Wider Gemini is an open-source Chrome extension that adjusts layout and styling on [Google Gemini](https://gemini.google.com/) and conversation width on [ChatGPT](https://chatgpt.com/). It is distributed through the Chrome Web Store and other channels chosen by the publisher.
+Wider Gemini is an open-source Chrome extension that adjusts layout and styling on [Google Gemini](https://gemini.google.com/) and [ChatGPT](https://chatgpt.com/). It is distributed through the Chrome Web Store and other channels chosen by the publisher.
 
 ### 2. Information the Extension processes
 
@@ -22,7 +22,7 @@ Applying a Gemini task preset also saves one previous Gemini layout in device-lo
 
 **Site access.** The Extension requests access to `https://gemini.google.com/*` and `https://chatgpt.com/*` to inspect page structure and apply CSS and related UI adjustments. The `scripting` permission restores missing content scripts when the extension starts, installs, or updates; `storage` saves preferences. No browsing-history `tabs` permission is requested. The Extension does **not** collect or transmit your prompts, replies, uploaded files, or other page content.
 
-**Optional diagnostic copy.** The help page can display the extension version, browser version, platform, Gemini layout settings, and ChatGPT width and range settings on your device. It excludes conversations, page URLs, titles, browsing history, and custom preset names. Nothing is sent automatically: copying only puts the displayed text on your clipboard. You choose whether to share it in a public GitHub issue.
+**Optional diagnostic copy.** The help page can display the extension version, browser version, platform, each site's Enable switch, Gemini layout settings, and ChatGPT width, range, and reading settings on your device. It excludes conversations, page URLs, titles, browsing history, and custom preset names. Nothing is sent automatically: copying only puts the displayed text on your clipboard. You choose whether to share it in a public GitHub issue.
 
 ### 3. Third parties
 
@@ -46,7 +46,7 @@ Questions about this policy or the Extension may be reported via the GitHub repo
 
 ### 1. 主体说明
 
-**Wider Gemini** 是一款开源 Chrome 扩展，用于调整 [Google Gemini](https://gemini.google.com/) 网页上的版式与样式，以及 [ChatGPT](https://chatgpt.com/) 网页的对话宽度。扩展通过 Chrome 应用商店及发布者选择的其他渠道分发。
+**Wider Gemini** 是一款开源 Chrome 扩展，用于调整 [Google Gemini](https://gemini.google.com/) 和 [ChatGPT](https://chatgpt.com/) 网页上的版式与样式。扩展通过 Chrome 应用商店及发布者选择的其他渠道分发。
 
 ### 2. 扩展处理的信息
 
@@ -58,7 +58,7 @@ Questions about this policy or the Extension may be reported via the GitHub repo
 
 **网站访问范围。** 扩展申请访问 `https://gemini.google.com/*` 和 `https://chatgpt.com/*`，检查页面结构并以注入 CSS 等方式调整界面。`scripting` 权限用于在扩展启动、安装或更新时补注入未加载的内容脚本；`storage` 用于保存偏好。不申请读取浏览记录的 `tabs` 权限。扩展**不会**收集或传输您的提问、回答、上传文件或其他页面内容。
 
-**可选的诊断复制。** 帮助页可以在本机显示扩展版本、浏览器版本、平台、Gemini 版式设置及 ChatGPT 宽度和范围设置，不包含对话、页面网址、标题、浏览记录或自定义预设名称。不会自动发送任何内容；复制操作仅将已显示的文本放入剪贴板。是否将其分享至公开的 GitHub Issue，由您自行决定。
+**可选的诊断复制。** 帮助页可以在本机显示扩展版本、浏览器版本、平台、各网站的启用开关、Gemini 版式设置及 ChatGPT 宽度、范围和阅读设置，不包含对话、页面网址、标题、浏览记录或自定义预设名称。不会自动发送任何内容；复制操作仅将已显示的文本放入剪贴板。是否将其分享至公开的 GitHub Issue，由您自行决定。
 
 ### 3. 第三方
 

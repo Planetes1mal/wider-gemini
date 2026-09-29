@@ -81,3 +81,15 @@ Every task sets density to 0 and clears custom spacing. Actual width respects yo
 **Restore previous settings** restores the width, font, spacing, and code-wrapping settings saved immediately before the latest task application on this device. The single saved snapshot survives closing the popup. Restoring also replaces any later manual changes to those four setting groups; it is not a multi-step history. These task shortcuts are internal, unreleased work, so a store-installed version may not show them.
 
 Maintainer references: [settings defaults and normalization](../../src/shared/settings-utils.js), [layout rules](../../src/content/gemini-content.css), [content behavior](../../src/content/gemini-content.js), and [diagnostic report fields](../../src/help/help.js).
+
+## ChatGPT in the current internal source — unreleased
+
+Select the **ChatGPT** tab in the popup. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
+
+| Task | Requested width | Font |
+|---|---|---|
+| Long reading | 1000 px | 110% |
+| Wide (tables & code) | 90% | 100% |
+| Large text | 1000 px | 140% |
+
+Use **Enable on ChatGPT** (or **Enable on Gemini**) below the site tabs to compare with the original page: turning it off pauses everything on that site while keeping your settings.

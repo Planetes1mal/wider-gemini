@@ -1,6 +1,6 @@
 # Engineering and compatibility
 
-Wider Gemini adjusts the reading layout of `gemini.google.com` and the conversation width of `chatgpt.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
+Wider Gemini adjusts the conversation width and reading layout of `gemini.google.com` and `chatgpt.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
 
 ## Implementation case studies
 
@@ -31,11 +31,11 @@ flowchart TD
     Inject --> Content
 ```
 
-[settings-utils.js](../src/shared/settings-utils.js) normalizes stored widths, units, presets, density, text size, and language. Gemini keeps its existing top-level storage fields; ChatGPT's width, unit, ranges, and presets live in `chatgptWidthSettings`. Each site's `widthEnabled` defaults to true; only an explicit false pauses widening. `normalizeSiteWidthSettings(stored, site)` reads the selected site's width fields. Gemini's reading, code-wrap, user-message, and task-preset controls do not apply to ChatGPT.
+[settings-utils.js](../src/shared/settings-utils.js) normalizes stored widths, units, presets, density, text size, and language. Gemini keeps its existing top-level storage fields; ChatGPT's width, unit, ranges, and presets live in `chatgptWidthSettings`. ChatGPT's font size, density, manual spacing, and user-message full width live in a separate `chatgptReadingSettings` object, so writing the width object never erases them; it has no code-wrap field. `geminiEnabled` and `chatgptEnabled` are per-site Enable switches, independent of `widthEnabled`. All three default to true; only an explicit false pauses, and an existing width-off preference is not migrated to a site pause. `normalizeSiteSettings(stored, site)` returns one site's complete view. Popup writes use allowlisted patches (`getSiteReadingPatch` merges the latest stored reading values), so a partial edit is never normalized into a full object that overwrites other fields. Task presets and their one-step undo records (`taskPresetUndo`, `chatgptTaskPresetUndo` in local storage) are per site; an undo record carries an apply/restore pending state that is reconciled against the actual saved values when the popup reopens.
 
-The popup persists settings and sends updates only to the selected site's open tabs; each content script also observes its storage fields. Both paths can deliver the same setting, so applying a setting must be harmless when repeated. A page reload is a fallback for a tab without a receiving content script.
+The popup persists settings and sends updates only to the selected site's open tabs; each content script also observes its storage fields. Both paths can deliver the same setting, so applying a setting must be harmless when repeated. Width changes keep the field messages understood by older content scripts, and a page reload remains the fallback for a tab without a receiving width content script. Enable-switch, reading, and task changes use protocol-2 notifications (`updateSiteEnabled`, `updateReadingSettings`, `refreshSettings`) that ask the content script to reread saved settings rather than replay values captured by the popup. These never reload a page; an older content script that does not acknowledge protocol 2 is reported in the popup instead.
 
-The popup asks `getLayoutStatus` on opening, site selection, and pause/resume. It displays a page-status notice only when the current tab belongs to the selected site; delayed replies are checked against the current site and tab before display. Unsupported or still-loading pages are not presented as successfully widened. This status describes recognized layout structure, not acceptance of every page feature or platform. No notice is inserted into the webpage.
+The popup asks `getLayoutStatus` on opening, site selection, and pause/resume. It displays a page-status notice only when the current tab belongs to the selected site; delayed replies are checked against the current site and tab before display. Unsupported or still-loading pages are not presented as successfully widened. Protocol 2 responses report `siteEnabled`, `widthEnabled`, and `pauseReason` separately; the legacy `enabled` field keeps its width-switch meaning. This status describes recognized layout structure, not acceptance of every page feature or platform. No notice is inserted into the webpage.
 
 Normally Chrome injects the manifest's content scripts on navigation. During browser or installed-site app startup, a page can be ready before the extension. `background.js` processes each site's manifest entry and checks its isolated-world loaded flag (`widerGeminiContentLoaded` or `widerChatgptContentLoaded`). It injects only that entry's CSS and JS when missing. Discarded tabs are skipped. Content-script guards keep repeated injection from installing duplicate listeners or observers.
 
@@ -53,11 +53,13 @@ Gemini can limit width at several nested message containers. Changing the outer 
 
 The [2.5.0 release](../CHANGELOG.md) documents the startup and duplicate-initialization fixes. [PR #10](https://github.com/Planetes1mal/wider-gemini/pull/10) and the 2.6.0 release document the later message-width compatibility work.
 
-Width styles are enabled only after saved settings have loaded, widening is on, and the site's known layout structure is present. Gemini recognizes its conversation or inner-input containers; ChatGPT requires the observed native width-owner class plus the transcript/footer pair or home composer. Unknown structures keep their native width rather than falling back to broad selectors. Pausing removes the width activation class and restores inline properties still owned by the extension, including their prior priorities. It preserves values subsequently written by the site. Saved width settings and presets are retained, and Gemini reading settings remain independent.
+Width styles are enabled only after saved settings have loaded, widening is on, and the site's known layout structure is present. Gemini recognizes its conversation or inner-input containers; ChatGPT requires the observed native width-owner class plus the transcript/footer pair or home composer. Unknown structures keep their native width rather than falling back to broad selectors. Pausing removes the width activation class and restores inline properties still owned by the extension, including their prior priorities. It preserves values subsequently written by the site. Saved width settings and presets are retained, and reading settings remain independent. The Enable switch goes further: it removes the site-active class that gates every extension rule, including Gemini's default code-nowrap override, clears measured reading markers, and leaves content inserted while paused untouched. Resuming samples native metrics again.
 
 ChatGPT uses separate content-script files. Its CSS overrides `--thread-content-responsive-max-width` only on identified conversation and composer width owners under `main`. This reuses ChatGPT's native `--thread-content-max-width` → `--thread-body-max-width` calculation and inline padding. The requested content width is capped to the available parent width minus that padding; native width variables are not overridden on `:root` or `body`.
 
 The transcript scroll area can reserve a stable scrollbar gutter while its absolutely positioned footer spans the gutter. A `ResizeObserver` watches the actual transcript parent and supplies its measured width to the matching footer through `--wg-chatgpt-available-width`, keeping their available-width limits aligned. A filtered `MutationObserver` rechecks known containers when they are added, removed, or replaced, or when their identifying classes/data attributes change. Losing a required marker deactivates widening; a later recognized mount can resume it. These observers do not restyle attachments or drag-and-drop overlays.
+
+ChatGPT reading controls record the native font size, line height, and margins of text owners inside assistant `.markdown` bodies and user message text, with the extension's own rules temporarily disabled while sampling. The `.markdown` root is never resized, so embedded controls with `font: inherit` keep their size. Font scaling applies to prose, headings, list items, table cells, and code text; density and manual spacing compress only prose line boxes and prose block margins. Code lines and table rows keep their native line height, scaled only with font size, and formula internals, buttons, editors, dialogs, and the composer are excluded. The default values produce no override. User-message full width targets the observed bubble width wrapper and applies only while width is effective. ChatGPT code wrapping is left entirely to its native per-block button.
 
 Keep native attachment, menu, preview, Canvas, and floating-composer layouts outside those overrides. Do not add global native-variable changes or generic `form`, `section`, table, dialog, or overlay width rules. A new live DOM variant needs observed evidence before adding another selector.
 
@@ -68,6 +70,7 @@ Internal checks require Node.js 24, plus Chrome for browser checks. No npm packa
 ```sh
 node scripts/test.js --skip-packaging
 node tests/e2e/message-width.js
+node tests/e2e/chatgpt-reading.js
 ```
 
 `WG_CHROME` selects the browser executable; the local default is Chrome's standard Windows installation path. The layout script prints the temporary fixture directory and retains the synthetic HTML and measurements for inspection.
@@ -82,6 +85,7 @@ For full release validation, `node scripts/test.js` also runs packaging tests an
 | `background.test.js` | Check-before-inject, manifest permissions, discarded tabs, and per-tab failures |
 | `release-package.test.js` (full suite only) | RC/stable tags, exact release notes, ZIP allowlist, and failed-build behavior |
 | `e2e/message-width.js` | Real-browser measurements on synthetic message trees: px/%, nested width limits, late messages, tables, code wrapping, images, input, and protected overlay content |
+| `e2e/chatgpt-reading.js` | Real-browser measurements on stripped ChatGPT markup: font/density/manual spacing boundaries, protected code/table/controls, user full width gated by width, native wrap, streamed content, pause restoration, and fresh resampling on resume |
 
 The Tests workflow runs these checks on PRs and pushes to `main`. The Release workflow calls the same workflow and publishes only after it passes. These checks exercise local fixtures and mocked extension APIs, not a signed-in Gemini account.
 
@@ -115,7 +119,9 @@ For a layout release, record the date, extension version, browser version, OS, a
 | ChatGPT upload sources, file/image previews, model and tool menus | Menus and previews retain native size and scrolling |
 | ChatGPT sidebar and Canvas | Chat width fits the remaining column without widening the side panel |
 | ChatGPT code, tables, and tool cards | Native wrapping, scrolling, and embedded component sizes are preserved |
-| Site tabs, width units, limits, and custom presets | Each site's values persist independently; Gemini task presets do not change ChatGPT |
+| Site tabs, width units, limits, and custom presets | Each site's values persist independently; a task preset changes only its own site |
+| Enable switch off, then edit values or apply a task | Page stays native; edits are saved; switching on applies the latest values |
+| ChatGPT font, density, and manual spacing | Prose changes; code lines, table rows, formulas, message toolbars, and the composer keep native sizing |
 | Pause and resume widening for one site | Native width returns while paused; saved values and presets survive; the other site and Gemini reading settings are unchanged |
 | Unrecognized layout or delayed page mounting | Unknown layouts keep native width; the popup reports the current page's status without adding a page banner |
 | Popup selects and disclosures | Unit and preset-editor selects, language menu, focus, keyboard operation, and advanced sections remain usable at popup size |

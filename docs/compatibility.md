@@ -1,5 +1,24 @@
 # Compatibility record
 
+## Reading controls and per-site Enable switch — September 29, 2026
+
+The `3.0.0-rc.1` working source adds ChatGPT reading controls (font size, density, manual spacing, user-message full width, three task presets with per-site Restore) and an Enable switch for each site that pauses every extension effect. ChatGPT code wrapping remains native. The manifest version is unchanged.
+
+| Area | Evidence and outcome | Limit |
+| --- | --- | --- |
+| Settings contracts | `settings-utils.test.js` covers legacy width-off staying site-enabled, native ChatGPT reading defaults, width writes preserving the reading object, partial Gemini patches, clamped task values, Restore of managed fields only, legacy bare undo snapshots, and pending-record reconciliation | Node unit checks |
+| Gemini pause | `gemini-content-lifecycle.test.js`: a saved `geminiEnabled:false` wins over an early width message; pause removes the site/width classes, code-wrap class, width and reading root variables; resume applies the latest width; width-off keeps reading active. `e2e/message-width.js` still passes all 73 scenarios plus pause/resume and inline restoration | Mocked extension APIs and synthetic Gemini markup |
+| ChatGPT reading | New `e2e/chatgpt-reading.js` on stripped ChatGPT markup in real Chrome: font scaling preserves heading/code/table/inline-code/math ratios; copy buttons, message toolbars, and composer unchanged; density and manual spacing leave code lines and table rows native; duplicate storage+message delivery does not compound; user full width follows the column only while width is effective; native table and code scrolling kept; simulated native wrap still wraps; streamed paragraphs receive settings; pause removes every marker and leaves new content native; resume resamples a changed native size | Synthetic structure assembled from earlier signed-in observations and pinned public references; not a live chatgpt.com check |
+| Popup | A disposable CDP probe against the real popup (source and extracted ZIP) passed: ChatGPT labels and accessible name, three ChatGPT tasks with a value preview, font writes into `chatgptReadingSettings` only, pause with width off keeps width controls editable, editing and applying a task while paused never re-enable, undo survives reopen and Restore returns previous values, a failed save shows the error and restores the confirmed switch, an ambiguous pending undo disables Restore. The existing six-language popup check passed with 105 matching keys. Screenshots covered light/dark, Spanish, Japanese, paused and error states | Isolated headless Chrome at 400px; the toolbar popup itself and live page-status transport were not exercised |
+| Package | `scripts/package.ps1` built the candidate ZIP; its 23 files match the runtime allowlist, and the extracted package passed `package-load.js` | Windows Chrome |
+
+Pending — not verified in this round:
+
+- **Authenticated ChatGPT DOM.** Claude in Chrome was not connected and the in-app browser was signed out, so the message, toolbar, editor, Canvas, and attachment structures were not re-inspected, and no live reading, full-width, or native-wrap check ran. Verify the selectors in `src/content/chatgpt-content.js` read-only on a signed-in page, then run the live matrix (rich messages, edit mode, attachments, sidebar/menus, SPA navigation).
+- **Gemini live layouts** with the Enable switch (Notebook + Sources, Drive picker, Deep Research, drag-and-drop) after the gating change.
+- **macOS Chrome and true installed-PWA cold start** for both sites, including a paused site staying native from startup.
+- **New popup with an older loaded content script** was reviewed in code (missing `protocolVersion` → "older version" notice, no reload) but not exercised in a browser.
+
 ## Source organization and internal candidate — September 29, 2026
 
 The current working version is `3.0.0-rc.1` (`version: 3.0.0`). Runtime files have moved into `src/shared/`, `src/content/`, `src/popup/`, and `src/help/`, with the service worker at `src/background.js`. The manifest remains at the repository root; unpacked loading and release packaging keep that root and preserve the `src/` paths. Repetitive popup guidance has been removed while page-status and error notices remain.

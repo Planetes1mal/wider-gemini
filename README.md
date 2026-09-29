@@ -2,7 +2,7 @@ English | [简体中文](./README.zh-CN.md) | [繁體中文](./docs/i18n/README.
 
 # Wider Gemini
 
-A Chrome extension for adjusting the width of Gemini and ChatGPT conversations. Each site remembers its own width and presets.
+A Chrome extension for adjusting the width and reading layout of Gemini and ChatGPT conversations. Each site remembers its own settings.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
 [![Internal candidate 3.0.0-rc.1](https://img.shields.io/badge/internal-3.0.0--rc.1-orange)](./CHANGELOG.md)
@@ -14,18 +14,19 @@ The same full Gemini conversation at the same window size, with the conversation
 
 ![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)
 
-This branch is the internal **3.0.0-rc.1** candidate, including ChatGPT support and the site-tab popup. It requires manual installation and has not been published as a stable Chrome Web Store release.
+This branch is the internal **3.0.0-rc.1** candidate, including ChatGPT width and reading support, a per-site Enable switch, and the site-tab popup. It requires manual installation and has not been published as a stable Chrome Web Store release.
 
 ## Features
 
 - **Adjust the width**: Select Gemini or ChatGPT, set pixels (`px`) or a percentage of the window (`%`), and save separate limits and presets for each site.
-- **Pause by site**: Turn off widening for either site to restore its original width while keeping saved values and presets. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
-- **Adjust Gemini text size and spacing**: Scale text from 75% to 200%, with separate controls for line height and paragraph spacing.
-- **Wrap Gemini code**: Keep long lines of code within the conversation area.
-- **Full-width user messages**: Left-align your messages and give them the full conversation width, just like Gemini's replies.
+- **Enable or pause by site**: The Enable switch below the site tabs pauses every effect on that site and restores the original page, while all settings stay editable and saved. A separate width switch turns off only widening. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
+- **Adjust text size and spacing**: On both sites, scale message text from 75% to 200% while keeping headings, code, and tables in proportion, tighten spacing with reading density, or set line height and paragraph spacing manually.
+- **Task presets**: Apply a reading, wide, or large-text setup in one step and restore the previous settings for that site.
+- **Wrap Gemini code**: Keep long lines of code within the conversation area. ChatGPT keeps its own per-block wrap button.
+- **Full-width user messages**: Left-align your messages and give them the full conversation width, just like the replies.
 - **Interface languages**: English, Simplified Chinese, Traditional Chinese, Korean, Japanese, and Spanish. Follow your browser's language or choose one manually. Korean, Japanese, and Spanish translations are machine-assisted; native-speaker improvements are welcome.
 
-Settings are saved automatically, and changes apply to open pages for the selected site. ChatGPT keeps its native text size, spacing, code formatting, and user-message layout.
+Settings are saved automatically, and changes apply to open pages for the selected site. At their defaults, the ChatGPT reading controls leave its native text size, spacing, code formatting, and user-message layout unchanged.
 
 ## Installation
 

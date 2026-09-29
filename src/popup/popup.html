@@ -26,8 +26,16 @@
                     ChatGPT <span class="site-current" hidden>Current</span>
                 </button>
             </div>
-            <p id="settingsError" class="site-scope" role="status" aria-live="polite" hidden></p>
-            <p id="layoutStatus" class="site-scope" role="status" aria-live="polite" hidden></p>
+            <div class="site-power" id="sitePower">
+                <span class="site-power-dot" aria-hidden="true"></span>
+                <label for="siteEnabledToggle" class="site-power-label" id="siteEnabledLabel">Enable on Gemini</label>
+                <span class="site-power-state" id="sitePowerState" hidden></span>
+                <label class="switch">
+                    <input type="checkbox" id="siteEnabledToggle" role="switch" disabled>
+                    <span class="slider-toggle" aria-hidden="true"></span>
+                </label>
+            </div>
+            <p id="siteStatus" class="site-status" role="status" aria-live="polite" hidden></p>
 
             <section class="card width-card">
                 <div class="card-header width-heading">
@@ -86,10 +94,6 @@
                 </fieldset>
             </section>
 
-            <p id="chatgptWidthNotice" class="site-scope" hidden>
-                <span id="i18n-chatgptWidthOnly">ChatGPT currently supports width adjustment.</span>
-            </p>
-
             <details id="readingSettings" class="card reading-settings">
                 <summary><span id="i18n-readingSettings">Reading &amp; typography</span></summary>
                 <div class="reading-body">
@@ -98,14 +102,8 @@
                             <span class="card-icon" aria-hidden="true">T</span>
                             <label for="taskPresetSelect" class="card-title" id="i18n-taskPresets">Task presets</label>
                         </div>
-                        <select id="taskPresetSelect" class="language-select" aria-describedby="taskPresetPreview taskPresetHint" disabled>
-                            <option value="reading" id="i18n-taskReading">Long reading</option>
-                            <option value="table" id="i18n-taskTable">Tables</option>
-                            <option value="code" id="i18n-taskCode">Code</option>
-                            <option value="large" id="i18n-taskLarge">Large text</option>
-                        </select>
+                        <select id="taskPresetSelect" class="language-select" aria-describedby="taskPresetPreview" disabled></select>
                         <p id="taskPresetPreview" class="task-preview"></p>
-                        <p id="taskPresetHint" class="task-hint"><span id="i18n-taskHint">Width respects your limits. Apply when ready; restore undoes the most recent task preset on this device.</span></p>
                         <div class="task-actions">
                             <button type="button" id="applyTaskPreset" class="secondary-btn task-apply" disabled><span id="i18n-taskApply">Apply</span></button>
                             <button type="button" id="restoreTaskPreset" class="secondary-btn" disabled><span id="i18n-taskRestore">Restore previous settings</span></button>
@@ -115,7 +113,7 @@
 
                     <section class="card density-card">
                         <div class="card-header">
-                            <span class="card-icon" aria-hidden="true">T</span>
+                            <span class="card-icon" aria-hidden="true">¶</span>
                             <label for="compactnessSlider" class="card-title" id="i18n-densityLabel">阅读密度</label>
                         </div>
                         <div class="slider-wrapper">
@@ -164,7 +162,7 @@
                         <button type="button" id="resetFontSizeBtn" class="secondary-btn"><span id="i18n-resetFontSize">重置字号</span></button>
                     </section>
 
-                    <section class="card code-card">
+                    <section class="card code-card" id="codeWrapCard">
                         <div class="card-header">
                             <span class="card-icon" aria-hidden="true">C</span>
                             <label for="codeWrapToggle" class="card-title" id="i18n-codeWrapLabel">代码区域自动换行</label>

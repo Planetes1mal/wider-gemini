@@ -42,9 +42,8 @@ function localizeHtmlPage() {
         "fontSizeLabel", "resetFontSize",
         "customSpacing", "autoSpacing",
         "uiLanguageLabel", "uiLanguageAuto", "helpLink", "sourceLink",
-        "taskPresets", "taskReading", "taskTable", "taskCode", "taskLarge", "taskHint", "taskApply", "taskRestore",
-        "autoSpacingHint", "settingsSite", "currentSite", "chatgptWidthOnly", "widthOptions", "readingSettings",
-        "widthEnabled"
+        "taskPresets", "taskApply", "taskRestore",
+        "autoSpacingHint", "settingsSite", "currentSite", "widthOptions", "readingSettings"
     ];
 
     ids.forEach(id => {
@@ -55,8 +54,6 @@ function localizeHtmlPage() {
     });
     const widthUnitGroup = document.querySelector('.unit-segment');
     if (widthUnitGroup) widthUnitGroup.setAttribute('aria-label', t('widthUnit', 'Width unit'));
-    const widthSwitch = document.querySelector('.width-switch');
-    if (widthSwitch) widthSwitch.title = t('widthEnabled', 'Enable widening');
 }
 
 localizeHtmlPage();
@@ -67,6 +64,8 @@ const RANGE_MIN = settingsUtils.PX_RANGE.min;
 const RANGE_MAX = settingsUtils.PX_RANGE.max;
 const PERCENT_RANGE_MIN = settingsUtils.PERCENT_RANGE.min;
 const PERCENT_RANGE_MAX = settingsUtils.PERCENT_RANGE.max;
+const SITE_NAMES = { gemini: 'Gemini', chatgpt: 'ChatGPT' };
+const TASK_LABELS = { reading: 'taskReading', table: 'taskTable', code: 'taskCode', wide: 'taskWide', large: 'taskLarge' };
 
 const PRESET_ICONS = ['S', 'D', 'W', 'U', 'M'];
 
@@ -84,12 +83,7 @@ function isSameWidthSetting(a, b) {
 }
 
 function getActiveRange() {
-    return settingsUtils.getRangeForUnit({
-        widthMin: currentWidthMin,
-        widthMax: currentWidthMax,
-        widthPercentMin: currentWidthPercentMin,
-        widthPercentMax: currentWidthPercentMax
-    }, currentWidthSetting.unit);
+    return settingsUtils.getRangeForUnit(getTaskRanges(), currentWidthSetting.unit);
 }
 
 function getUnitFallbackValue(unit) {
@@ -112,13 +106,6 @@ function setPresetGroup(unit, presets) {
         [normalizedUnit]: presets
     };
     currentPresets = presets;
-}
-
-function saveWidthSettings() {
-    const site = selectedSite;
-    const settings = getCurrentWidthSettings();
-    widthSettingsBySite[site] = settings;
-    return queueSettingsWrite(settingsUtils.getSiteWidthStoragePayload(settings, site));
 }
 
 function renderPresetButtons(presets, widthMin, widthMax, currentSetting) {
@@ -164,12 +151,7 @@ function renderPresetButtonsEditMode(presets) {
         const row = document.createElement('div');
         row.className = 'preset-edit-row';
         const name = getPresetName(preset);
-        const range = settingsUtils.getRangeForUnit({
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax
-        }, currentWidthSetting.unit);
+        const range = getActiveRange();
         row.innerHTML = `
             <span class="preset-edit-label"></span>
             <input type="number" class="preset-edit-width" data-index="${i}" value="${preset.value}" min="${range.min}" max="${range.max}" step="${range.step}">
@@ -180,17 +162,11 @@ function renderPresetButtonsEditMode(presets) {
         label.title = name;
         const input = row.querySelector('.preset-edit-width');
         input.addEventListener('blur', function () {
-            const unit = currentWidthSetting.unit;
             const originalValue = parseFloat(this.value);
             const normalized = settingsUtils.normalizeWidthSetting({
                 value: originalValue,
-                unit
-            }, {
-                widthMin: currentWidthMin,
-                widthMax: currentWidthMax,
-                widthPercentMin: currentWidthPercentMin,
-                widthPercentMax: currentWidthPercentMax
-            });
+                unit: currentWidthSetting.unit
+            }, getTaskRanges());
             this.value = normalized.value;
             if (originalValue !== normalized.value) showClampedHint();
         });
@@ -222,17 +198,13 @@ function saveManagePresetsFromRows() {
         const name = nameInput ? nameInput.value.trim() : getPresetName(p);
         const defaultName = t(p.nameKey || DEFAULTS.presets[i].nameKey, '');
         const customName = name && name !== defaultName ? name : undefined;
-        const unit = currentWidthSetting.unit;
         const value = widthInput ? parseFloat(widthInput.value) : p.value;
-        return settingsUtils.normalizePreset({ id: p.id, nameKey: p.nameKey, name: customName, value, unit }, i, {
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax
-        });
+        return settingsUtils.normalizePreset({
+            id: p.id, nameKey: p.nameKey, name: customName, value, unit: currentWidthSetting.unit
+        }, i, getTaskRanges());
     });
     setPresetGroup(currentWidthSetting.unit, nextPresets);
-    saveWidthSettings().catch(showSaveError);
+    saveWidthSettings();
     renderPresetsForMode(nextPresets);
     document.getElementById('managePresetsSummary').textContent = t('managePresetsSummary', '已自定义 5 个预设');
 }
@@ -246,12 +218,7 @@ function renderManagePresetsRows(presets) {
         row.className = 'manage-row';
         const defaultName = t(preset.nameKey || DEFAULTS.presets[i].nameKey, '');
         const displayName = preset.name != null && preset.name !== '' ? preset.name : defaultName;
-        const range = settingsUtils.getRangeForUnit({
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax
-        }, currentWidthSetting.unit);
+        const range = getActiveRange();
         row.innerHTML = `
             <input type="text" class="manage-name" data-index="${i}">
             <input type="number" class="manage-width" value="${preset.value}" min="${range.min}" max="${range.max}" step="${range.step}" data-index="${i}">
@@ -265,16 +232,10 @@ function renderManagePresetsRows(presets) {
         const save = () => saveManagePresetsFromRows();
         nameInput.addEventListener('blur', save);
         widthInput.addEventListener('blur', function () {
-            const unit = currentWidthSetting.unit;
             const normalized = settingsUtils.normalizeWidthSetting({
                 value: parseFloat(this.value),
-                unit
-            }, {
-                widthMin: currentWidthMin,
-                widthMax: currentWidthMax,
-                widthPercentMin: currentWidthPercentMin,
-                widthPercentMax: currentWidthPercentMax
-            });
+                unit: currentWidthSetting.unit
+            }, getTaskRanges());
             this.value = normalized.value;
             save();
         });
@@ -305,10 +266,6 @@ function clamp(val, min, max) {
     return Math.min(Math.max(Number(val), min), max);
 }
 
-function normalizeStorage(result) {
-    return settingsUtils.normalizeStorage(result);
-}
-
 const widthSlider = document.getElementById('widthSlider');
 const widthValue = document.getElementById('widthValue');
 const widthMinInput = document.getElementById('widthMinInput');
@@ -329,6 +286,7 @@ const fontSizeSlider = document.getElementById('fontSizeSlider');
 const fontSizeValue = document.getElementById('fontSizeValue');
 const resetFontSizeBtn = document.getElementById('resetFontSizeBtn');
 const resetDensityBtn = document.getElementById('resetDensityBtn');
+const codeWrapCard = document.getElementById('codeWrapCard');
 const codeWrapToggle = document.getElementById('codeWrapToggle');
 const codeWrapStatus = document.getElementById('codeWrapStatus');
 const userFullWidthToggle = document.getElementById('userFullWidthToggle');
@@ -342,40 +300,49 @@ const taskPresetStatus = document.getElementById('taskPresetStatus');
 const settingsControls = document.getElementById('settingsControls');
 const widthControls = document.getElementById('widthControls');
 const widthEnabledToggle = document.getElementById('widthEnabledToggle');
+const widthEnabledLabel = document.getElementById('i18n-widthEnabled');
+const siteEnabledToggle = document.getElementById('siteEnabledToggle');
+const siteEnabledLabel = document.getElementById('siteEnabledLabel');
+const sitePower = document.getElementById('sitePower');
+const sitePowerState = document.getElementById('sitePowerState');
+const siteStatus = document.getElementById('siteStatus');
 const siteButtons = [document.getElementById('siteGeminiBtn'), document.getElementById('siteChatgptBtn')];
-const settingsError = document.getElementById('settingsError');
-const layoutStatus = document.getElementById('layoutStatus');
-const chatgptWidthNotice = document.getElementById('chatgptWidthNotice');
-const readingSettings = document.getElementById('readingSettings');
-const TASK_UNDO_KEY = 'taskPresetUndo';
-const TASK_PRESETS = {
-    reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110, codeWrap: true },
-    table: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: false },
-    code: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: true },
-    large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140, codeWrap: true }
-};
-let taskUndoSettings = null;
+
 let taskBusy = false;
 let settingsLoaded = false;
 let selectedSite = 'gemini';
-let widthSettingsBySite = {};
-let settingsWriteQueue = Promise.resolve();
+let activeTabSite = null;
+let storedSettings = {};
+const siteSettings = {};
+const taskUndo = { gemini: null, chatgpt: null };
+let writeQueue = Promise.resolve();
+let failedSinceFlush = false;
 const latestSiteMessages = new Map();
 let layoutStatusRequest = 0;
 
 let widthUpdateTimer = null;
-let densityUpdateTimer = null;
+let readingUpdateTimer = null;
+let pendingReadingEdit = null;
 
-let currentWidthSetting = { ...settingsUtils.DEFAULTS.chatWidthSetting };
+let currentWidthSetting = { ...DEFAULTS.chatWidthSetting };
 let currentWidthEnabled = DEFAULTS.widthEnabled;
 let currentWidthMin = DEFAULTS.widthMin;
 let currentWidthMax = DEFAULTS.widthMax;
-let currentWidthPercentMin = settingsUtils.DEFAULTS.widthPercentMin;
-let currentWidthPercentMax = settingsUtils.DEFAULTS.widthPercentMax;
+let currentWidthPercentMin = DEFAULTS.widthPercentMin;
+let currentWidthPercentMax = DEFAULTS.widthPercentMax;
 let currentDensity = settingsUtils.normalizeDensity({});
-let currentFontSize = settingsUtils.DEFAULTS.messageFontSize;
+let currentFontSize = DEFAULTS.messageFontSize;
 let currentPresetsByUnit = settingsUtils.normalizePresetGroups({}, DEFAULTS);
 let currentPresets = currentPresetsByUnit[settingsUtils.UNIT_PX];
+
+function getTaskRanges() {
+    return {
+        widthMin: currentWidthMin,
+        widthMax: currentWidthMax,
+        widthPercentMin: currentWidthPercentMin,
+        widthPercentMax: currentWidthPercentMax
+    };
+}
 
 function getCurrentWidthSettings() {
     return settingsUtils.normalizeSiteWidthSettings({
@@ -386,35 +353,140 @@ function getCurrentWidthSettings() {
     }, 'gemini');
 }
 
-// ChatGPT 的宽度配置是一个独立存储对象，顺序写入避免较慢的旧请求覆盖新设置。
-function queueSettingsWrite(payload) {
-    const write = settingsWriteQueue.then(() => chrome.storage.sync.set(payload));
-    settingsWriteQueue = write.catch(() => {});
-    return write;
+// ---- 状态提示：同一位置按优先级显示——保存失败 > 页面/协议问题 > 短暂提示。 ----
+
+const statusMessages = { error: '', page: '', transient: '' };
+
+function renderStatus() {
+    const kind = ['error', 'page', 'transient'].find(key => statusMessages[key]);
+    siteStatus.textContent = kind ? statusMessages[kind] : '';
+    siteStatus.dataset.kind = kind || '';
+    siteStatus.hidden = !kind;
 }
 
-function showSaveError(error) {
+function setStatus(kind, message) {
+    statusMessages[kind] = message || '';
+    if (kind === 'transient') {
+        clearTimeout(setStatus.timer);
+        if (message) setStatus.timer = setTimeout(() => setStatus('transient', ''), 2400);
+    }
+    renderStatus();
+}
+
+// ---- 存储写入：串行执行；站点与数值在入队时确定。 ----
+
+function enqueue(operation) {
+    const run = writeQueue.then(operation);
+    writeQueue = run.catch(() => {});
+    return run;
+}
+
+async function onSaved(site) {
+    siteSettings[site] = settingsUtils.normalizeSiteSettings(storedSettings, site);
+    if (site !== selectedSite) return;
+    setStatus('error', '');
+    if (!siteSettings[site].siteEnabled) setStatus('transient', t('savedWhilePaused', 'Saved. Applies when enabled.'));
+}
+
+// 写入失败时显示错误，并按存储中最后一次确认的值重新渲染控件。
+async function onSaveFailed(site, error) {
     console.error('[Wider Gemini] Settings could not be saved:', error);
-    settingsError.textContent = t('settingsSaveError', 'Could not save settings. Please try again.');
-    settingsError.hidden = false;
+    failedSinceFlush = true;
+    try {
+        Object.assign(storedSettings, await chrome.storage.sync.get(settingsUtils.getSiteStorageKeys(site)));
+    } catch (e) {
+        // 读取也失败时保留当前视图，错误提示仍然准确。
+    }
+    siteSettings[site] = settingsUtils.normalizeSiteSettings(storedSettings, site);
+    if (site === selectedSite) {
+        renderSite();
+        setStatus('error', t('saveFailed', 'Could not save. Please try again.'));
+    }
 }
 
-function flushPendingChanges() {
+function writePatch(site, buildPatch, message) {
+    return enqueue(async () => {
+        const patch = await buildPatch();
+        await chrome.storage.sync.set(patch);
+        Object.assign(storedSettings, patch);
+    }).then(() => {
+        onSaved(site);
+        if (message) notifySiteTabs(site, message);
+    }, error => onSaveFailed(site, error));
+}
+
+function saveWidthSettings() {
+    const site = selectedSite;
+    const settings = getCurrentWidthSettings();
+    const message = {
+        action: 'updateWidthSetting',
+        setting: { ...settings.chatWidthSetting },
+        ranges: getTaskRanges(),
+        enabled: settings.widthEnabled
+    };
+    return writePatch(site, () => settingsUtils.getSiteWidthStoragePayload(settings, site), message);
+}
+
+// 阅读字段先读取最新已存值再合并，避免旧的 popup 快照覆盖较早的写入。
+function saveReading(site, edit) {
+    return writePatch(site, async () => {
+        const latest = await chrome.storage.sync.get(settingsUtils.getSiteStorageKeys(site));
+        return settingsUtils.getSiteReadingPatch(latest, site, edit);
+    }, { action: 'updateReadingSettings' });
+}
+
+// 执行依赖操作前先提交防抖中的编辑并等待写入完成；期间有失败则不继续。
+async function flushPendingChanges() {
+    if (isEditMode) savePresetEdits();
     if (widthUpdateTimer !== null) updateWidthSetting(currentWidthSetting);
-    if (densityUpdateTimer !== null) updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
+    if (readingUpdateTimer !== null) commitReadingEdit();
+    await writeQueue;
+    if (failedSinceFlush) {
+        failedSinceFlush = false;
+        throw new Error('A pending settings write failed');
+    }
 }
 
-function updateSiteUi() {
-    siteButtons.forEach(button => {
-        const active = button.dataset.site === selectedSite;
-        button.classList.toggle('site-active', active);
-        button.setAttribute('aria-pressed', String(active));
-    });
-    settingsError.textContent = '';
-    settingsError.hidden = true;
-    chatgptWidthNotice.hidden = selectedSite !== 'chatgpt';
-    readingSettings.hidden = selectedSite !== 'gemini';
-    refreshLayoutStatus();
+// ---- 页面通知与状态 ----
+
+function isNoReceiver(error) {
+    return /Receiving end does not exist/i.test(error && error.message || String(error));
+}
+
+async function reportOutdatedPage(site, tabId) {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []);
+    if (site === selectedSite && tab && tab.id === tabId) {
+        setStatus('page', t('pageOutdated', 'Saved, but this page runs an older extension version.'));
+    }
+}
+
+// 消息目标在提交时固定。宽度消息保留原有的“缺少内容脚本则刷新”回退；
+// v2 消息不会自动刷新页面，旧版内容脚本只提示当前页尚未更新。
+function notifySiteTabs(site, message) {
+    const v2 = message.action === 'updateSiteEnabled' || message.action === 'updateReadingSettings' ||
+        message.action === 'refreshSettings';
+    const key = `${site}:${message.action === 'updateWidthSetting' ? 'width' : message.action}`;
+    latestSiteMessages.set(key, message);
+    return chrome.tabs.query({ url: settingsUtils.SITE_MATCHES[site] }).then(tabs => {
+        if (latestSiteMessages.get(key) !== message) return;
+        return Promise.all(tabs.map(tab => {
+            if (tab.discarded) return;
+            return chrome.tabs.sendMessage(tab.id, message).then(response => {
+                if (v2 && !(response && response.protocolVersion >= settingsUtils.PROTOCOL_VERSION)) {
+                    return reportOutdatedPage(site, tab.id);
+                }
+            }, error => {
+                if (v2) {
+                    if (!isNoReceiver(error)) return reportOutdatedPage(site, tab.id);
+                } else if (isNoReceiver(error)) {
+                    showRefreshNotice();
+                    chrome.tabs.reload(tab.id).catch(() => {});
+                }
+            });
+        }));
+    }).then(() => {
+        if (site === selectedSite) refreshLayoutStatus();
+    }).catch(error => console.error('[Wider Gemini] Could not query site tabs:', error));
 }
 
 function getTabSite(tab) {
@@ -424,72 +496,35 @@ function getTabSite(tab) {
     return null;
 }
 
-// 只报告当前页的状态；切换设置站点或较慢的旧响应不能把别的页面标成未适配。
+// 只报告当前标签页的状态；切换站点或较慢的旧响应不会把别的页面标成未适配。
 async function refreshLayoutStatus() {
     const request = ++layoutStatusRequest;
     const site = selectedSite;
-    let targetTabId = null;
-    layoutStatus.hidden = true;
     try {
-        await settingsWriteQueue;
+        await writeQueue;
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (request !== layoutStatusRequest || site !== selectedSite || getTabSite(tab) !== site) return;
-        targetTabId = tab.id;
-        const result = await chrome.tabs.sendMessage(tab.id, { action: 'getLayoutStatus' });
         if (request !== layoutStatusRequest || site !== selectedSite) return;
-        const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (request !== layoutStatusRequest || currentTab?.id !== tab.id || getTabSite(currentTab) !== site) return;
-        if (!result || result.site !== site) return;
-        const key = {
-            paused: 'widthPaused',
-            unsupported: 'layoutUnsupported',
-            loading: 'layoutLoading'
-        }[result.status];
-        layoutStatus.textContent = key ? t(key) : '';
-        layoutStatus.hidden = !key;
+        if (getTabSite(tab) !== site) {
+            setStatus('page', '');
+            return;
+        }
+        let message = '';
+        try {
+            const result = await chrome.tabs.sendMessage(tab.id, { action: 'getLayoutStatus' });
+            if (!result || result.site !== site) return;
+            if (!(result.protocolVersion >= settingsUtils.PROTOCOL_VERSION)) {
+                message = t('pageOutdated', 'Saved, but this page runs an older extension version.');
+            } else if (result.siteEnabled && result.widthEnabled) {
+                message = { unsupported: t('layoutUnsupported'), loading: t('layoutLoading') }[result.status] || '';
+            }
+        } catch (error) {
+            message = t('layoutUnavailable', 'Page status unavailable. Refresh the page and try again.');
+        }
+        if (request === layoutStatusRequest && site === selectedSite) setStatus('page', message);
     } catch (error) {
-        if (targetTabId === null || request !== layoutStatusRequest || site !== selectedSite) return;
-        const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []);
-        if (request !== layoutStatusRequest || currentTab?.id !== targetTabId || getTabSite(currentTab) !== site) return;
-        layoutStatus.textContent = t('layoutUnavailable', 'Page status unavailable. Refresh the page and try again.');
-        layoutStatus.hidden = false;
+        // 标签页查询失败时不显示页面状态。
     }
 }
-
-function applyWidthEnabledUi() {
-    widthEnabledToggle.checked = currentWidthEnabled;
-    widthControls.disabled = !currentWidthEnabled;
-    unitPxBtn.disabled = !currentWidthEnabled;
-    unitPercentBtn.disabled = !currentWidthEnabled;
-}
-
-widthEnabledToggle.addEventListener('change', function () {
-    if (!settingsLoaded || taskBusy) return;
-    ++layoutStatusRequest;
-    layoutStatus.hidden = true;
-    if (isEditMode) savePresetEdits();
-    // 切换前保存尚未触发 change 的滑块值，暂停不会丢掉用户的宽度和预设。
-    flushPendingChanges();
-    currentWidthEnabled = this.checked;
-    applyWidthEnabledUi();
-    const site = selectedSite;
-    const message = { action: 'updateWidthEnabled', enabled: currentWidthEnabled };
-    saveWidthSettings().then(() => notifySiteTabs(site, message)).then(() => {
-        if (site === selectedSite) refreshLayoutStatus();
-    }).catch(showSaveError);
-});
-
-siteButtons.forEach(button => {
-    button.addEventListener('click', function () {
-        if (!settingsLoaded || taskBusy || this.dataset.site === selectedSite) return;
-        if (isEditMode) savePresetEdits();
-        flushPendingChanges();
-        widthSettingsBySite[selectedSite] = getCurrentWidthSettings();
-        selectedSite = this.dataset.site;
-        applyWidthUi(widthSettingsBySite[selectedSite]);
-        updateSiteUi();
-    });
-});
 
 function showRefreshNotice() {
     refreshNotice.classList.add('show');
@@ -497,6 +532,8 @@ function showRefreshNotice() {
         refreshNotice.classList.remove('show');
     }, 2000);
 }
+
+// ---- 渲染 ----
 
 function syncRangeProgress(input) {
     if (!input) return;
@@ -508,12 +545,32 @@ function syncRangeProgress(input) {
 }
 
 function syncAllRangeProgress() {
-    [widthSlider, compactnessSlider, lineHeightSlider, paragraphSpacingSlider].forEach(syncRangeProgress);
+    [widthSlider, compactnessSlider, lineHeightSlider, paragraphSpacingSlider, fontSizeSlider].forEach(syncRangeProgress);
+}
+
+// 整站暂停时所有设置仍可编辑；只有启用中且宽度关闭时才锁定宽度控件。
+function applyEnabledUi() {
+    const settings = siteSettings[selectedSite];
+    const siteName = SITE_NAMES[selectedSite];
+    const enabled = settings ? settings.siteEnabled : true;
+    siteEnabledToggle.checked = enabled;
+    siteEnabledLabel.textContent = t('siteEnabled', 'Enable on {site}').replace('{site}', siteName);
+    siteEnabledToggle.setAttribute('aria-label',
+        t('siteEnabledA11y', 'Enable Wider Gemini on {site}').replace('{site}', siteName));
+    sitePower.classList.toggle('is-paused', !enabled);
+    sitePowerState.textContent = t('sitePaused', 'Paused');
+    sitePowerState.hidden = enabled;
+    widthEnabledLabel.textContent = t('widthEnabledSite', 'Widen {site} conversations').replace('{site}', siteName);
+    widthEnabledToggle.checked = currentWidthEnabled;
+    const locked = enabled && !currentWidthEnabled;
+    widthControls.disabled = locked;
+    unitPxBtn.disabled = locked;
+    unitPercentBtn.disabled = locked;
+    document.querySelector('.width-switch').title = widthEnabledLabel.textContent;
 }
 
 function applyWidthUi(settings) {
     if (settings.widthEnabled !== undefined) currentWidthEnabled = settings.widthEnabled;
-    applyWidthEnabledUi();
     currentWidthMin = settings.widthMin;
     currentWidthMax = settings.widthMax;
     currentWidthPercentMin = settings.widthPercentMin;
@@ -523,6 +580,7 @@ function applyWidthUi(settings) {
         currentPresetsByUnit = settings.presetsByUnit;
     }
     currentPresets = getPresetGroup(currentWidthSetting.unit);
+    applyEnabledUi();
 
     const range = getActiveRange();
     widthMinInput.value = range.min;
@@ -538,7 +596,7 @@ function applyWidthUi(settings) {
     widthSlider.step = range.step;
     widthSlider.value = currentWidthSetting.value;
     widthValue.textContent = currentWidthSetting.value;
-    widthUnitLabel.textContent = currentWidthSetting.unit === settingsUtils.UNIT_PERCENT ? '%' : 'px';
+    widthUnitLabel.textContent = getUnitLabel(currentWidthSetting.unit);
     syncRangeProgress(widthSlider);
 
     unitPxBtn.classList.toggle('segment-active', currentWidthSetting.unit === settingsUtils.UNIT_PX);
@@ -552,97 +610,6 @@ function applyWidthUi(settings) {
     updateTaskPreview();
 }
 
-function getTaskRanges() {
-    return {
-        widthMin: currentWidthMin,
-        widthMax: currentWidthMax,
-        widthPercentMin: currentWidthPercentMin,
-        widthPercentMax: currentWidthPercentMax
-    };
-}
-
-// 仅写入任务使用的字段，原宽度预设、范围、语言及用户消息宽度保持独立。
-function getTaskPayload(settings) {
-    const chatWidthSetting = settingsUtils.normalizeWidthSetting(settings.chatWidthSetting, getTaskRanges());
-    return {
-        chatWidthSetting,
-        chatWidth: settingsUtils.getLegacyChatWidth(chatWidthSetting),
-        ...settingsUtils.normalizeDensity(settings),
-        messageFontSize: settingsUtils.normalizeFontSize(settings.messageFontSize),
-        codeWrap: settings.codeWrap === true
-    };
-}
-
-function updateTaskPreview() {
-    const settings = getTaskPayload(TASK_PRESETS[taskPresetSelect.value]);
-    document.getElementById('taskPresetPreview').textContent = t('taskPreview')
-        .replace('{width}', formatWidthValue(settings.chatWidthSetting))
-        .replace('{font}', settings.messageFontSize)
-        .replace('{wrap}', t(settings.codeWrap ? 'statusOn' : 'statusOff'));
-}
-
-function setTaskBusy(busy) {
-    taskBusy = busy;
-    settingsControls.disabled = busy || !settingsLoaded;
-    siteButtons.forEach(button => { button.disabled = busy || !settingsLoaded; });
-    uiLanguageSelect.disabled = busy || !settingsLoaded;
-    taskPresetSelect.disabled = busy;
-    applyTaskPreset.disabled = busy;
-    restoreTaskPreset.disabled = busy || !taskUndoSettings;
-}
-
-async function saveTaskSettings(settings) {
-    const payload = getTaskPayload(settings);
-    await queueSettingsWrite(payload);
-    applyWidthUi({ ...getTaskRanges(), chatWidthSetting: payload.chatWidthSetting });
-    applyDensityUi(payload);
-    applyFontSizeUi(payload);
-    codeWrapToggle.checked = payload.codeWrap;
-    updateCodeWrapStatus(payload.codeWrap);
-    widthSettingsBySite.gemini = getCurrentWidthSettings();
-    notifyGeminiTabs({
-        action: 'updateWidthSetting', setting: payload.chatWidthSetting,
-        ranges: getTaskRanges(), enabled: currentWidthEnabled
-    });
-    notifyGeminiTabs({ action: 'updateDensity', settings: payload });
-    notifyGeminiTabs({ action: 'updateCodeWrap', enabled: payload.codeWrap });
-}
-
-async function runTaskPreset(restore) {
-    if (!settingsLoaded || taskBusy || selectedSite !== 'gemini' || (restore && !taskUndoSettings)) return;
-    if (isEditMode) savePresetEdits();
-    flushPendingChanges();
-    setTaskBusy(true);
-    taskPresetStatus.textContent = t('taskSaving');
-    try {
-        if (restore) {
-            await saveTaskSettings(taskUndoSettings);
-            await chrome.storage.local.remove(TASK_UNDO_KEY);
-            taskUndoSettings = null;
-        } else {
-            const snapshot = getTaskPayload({
-                chatWidthSetting: currentWidthSetting,
-                ...currentDensity,
-                messageFontSize: currentFontSize,
-                codeWrap: codeWrapToggle.checked
-            });
-            await chrome.storage.local.set({ [TASK_UNDO_KEY]: snapshot });
-            taskUndoSettings = snapshot;
-            await saveTaskSettings(TASK_PRESETS[taskPresetSelect.value]);
-        }
-        taskPresetStatus.textContent = t(restore ? 'taskRestored' : 'taskApplied');
-    } catch (error) {
-        console.error('[Wider Gemini] Task preset could not be saved:', error);
-        taskPresetStatus.textContent = t('taskSaveError');
-    } finally {
-        setTaskBusy(false);
-    }
-}
-
-taskPresetSelect.addEventListener('change', updateTaskPreview);
-applyTaskPreset.addEventListener('click', () => runTaskPreset(false));
-restoreTaskPreset.addEventListener('click', () => runTaskPreset(true));
-
 function applyDensityUi(settings) {
     currentDensity = settingsUtils.normalizeDensity(settings);
     compactnessSlider.value = currentDensity.messageCompactness;
@@ -651,133 +618,325 @@ function applyDensityUi(settings) {
     lineHeightValue.textContent = currentDensity.messageLineHeight.toFixed(2);
     paragraphSpacingSlider.value = currentDensity.messageParagraphSpacing;
     paragraphSpacingValue.textContent = currentDensity.messageParagraphSpacing;
+    densitySummary.textContent = currentDensity.messageSpacingCustom
+        ? t('customSpacing', 'Custom') : t('autoSpacing', 'Auto');
     syncAllRangeProgress();
-    updateDensitySummary();
 }
 
-function applyFontSizeUi(settings) {
-    if (typeof settings.messageFontSize === 'number') {
-        currentFontSize = settings.messageFontSize;
-    }
+function applyFontSizeUi(fontSize) {
+    currentFontSize = fontSize;
     fontSizeSlider.value = currentFontSize;
     fontSizeValue.textContent = currentFontSize;
     syncRangeProgress(fontSizeSlider);
 }
 
-function updateDensitySummary() {
-    const custom = t('customSpacing', 'Custom');
-    const auto = t('autoSpacing', 'Auto');
-    densitySummary.textContent = currentDensity.messageSpacingCustom ? custom : auto;
+function setToggleStatus(element, enabled) {
+    element.textContent = enabled ? t('statusOn', 'On') : t('statusOff', 'Off');
 }
 
-const STORAGE_KEYS = [
-    'widthEnabled',
-    'chatWidth',
-    'chatWidthSetting',
-    'codeWrap',
-    'userFullWidth',
-    'widthMin',
-    'widthMax',
-    'widthPercentMin',
-    'widthPercentMax',
-    'presetsByUnit',
-    'presets',
-    'messageCompactness',
-    'messageLineHeight',
-    'messageParagraphSpacing',
-    'messageSpacingCustom',
-    'messageFontSize',
-    'uiLanguage',
-    settingsUtils.CHATGPT_WIDTH_KEY
-];
+function renderTaskOptions() {
+    const value = taskPresetSelect.value;
+    taskPresetSelect.innerHTML = '';
+    for (const task of Object.keys(settingsUtils.TASK_PRESETS[selectedSite])) {
+        const option = document.createElement('option');
+        option.value = task;
+        option.textContent = t(TASK_LABELS[task]);
+        taskPresetSelect.appendChild(option);
+    }
+    if (settingsUtils.TASK_PRESETS[selectedSite][value]) taskPresetSelect.value = value;
+}
+
+function renderSite() {
+    const settings = siteSettings[selectedSite];
+    siteButtons.forEach(button => {
+        const active = button.dataset.site === selectedSite;
+        button.classList.toggle('site-active', active);
+        button.setAttribute('aria-pressed', String(active));
+    });
+    codeWrapCard.hidden = selectedSite !== 'gemini';
+    renderTaskOptions();
+    applyWidthUi(settings);
+    applyDensityUi(settings);
+    applyFontSizeUi(settings.messageFontSize);
+    codeWrapToggle.checked = settings.codeWrap === true;
+    setToggleStatus(codeWrapStatus, codeWrapToggle.checked);
+    userFullWidthToggle.checked = settings.userFullWidth;
+    setToggleStatus(userFullWidthStatus, settings.userFullWidth);
+    renderTaskState();
+}
+
+// ---- 任务预设与一步恢复 ----
+
+function updateTaskPreview() {
+    const task = taskPresetSelect.value;
+    if (!settingsUtils.TASK_PRESETS[selectedSite][task]) return;
+    const values = settingsUtils.getTaskValues(selectedSite, task, getTaskRanges());
+    const parts = [formatWidthValue(values.chatWidthSetting), `${values.messageFontSize}%`,
+        t('taskSpacingNative', 'Native spacing')];
+    if (selectedSite === 'gemini') parts.push(t(values.codeWrap ? 'taskWrapOn' : 'taskWrapOff'));
+    document.getElementById('taskPresetPreview').textContent = parts.join(' · ');
+}
+
+function renderTaskState(message) {
+    const undo = taskUndo[selectedSite];
+    if (message !== undefined) taskPresetStatus.textContent = message;
+    else taskPresetStatus.textContent = undo && undo.ambiguous ? t('taskPendingUnknown') : '';
+    setTaskBusy(taskBusy);
+}
+
+function setTaskBusy(busy) {
+    taskBusy = busy;
+    const undo = taskUndo[selectedSite];
+    settingsControls.disabled = busy || !settingsLoaded;
+    siteButtons.forEach(button => { button.disabled = busy || !settingsLoaded; });
+    siteEnabledToggle.disabled = busy || !settingsLoaded;
+    uiLanguageSelect.disabled = busy || !settingsLoaded;
+    taskPresetSelect.disabled = busy || !settingsLoaded;
+    applyTaskPreset.disabled = busy || !settingsLoaded;
+    restoreTaskPreset.disabled = busy || !settingsLoaded || !undo || undo.ambiguous || undo.record.state !== 'ready';
+}
+
+async function readSite(site) {
+    const stored = await chrome.storage.sync.get(settingsUtils.getSiteStorageKeys(site));
+    Object.assign(storedSettings, stored);
+    return stored;
+}
+
+function afterTaskWrite(site) {
+    siteSettings[site] = settingsUtils.normalizeSiteSettings(storedSettings, site);
+    if (site === selectedSite) renderSite();
+    notifySiteTabs(site, { action: 'refreshSettings' });
+}
+
+async function applyTask(site, task) {
+    const key = settingsUtils.TASK_UNDO_KEYS[site];
+    const stored = await readSite(site);
+    const current = settingsUtils.normalizeSiteSettings(stored, site);
+    const snapshot = settingsUtils.getTaskManaged(current, site);
+    const values = settingsUtils.getTaskValues(site, task, current);
+    const previousUndo = taskUndo[site];
+    const previous = previousUndo && !previousUndo.ambiguous && previousUndo.record.state === 'ready'
+        ? previousUndo.record : null;
+    // 1. 先保存带“应用中”标记的撤销快照；失败则不应用任务。
+    const pending = { state: 'applying', snapshot, previous, pending: { from: snapshot, to: values } };
+    await chrome.storage.local.set({ [key]: pending });
+    // 2. 一次写入任务的全部设置；失败时恢复原撤销记录。
+    const patch = settingsUtils.getTaskPatch(stored, site, values);
+    try {
+        await chrome.storage.sync.set(patch);
+    } catch (error) {
+        await (previous ? chrome.storage.local.set({ [key]: previous }) : chrome.storage.local.remove(key))
+            .catch(() => { taskUndo[site] = { record: pending, ambiguous: true }; });
+        throw error;
+    }
+    Object.assign(storedSettings, patch);
+    afterTaskWrite(site);
+    // 3. 标记撤销记录可用；失败只影响撤销记录，任务本身已生效。
+    const ready = { state: 'ready', snapshot };
+    try {
+        await chrome.storage.local.set({ [key]: ready });
+        taskUndo[site] = { record: ready };
+        return t('taskApplied');
+    } catch (error) {
+        taskUndo[site] = { record: pending, ambiguous: false };
+        return t('taskUndoRecordError', 'Applied, but the restore point could not be saved.');
+    }
+}
+
+async function restoreTask(site) {
+    const key = settingsUtils.TASK_UNDO_KEYS[site];
+    const record = taskUndo[site].record;
+    const stored = await readSite(site);
+    const before = settingsUtils.getTaskManaged(settingsUtils.normalizeSiteSettings(stored, site), site);
+    // 按当前范围钳制快照宽度，保留用户之后设置的范围。
+    const patch = settingsUtils.getTaskPatch(stored, site, record.snapshot);
+    const target = settingsUtils.getTaskManaged(
+        settingsUtils.normalizeSiteSettings({ ...stored, ...patch }, site), site);
+    await chrome.storage.local.set({ [key]: { state: 'restoring', snapshot: record.snapshot, pending: { from: before, to: target } } });
+    try {
+        await chrome.storage.sync.set(patch);
+    } catch (error) {
+        await chrome.storage.local.set({ [key]: record }).catch(() => {});
+        throw error;
+    }
+    Object.assign(storedSettings, patch);
+    afterTaskWrite(site);
+    const clamped = !isSameWidthSetting(target.chatWidthSetting, record.snapshot.chatWidthSetting);
+    const result = clamped
+        ? t('taskRestoredClamped', 'Restored; width adjusted to {width}.').replace('{width}', formatWidthValue(target.chatWidthSetting))
+        : t('taskRestored');
+    try {
+        await chrome.storage.local.remove(key);
+        taskUndo[site] = null;
+        return result;
+    } catch (error) {
+        // 设置已恢复；撤销记录会在下次打开时按实际值清理，不会再次回放。
+        taskUndo[site] = { record: { state: 'restoring' }, ambiguous: false };
+        return t('taskUndoCleanupError', 'Settings restored, but the restore point could not be cleared.');
+    }
+}
+
+async function runTaskPreset(restore) {
+    const site = selectedSite;
+    const task = taskPresetSelect.value;
+    const undo = taskUndo[site];
+    if (!settingsLoaded || taskBusy || (restore && (!undo || undo.record.state !== 'ready'))) return;
+    setTaskBusy(true);
+    taskPresetStatus.textContent = t('taskSaving');
+    let message;
+    try {
+        await flushPendingChanges();
+        message = await enqueue(() => restore ? restoreTask(site) : applyTask(site, task));
+    } catch (error) {
+        console.error('[Wider Gemini] Task preset could not be saved:', error);
+        message = t('taskSaveError');
+        await readSite(site).catch(() => {});
+        siteSettings[site] = settingsUtils.normalizeSiteSettings(storedSettings, site);
+        if (site === selectedSite) renderSite();
+    } finally {
+        taskBusy = false;
+    }
+    if (site === selectedSite) renderTaskState(message);
+    else setTaskBusy(false);
+}
+
+taskPresetSelect.addEventListener('change', updateTaskPreview);
+applyTaskPreset.addEventListener('click', () => runTaskPreset(false));
+restoreTaskPreset.addEventListener('click', () => runTaskPreset(true));
+
+// 重新打开时核对未完成的任务记录：只改本地记录，不改同步设置，也不会自动重放恢复。
+async function loadTaskUndo(site, localValues) {
+    const key = settingsUtils.TASK_UNDO_KEYS[site];
+    const record = settingsUtils.readUndoRecord(localValues[key]);
+    const actual = settingsUtils.getTaskManaged(siteSettings[site], site);
+    const result = settingsUtils.reconcileUndoRecord(record, actual, site);
+    if (result.record !== record && !result.ambiguous) {
+        await (result.record ? chrome.storage.local.set({ [key]: result.record }) : chrome.storage.local.remove(key))
+            .catch(() => {});
+    }
+    taskUndo[site] = result.record ? { record: result.record, ambiguous: !!result.ambiguous } : null;
+}
+
+// ---- 初始化 ----
 
 async function initializeSettings() {
     setTaskBusy(false);
     try {
-        const [result, tabs, undo] = await Promise.all([
-            chrome.storage.sync.get(STORAGE_KEYS),
+        const [result, tabs, localValues] = await Promise.all([
+            chrome.storage.sync.get([...settingsUtils.getSiteStorageKeys('gemini'),
+                ...settingsUtils.getSiteStorageKeys('chatgpt'), 'uiLanguage']),
             chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []),
-            chrome.storage.local.get(TASK_UNDO_KEY).catch(() => ({}))
+            chrome.storage.local.get(Object.values(settingsUtils.TASK_UNDO_KEYS)).catch(() => ({}))
         ]);
-        const settings = normalizeStorage(result);
-        widthSettingsBySite = {
-            gemini: settingsUtils.normalizeSiteWidthSettings(result, 'gemini'),
-            chatgpt: settingsUtils.normalizeSiteWidthSettings(result, 'chatgpt')
-        };
-        const activeSite = getTabSite(tabs[0]);
+        storedSettings = result;
+        siteSettings.gemini = settingsUtils.normalizeSiteSettings(result, 'gemini');
+        siteSettings.chatgpt = settingsUtils.normalizeSiteSettings(result, 'chatgpt');
+        await Promise.all(['gemini', 'chatgpt'].map(site => loadTaskUndo(site, localValues)));
+        activeTabSite = getTabSite(tabs[0]);
         const savedSite = new URLSearchParams(window.location.search).get('site');
-        selectedSite = savedSite === 'gemini' || savedSite === 'chatgpt' ? savedSite : activeSite || 'gemini';
+        selectedSite = SITE_NAMES[savedSite] ? savedSite : activeTabSite || 'gemini';
 
-        // 等语言、站点与存储全部就绪再开放控件，避免初始化覆盖用户操作。
-        await loadLanguageDictionary(settings.uiLanguage);
+        // 语言、站点与存储全部就绪后才开放控件，避免初始状态闪烁或覆盖用户操作。
+        const uiLanguage = settingsUtils.normalizeUiLanguage(result.uiLanguage);
+        await loadLanguageDictionary(uiLanguage);
         localizeHtmlPage();
         siteButtons.forEach(button => {
             const marker = button.querySelector('.site-current');
             if (marker) {
-                marker.hidden = button.dataset.site !== activeSite;
+                marker.hidden = button.dataset.site !== activeTabSite;
                 marker.textContent = t('currentSite', 'Current');
             }
         });
-        uiLanguageSelect.value = settings.uiLanguage;
-        applyWidthUi(widthSettingsBySite[selectedSite]);
-        applyDensityUi(settings);
-        applyFontSizeUi(settings);
-        codeWrapToggle.checked = settings.codeWrap;
-        updateCodeWrapStatus(settings.codeWrap);
-        userFullWidthToggle.checked = settings.userFullWidth;
-        updateUserFullWidthStatus(settings.userFullWidth);
-        taskUndoSettings = undo[TASK_UNDO_KEY] || null;
-        updateSiteUi();
+        uiLanguageSelect.value = uiLanguage;
+        renderSite();
         if (result.uiLanguage === undefined) {
-            await queueSettingsWrite({ uiLanguage: settings.uiLanguage });
+            await enqueue(() => chrome.storage.sync.set({ uiLanguage }));
         }
         settingsLoaded = true;
         setTaskBusy(false);
+        refreshLayoutStatus();
     } catch (error) {
-        showSaveError(error);
+        console.error('[Wider Gemini] Settings could not be loaded:', error);
+        setStatus('error', t('saveFailed', 'Could not save. Please try again.'));
     }
 }
 
 initializeSettings();
 
+// ---- 控件事件 ----
+
+siteEnabledToggle.addEventListener('change', async function () {
+    const site = selectedSite;
+    const enabled = this.checked;
+    if (!settingsLoaded || taskBusy) return;
+    try {
+        await flushPendingChanges();
+    } catch (error) {
+        this.checked = !enabled;
+        setStatus('error', t('saveFailed', 'Could not save. Please try again.'));
+        return;
+    }
+    siteSettings[site].siteEnabled = enabled;
+    if (site === selectedSite) applyEnabledUi();
+    writePatch(site, () => settingsUtils.getSiteEnabledPatch(site, enabled), { action: 'updateSiteEnabled' });
+});
+
+widthEnabledToggle.addEventListener('change', async function () {
+    if (!settingsLoaded || taskBusy) return;
+    const enabled = this.checked;
+    try {
+        await flushPendingChanges();
+    } catch (error) {
+        this.checked = !enabled;
+        return;
+    }
+    currentWidthEnabled = enabled;
+    applyEnabledUi();
+    saveWidthSettings();
+});
+
+siteButtons.forEach(button => {
+    button.addEventListener('click', async function () {
+        const site = this.dataset.site;
+        if (!settingsLoaded || taskBusy || site === selectedSite) return;
+        try {
+            await flushPendingChanges();
+        } catch (error) {
+            return;
+        }
+        selectedSite = site;
+        statusMessages.error = '';
+        statusMessages.transient = '';
+        statusMessages.page = '';
+        renderStatus();
+        renderSite();
+        refreshLayoutStatus();
+    });
+});
+
 function onRangeInput(isMin) {
     if (isEditMode) savePresetEdits();
     const isPercent = currentWidthSetting.unit === settingsUtils.UNIT_PERCENT;
-
-    if (isPercent) {
-        let minVal = parseInt(widthMinInput.value, 10) || PERCENT_RANGE_MIN;
-        let maxVal = parseInt(widthMaxInput.value, 10) || PERCENT_RANGE_MAX;
-        minVal = clamp(minVal, PERCENT_RANGE_MIN, PERCENT_RANGE_MAX);
-        maxVal = clamp(maxVal, PERCENT_RANGE_MIN, PERCENT_RANGE_MAX);
-        if (minVal >= maxVal) {
-            if (isMin) {
-                minVal = Math.min(minVal, PERCENT_RANGE_MAX - 1);
-                maxVal = minVal + 1;
-            } else {
-                maxVal = Math.max(maxVal, PERCENT_RANGE_MIN + 1);
-                minVal = maxVal - 1;
-            }
+    const low = isPercent ? PERCENT_RANGE_MIN : RANGE_MIN;
+    const high = isPercent ? PERCENT_RANGE_MAX : RANGE_MAX;
+    const step = isPercent ? 1 : settingsUtils.PX_RANGE.step;
+    let minVal = clamp(parseInt(widthMinInput.value, 10) || low, low, high);
+    let maxVal = clamp(parseInt(widthMaxInput.value, 10) || high, low, high);
+    if (minVal >= maxVal) {
+        if (isMin) {
+            minVal = Math.min(minVal, high - step);
+            maxVal = minVal + step;
+        } else {
+            maxVal = Math.max(maxVal, low + step);
+            minVal = maxVal - step;
         }
-        widthMinInput.value = minVal;
-        widthMaxInput.value = maxVal;
+    }
+    widthMinInput.value = minVal;
+    widthMaxInput.value = maxVal;
+    if (isPercent) {
         currentWidthPercentMin = minVal;
         currentWidthPercentMax = maxVal;
     } else {
-        let minVal = parseInt(widthMinInput.value, 10) || RANGE_MIN;
-        let maxVal = parseInt(widthMaxInput.value, 10) || RANGE_MAX;
-        minVal = clamp(minVal, RANGE_MIN, RANGE_MAX);
-        maxVal = clamp(maxVal, RANGE_MIN, RANGE_MAX);
-        if (minVal >= maxVal) {
-            if (isMin) {
-                minVal = Math.min(minVal, RANGE_MAX - settingsUtils.PX_RANGE.step);
-                maxVal = minVal + settingsUtils.PX_RANGE.step;
-            } else {
-                maxVal = Math.max(maxVal, RANGE_MIN + settingsUtils.PX_RANGE.step);
-                minVal = maxVal - settingsUtils.PX_RANGE.step;
-            }
-        }
-        widthMinInput.value = minVal;
-        widthMaxInput.value = maxVal;
         currentWidthMin = minVal;
         currentWidthMax = maxVal;
     }
@@ -790,6 +949,13 @@ function onRangeInput(isMin) {
 widthMinInput.addEventListener('change', () => onRangeInput(true));
 widthMaxInput.addEventListener('change', () => onRangeInput(false));
 
+function updateWidthSetting(setting) {
+    clearTimeout(widthUpdateTimer);
+    widthUpdateTimer = null;
+    currentWidthSetting = settingsUtils.normalizeWidthSetting(setting, getTaskRanges());
+    return saveWidthSettings();
+}
+
 widthSlider.addEventListener('input', function () {
     const value = parseFloat(this.value);
     currentWidthSetting = { value, unit: currentWidthSetting.unit };
@@ -798,12 +964,8 @@ widthSlider.addEventListener('input', function () {
     if (!isEditMode) {
         renderPresetButtons(currentPresets, currentWidthMin, currentWidthMax, currentWidthSetting);
     }
-
-    if (widthUpdateTimer) clearTimeout(widthUpdateTimer);
-    widthUpdateTimer = setTimeout(() => {
-        widthUpdateTimer = null;
-        updateWidthSetting(currentWidthSetting);
-    }, 500);
+    clearTimeout(widthUpdateTimer);
+    widthUpdateTimer = setTimeout(() => updateWidthSetting(currentWidthSetting), 500);
 });
 
 // 松手时立即提交，避免关闭弹窗取消尚未执行的防抖回调。
@@ -816,21 +978,9 @@ widthSlider.addEventListener('change', function () {
         const unit = this.dataset.unit;
         if (unit === currentWidthSetting.unit) return;
         if (isEditMode) savePresetEdits();
-        const fallbackValue = getUnitFallbackValue(unit);
-        const next = settingsUtils.normalizeWidthSetting({ value: fallbackValue, unit }, {
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax
-        });
+        const next = settingsUtils.normalizeWidthSetting({ value: getUnitFallbackValue(unit), unit }, getTaskRanges());
         currentWidthSetting = next;
-        applyWidthUi({
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax,
-            chatWidthSetting: next
-        });
+        applyWidthUi({ ...getTaskRanges(), chatWidthSetting: next });
         updateWidthSetting(next);
     });
 });
@@ -849,17 +999,13 @@ function savePresetEdits() {
         const row = rows[i];
         const input = row && row.querySelector('.preset-edit-width');
         const value = input ? parseFloat(input.value) : p.value;
-        const unit = currentWidthSetting.unit;
-        return settingsUtils.normalizePreset({ id: p.id, nameKey: p.nameKey, name: p.name, value, unit }, i, {
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax
-        });
+        return settingsUtils.normalizePreset({
+            id: p.id, nameKey: p.nameKey, name: p.name, value, unit: currentWidthSetting.unit
+        }, i, getTaskRanges());
     });
     setPresetGroup(currentWidthSetting.unit, nextPresets);
-    saveWidthSettings().catch(showSaveError);
     isEditMode = false;
+    saveWidthSettings();
     editPresetsBtn.style.display = 'inline-block';
     donePresetsBtn.style.display = 'none';
     renderPresetButtons(nextPresets, currentWidthMin, currentWidthMax, currentWidthSetting);
@@ -873,45 +1019,32 @@ document.getElementById('presetButtonsContainer').addEventListener('click', func
     const setting = settingsUtils.normalizeWidthSetting({
         value: parseFloat(btn.dataset.value),
         unit: btn.dataset.unit
-    }, {
-        widthMin: currentWidthMin,
-        widthMax: currentWidthMax,
-        widthPercentMin: currentWidthPercentMin,
-        widthPercentMax: currentWidthPercentMax
-    });
-    if (setting.unit !== currentWidthSetting.unit) {
-        currentWidthSetting = setting;
-        applyWidthUi({
-            widthMin: currentWidthMin,
-            widthMax: currentWidthMax,
-            widthPercentMin: currentWidthPercentMin,
-            widthPercentMax: currentWidthPercentMax,
-            chatWidthSetting: setting
-        });
-    } else {
-        widthSlider.value = setting.value;
-        widthValue.textContent = setting.value;
-        currentWidthSetting = setting;
-        syncRangeProgress(widthSlider);
-        renderPresetButtons(currentPresets, currentWidthMin, currentWidthMax, currentWidthSetting);
-    }
+    }, getTaskRanges());
+    currentWidthSetting = setting;
+    applyWidthUi({ ...getTaskRanges(), chatWidthSetting: setting });
     updateWidthSetting(setting);
 });
 
-compactnessSlider.addEventListener('input', function () {
-    syncRangeProgress(this);
-    const derived = settingsUtils.deriveDensityFromCompactness(parseInt(this.value, 10));
-    currentDensity = {
-        ...derived,
-        messageSpacingCustom: false
-    };
-    applyDensityUi(currentDensity);
+// 阅读控件：滑块防抖，编辑的站点和数值在入队时确定。
+function commitReadingEdit() {
+    clearTimeout(readingUpdateTimer);
+    readingUpdateTimer = null;
+    if (!pendingReadingEdit) return;
+    const { site, edit } = pendingReadingEdit;
+    pendingReadingEdit = null;
+    saveReading(site, edit);
+}
 
-    if (densityUpdateTimer) clearTimeout(densityUpdateTimer);
-    densityUpdateTimer = setTimeout(() => {
-        densityUpdateTimer = null;
-        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
-    }, 500);
+function scheduleReadingEdit(edit, delay = 400) {
+    if (pendingReadingEdit && pendingReadingEdit.site !== selectedSite) commitReadingEdit();
+    pendingReadingEdit = { site: selectedSite, edit: { ...(pendingReadingEdit && pendingReadingEdit.edit), ...edit } };
+    clearTimeout(readingUpdateTimer);
+    readingUpdateTimer = setTimeout(commitReadingEdit, delay);
+}
+
+compactnessSlider.addEventListener('input', function () {
+    applyDensityUi({ messageCompactness: parseInt(this.value, 10), messageSpacingCustom: false });
+    scheduleReadingEdit({ ...currentDensity });
 });
 
 advancedDensityToggle.addEventListener('click', function () {
@@ -922,156 +1055,57 @@ advancedDensityToggle.addEventListener('click', function () {
 
 [lineHeightSlider, paragraphSpacingSlider].forEach(input => {
     input.addEventListener('input', function () {
-        syncRangeProgress(this);
-        currentDensity = settingsUtils.normalizeDensity({
+        applyDensityUi({
             messageCompactness: parseInt(compactnessSlider.value, 10),
             messageLineHeight: parseFloat(lineHeightSlider.value),
             messageParagraphSpacing: parseInt(paragraphSpacingSlider.value, 10),
             messageSpacingCustom: true
         });
-        applyDensityUi(currentDensity);
-        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
+        scheduleReadingEdit({ ...currentDensity }, 250);
     });
 });
 
 fontSizeSlider.addEventListener('input', function () {
-    syncRangeProgress(this);
-    currentFontSize = parseInt(this.value, 10);
-    fontSizeValue.textContent = currentFontSize;
-
-    if (densityUpdateTimer) clearTimeout(densityUpdateTimer);
-    densityUpdateTimer = setTimeout(() => {
-        densityUpdateTimer = null;
-        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
-    }, 500);
+    applyFontSizeUi(parseInt(this.value, 10));
+    scheduleReadingEdit({ messageFontSize: currentFontSize });
 });
 
-[compactnessSlider, fontSizeSlider].forEach(input => {
-    input.addEventListener('change', function () {
-        updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
-    });
+[compactnessSlider, fontSizeSlider, lineHeightSlider, paragraphSpacingSlider].forEach(input => {
+    input.addEventListener('change', commitReadingEdit);
 });
 
 resetFontSizeBtn.addEventListener('click', function () {
-    currentFontSize = settingsUtils.DEFAULTS.messageFontSize;
-    fontSizeSlider.value = currentFontSize;
-    fontSizeValue.textContent = currentFontSize;
-    syncRangeProgress(fontSizeSlider);
-    updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
+    applyFontSizeUi(DEFAULTS.messageFontSize);
+    scheduleReadingEdit({ messageFontSize: currentFontSize }, 0);
 });
 
 resetDensityBtn.addEventListener('click', function () {
-    const derived = settingsUtils.deriveDensityFromCompactness(parseInt(compactnessSlider.value, 10));
-    currentDensity = {
-        ...derived,
-        messageSpacingCustom: false
-    };
-    applyDensityUi(currentDensity);
-    updateDensity({ ...currentDensity, messageFontSize: currentFontSize });
+    applyDensityUi({ messageCompactness: parseInt(compactnessSlider.value, 10), messageSpacingCustom: false });
+    scheduleReadingEdit({ ...currentDensity }, 0);
 });
 
 codeWrapToggle.addEventListener('change', function () {
-    const enabled = this.checked;
-    updateCodeWrapStatus(enabled);
-    updateCodeWrap(enabled);
+    setToggleStatus(codeWrapStatus, this.checked);
+    scheduleReadingEdit({ codeWrap: this.checked }, 0);
 });
 
 userFullWidthToggle.addEventListener('change', function () {
-    const enabled = this.checked;
-    updateUserFullWidthStatus(enabled);
-    updateUserFullWidth(enabled);
+    setToggleStatus(userFullWidthStatus, this.checked);
+    scheduleReadingEdit({ userFullWidth: this.checked }, 0);
 });
 
 uiLanguageSelect.addEventListener('change', async function () {
     const language = settingsUtils.normalizeUiLanguage(this.value);
-    if (isEditMode) savePresetEdits();
-    flushPendingChanges();
     setTaskBusy(true);
     try {
-        await queueSettingsWrite({ uiLanguage: language });
+        await flushPendingChanges();
+        await enqueue(() => chrome.storage.sync.set({ uiLanguage: language }));
         // 保留手动选择的站点，重新加载 popup 以全量重渲染新语言。
         const url = new URL(window.location.href);
         url.searchParams.set('site', selectedSite);
         window.location.replace(url.href);
     } catch (error) {
-        showSaveError(error);
+        setStatus('error', t('saveFailed', 'Could not save. Please try again.'));
         setTaskBusy(false);
     }
 });
-
-function updateCodeWrapStatus(enabled) {
-    const statusOn = t("statusOn", "On");
-    const statusOff = t("statusOff", "Off");
-    codeWrapStatus.textContent = enabled ? statusOn : statusOff;
-}
-
-function updateUserFullWidthStatus(enabled) {
-    const statusOn = t("statusOn", "On");
-    const statusOff = t("statusOff", "Off");
-    userFullWidthStatus.textContent = enabled ? statusOn : statusOff;
-}
-
-// 消息目标在提交时固定；只在确认内容脚本缺失时回退为刷新页面。
-function notifySiteTabs(site, message) {
-    const action = message.action === 'updateWidthSetting' || message.action === 'updateWidthEnabled'
-        ? 'width' : message.action;
-    const key = `${site}:${action}`;
-    latestSiteMessages.set(key, message);
-    return chrome.tabs.query({ url: settingsUtils.SITE_MATCHES[site] }).then(tabs => {
-        if (latestSiteMessages.get(key) !== message) return;
-        return Promise.all(tabs.map(tab => {
-            if (tab.discarded) return;
-
-            return chrome.tabs.sendMessage(tab.id, message).catch(error => {
-                if (/Receiving end does not exist/i.test(error.message || String(error))) {
-                    showRefreshNotice();
-                    chrome.tabs.reload(tab.id).catch(() => {});
-                }
-            });
-        }));
-    }).catch(error => console.error('[Wider Gemini] Could not query site tabs:', error));
-}
-
-function notifyGeminiTabs(message) {
-    notifySiteTabs('gemini', message);
-}
-
-function updateWidthSetting(setting) {
-    clearTimeout(widthUpdateTimer);
-    widthUpdateTimer = null;
-    currentWidthSetting = settingsUtils.normalizeWidthSetting(setting, getTaskRanges());
-    const site = selectedSite;
-    const message = {
-        action: 'updateWidthSetting',
-        setting: { ...currentWidthSetting },
-        ranges: getTaskRanges(),
-        enabled: currentWidthEnabled
-    };
-    saveWidthSettings().then(() => notifySiteTabs(site, message)).catch(showSaveError);
-}
-
-function updateDensity(settings) {
-    clearTimeout(densityUpdateTimer);
-    densityUpdateTimer = null;
-    const normalized = settingsUtils.normalizeDensity(settings);
-    const fontSize = settingsUtils.normalizeFontSize(settings.messageFontSize);
-    const payload = { ...normalized, messageFontSize: fontSize };
-    queueSettingsWrite(payload).then(() => notifyGeminiTabs({
-        action: 'updateDensity',
-        settings: payload
-    })).catch(showSaveError);
-}
-
-function updateCodeWrap(enabled) {
-    queueSettingsWrite({ codeWrap: enabled }).then(() => notifyGeminiTabs({
-        action: 'updateCodeWrap',
-        enabled: enabled
-    })).catch(showSaveError);
-}
-
-function updateUserFullWidth(enabled) {
-    queueSettingsWrite({ userFullWidth: enabled }).then(() => notifyGeminiTabs({
-        action: 'updateUserFullWidth',
-        enabled: enabled
-    })).catch(showSaveError);
-}

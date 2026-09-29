@@ -4,7 +4,8 @@
     const SETTINGS_KEYS = [
         'widthEnabled', 'chatWidth', 'chatWidthSetting', 'widthMin', 'widthMax', 'widthPercentMin', 'widthPercentMax',
         'messageCompactness', 'messageLineHeight', 'messageParagraphSpacing', 'messageSpacingCustom',
-        'messageFontSize', 'codeWrap', 'userFullWidth', 'uiLanguage', 'chatgptWidthSettings'
+        'messageFontSize', 'codeWrap', 'userFullWidth', 'uiLanguage', 'chatgptWidthSettings',
+        'geminiEnabled', 'chatgptEnabled', 'chatgptReadingSettings'
     ];
     const generateButton = document.getElementById('generateReport');
     const preview = document.getElementById('reportPreview');
@@ -60,7 +61,8 @@
                 chrome.runtime.getPlatformInfo()
             ]);
             const settings = window.widerGeminiSettings.normalizeStorage(stored);
-            const chatgpt = window.widerGeminiSettings.normalizeSiteWidthSettings(stored, 'chatgpt');
+            const chatgpt = window.widerGeminiSettings.normalizeSiteSettings(stored, 'chatgpt');
+            const geminiEnabled = window.widerGeminiSettings.normalizeSiteSettings(stored, 'gemini').siteEnabled;
             const manifest = chrome.runtime.getManifest();
             // 逐项构造报告，避免把未来新增设置或用户自定义名称带入诊断。
             const diagnostics = {
@@ -69,6 +71,7 @@
                 platform: platform.os,
                 settings: {
                     uiLanguage: settings.uiLanguage,
+                    geminiEnabled,
                     widthEnabled: settings.widthEnabled,
                     chatWidthSetting: settings.chatWidthSetting,
                     widthMin: settings.widthMin,
@@ -82,6 +85,15 @@
                     messageFontSize: settings.messageFontSize,
                     codeWrap: settings.codeWrap,
                     userFullWidth: settings.userFullWidth,
+                    chatgptEnabled: chatgpt.siteEnabled,
+                    chatgptReadingSettings: {
+                        messageCompactness: chatgpt.messageCompactness,
+                        messageLineHeight: chatgpt.messageLineHeight,
+                        messageParagraphSpacing: chatgpt.messageParagraphSpacing,
+                        messageSpacingCustom: chatgpt.messageSpacingCustom,
+                        messageFontSize: chatgpt.messageFontSize,
+                        userFullWidth: chatgpt.userFullWidth
+                    },
                     chatgptWidthSettings: {
                         widthEnabled: chatgpt.widthEnabled,
                         chatWidthSetting: {

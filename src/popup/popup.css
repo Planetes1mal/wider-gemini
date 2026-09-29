@@ -20,6 +20,7 @@
     --track: #d7deea;
     --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
     --focus-ring: rgba(37, 99, 235, 0.16);
+    --warn: #b45309;
 }
 
 body {
@@ -63,7 +64,7 @@ html:lang(zh-TW) body {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     padding: 4px;
     border: 1px solid var(--border);
     border-radius: 9px;
@@ -107,16 +108,69 @@ html:lang(zh-TW) body {
     font-weight: 600;
 }
 
-.site-scope {
-    margin: 8px 2px 12px;
+/* 站点总开关：紧贴站点标签的一行，不做卡片；状态点与开关表达启用/暂停。 */
+.site-power {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    margin-bottom: 12px;
+    padding: 0 2px 0 8px;
+}
+
+.site-power-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.site-power.is-paused .site-power-dot {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--subtle);
+}
+
+.site-power-label {
+    flex: 1;
+    min-width: 0;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.site-power.is-paused .site-power-label {
+    color: var(--muted);
+}
+
+.site-power-state {
+    flex: 0 0 auto;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface-muted);
     color: var(--muted);
     font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.site-status {
+    margin: -8px 2px 12px 26px;
+    color: var(--muted);
+    font-size: 11.5px;
     line-height: 1.5;
     overflow-wrap: anywhere;
 }
 
-#settingsError {
-    color: var(--accent-strong);
+.site-status[data-kind="error"] {
+    color: var(--warn);
+    font-weight: 650;
 }
 
 .width-switch {
@@ -527,7 +581,8 @@ select option {
     color: var(--text);
 }
 
-#compactnessValue {
+#compactnessValue,
+#fontSizeValue {
     color: var(--text);
     font-size: 18px;
     font-weight: 800;
@@ -984,6 +1039,7 @@ input:checked + .slider-toggle::before {
         --track: #313849;
         --shadow: none;
         --focus-ring: rgba(96, 165, 250, 0.22);
+        --warn: #fbbf24;
     }
 
     .header-icon {
@@ -1039,6 +1095,7 @@ input:checked + .slider-toggle::before {
 @media (prefers-reduced-motion: reduce) {
     .slider-toggle,
     .slider-toggle::before,
+    .site-power-dot,
     .clamped-hint {
         transition: none;
     }

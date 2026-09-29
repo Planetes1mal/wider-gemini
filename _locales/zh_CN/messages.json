@@ -3,7 +3,7 @@
     "message": "Wider Gemini"
   },
   "appDesc": {
-    "message": "分别拓宽 Gemini 和 ChatGPT 的对话区域，支持像素与百分比宽度；Gemini 还可调整字号、阅读密度和代码换行。"
+    "message": "分别拓宽 Gemini 和 ChatGPT 的对话区域，按网站调整字号与阅读密度，并可随时暂停任一网站。"
   },
   "headerSubtitle": {
     "message": "让对话界面更宽更舒适"
@@ -133,19 +133,19 @@
     "message": "消息区域宽度"
   },
   "helpWidthBody": {
-    "message": "选择 px 使用固定宽度，选择 % 跟随窗口大小。拖动滑块或点选预设。Gemini 和 ChatGPT 分别保存宽度、范围和预设，每种单位也有独立预设。展开“范围与预设”即可编辑。宽度标题旁的开关可以单独暂停该网站的拓宽并恢复原站宽度，已保存的数值和预设会保留，Gemini 阅读设置仍然有效。"
+    "message": "选择 px 使用固定宽度，选择 % 跟随窗口大小。拖动滑块或点选预设。Gemini 和 ChatGPT 分别保存宽度、范围和预设，每种单位也有独立预设。展开“范围与预设”即可编辑。宽度标题旁的开关可以单独暂停该网站的拓宽并恢复原站宽度，已保存的数值和预设会保留，阅读设置仍然有效。"
   },
   "helpCodeTitle": {
     "message": "代码换行"
   },
   "helpCodeBody": {
-    "message": "仅适用于 Gemini：开启“代码自动换行”，减少阅读长代码时的横向滚动。关闭后保留不折行的代码显示。"
+    "message": "仅适用于 Gemini：开启“代码自动换行”，减少阅读长代码时的横向滚动。ChatGPT 请使用代码块自带的换行按钮，扩展不会改动它。"
   },
   "helpReadingTitle": {
     "message": "字号与间距"
   },
   "helpReadingBody": {
-    "message": "仅适用于 Gemini：字号可在75%至200%之间调整，无需缩放整个页面。自动密度为0时保留原生段距和行高比例，提高密度会逐渐收紧原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。"
+    "message": "字号可在75%至200%之间调整，无需缩放整个页面，标题、代码和表格保持原有比例。自动密度为0时保留原生段距和行高，提高密度只会逐渐收紧正文。在 ChatGPT 中，代码行、表格行和公式保持原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。Gemini 与 ChatGPT 分别保存阅读设置。"
   },
   "helpLiveSettings": {
     "message": "设置会自动保存并实时应用到所选网站已打开的标签页。两个网站的设置互相独立，弹窗语言共用。跨设备同步取决于浏览器的同步设置。"
@@ -160,7 +160,7 @@
     "message": "确认当前网站是 gemini.google.com 或 chatgpt.com，且 Wider Gemini 已启用并获准访问该网站。通过 Chrome 安装的网页应用（PWA）使用同一网页。不支持原生桌面客户端或 Chrome 内置的 Gemini 面板。"
   },
   "helpTroubleshootRefresh": {
-    "message": "安装或更新扩展后，如果设置没有生效，请刷新对应页面一次。出现布局未适配提示时，当前页不会应用拓宽，会保留原站宽度。你也可以通过宽度开关单独暂停该网站的拓宽。"
+    "message": "安装或更新扩展后，如果设置没有生效，请刷新对应页面一次。若弹窗提示页面仍在运行旧版扩展，请先在 chrome://extensions 重新加载扩展。出现布局未适配提示时，当前页不会应用拓宽。站点标签下方的“启用”开关可暂停该网站的全部效果，已保存的设置会保留。"
   },
   "helpTroubleshootReport": {
     "message": "如果问题仍然存在，请记录网站、复现步骤和窗口大小。可附上已移除隐私内容的截图，并说明其他会调整网页布局的扩展。"
@@ -222,17 +222,11 @@
   "taskLarge": {
     "message": "大字"
   },
-  "taskHint": {
-    "message": "遵守自定义宽度范围。恢复会将宽度、字号、间距和代码换行还原至最近一次应用之前。"
-  },
   "taskApply": {
     "message": "应用"
   },
   "taskRestore": {
     "message": "恢复应用前设置"
-  },
-  "taskPreview": {
-    "message": "宽度 {width} · 字号 {font}% · 原生间距 · 代码换行{wrap}"
   },
   "taskSaving": {
     "message": "正在保存设置…"
@@ -250,7 +244,7 @@
     "message": "任务预设"
   },
   "helpTaskBody": {
-    "message": "仅适用于 Gemini：选择长文阅读、表格、代码或大字，查看设置摘要后点击应用。预设只调整宽度、字号、间距和代码换行，并遵守自定义宽度范围。“恢复应用前设置”可撤销此设备上最近一次应用，即使已关闭弹窗；恢复会覆盖之后对这四类设置的调整。"
+    "message": "选择任务预设，查看摘要后点击应用。Gemini 提供长文阅读、表格、代码和大字；ChatGPT 提供长文阅读、宽屏（表格与代码）和大字。预设只调整宽度、字号和间距（Gemini 另含代码换行），并遵守自定义宽度范围。“恢复应用前设置”可撤销此设备上该网站最近一次应用，即使已关闭弹窗；恢复会覆盖之后对这些设置的调整。"
   },
   "autoSpacingHint": {
     "message": "自动模式跟随各消息的原生间距。移动任一滑块后，将手动应用下方两项数值。"
@@ -261,23 +255,11 @@
   "currentSite": {
     "message": "当前网页"
   },
-  "chatgptWidthOnly": {
-    "message": "ChatGPT 目前支持调整对话宽度。"
-  },
   "widthOptions": {
     "message": "范围与预设"
   },
   "readingSettings": {
     "message": "阅读与排版"
-  },
-  "settingsSaveError": {
-    "message": "无法保存设置，请重新打开弹窗后再试。"
-  },
-  "widthEnabled": {
-    "message": "启用拓宽"
-  },
-  "widthPaused": {
-    "message": "已暂停拓宽，宽度和预设已保留。"
   },
   "layoutUnsupported": {
     "message": "暂未适配当前页面布局，已保留原站宽度。"
@@ -287,5 +269,50 @@
   },
   "layoutUnavailable": {
     "message": "暂时无法读取页面状态，请刷新页面后重试。"
+  },
+  "siteEnabled": {
+    "message": "在 {site} 上启用"
+  },
+  "siteEnabledA11y": {
+    "message": "在 {site} 上启用 Wider Gemini"
+  },
+  "widthEnabledSite": {
+    "message": "启用 {site} 对话拓宽"
+  },
+  "sitePaused": {
+    "message": "已暂停"
+  },
+  "savedWhilePaused": {
+    "message": "已保存，待启用"
+  },
+  "saveFailed": {
+    "message": "未能保存，请重试"
+  },
+  "pageOutdated": {
+    "message": "设置已保存，但此页面仍在运行旧版扩展。请先在 chrome://extensions 重新加载扩展，再刷新此页面。"
+  },
+  "taskWide": {
+    "message": "宽屏（表格与代码）"
+  },
+  "taskSpacingNative": {
+    "message": "原生间距"
+  },
+  "taskWrapOn": {
+    "message": "代码换行"
+  },
+  "taskWrapOff": {
+    "message": "代码不换行"
+  },
+  "taskRestoredClamped": {
+    "message": "已恢复。宽度已按当前范围调整为 {width}。"
+  },
+  "taskUndoRecordError": {
+    "message": "已应用，但未能在此设备保存恢复点。"
+  },
+  "taskUndoCleanupError": {
+    "message": "设置已恢复，但未能清除恢复点，下次打开时会自动清理。"
+  },
+  "taskPendingUnknown": {
+    "message": "上次任务预设未完成，暂时无法恢复。重新应用任务即可继续。"
   }
 }

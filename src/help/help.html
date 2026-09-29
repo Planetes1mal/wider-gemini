@@ -26,19 +26,19 @@
             <dl class="instructions">
                 <div>
                     <dt data-i18n="helpTaskTitle">Task presets</dt>
-                    <dd data-i18n="helpTaskBody">In the Gemini tab, choose Long reading, Tables, Code, or Large text, review the settings, then click Apply. These change Gemini's width, font size, spacing, and code wrapping. Your width limits still apply. Restore previous settings undoes the most recent task preset on this device, even after closing the popup; it replaces any later changes to those settings.</dd>
+                    <dd data-i18n="helpTaskBody">Choose a task preset, review the summary, then click Apply. Gemini offers Long reading, Tables, Code, and Large text; ChatGPT offers Long reading, Wide (tables &amp; code), and Large text. Presets change width, font size, and spacing (and code wrapping in Gemini), within your width limits. Restore previous settings undoes the most recent preset for that site on this device, even after closing the popup; it replaces later changes to those settings.</dd>
                 </div>
                 <div>
                     <dt data-i18n="helpWidthTitle">Conversation width</dt>
-                    <dd data-i18n="helpWidthBody">Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Gemini and ChatGPT save width, limits, and presets separately; each unit has its own presets. Expand Range &amp; presets to edit them. The switch beside the width title pauses widening for that site and restores its original width. Your saved values and presets are kept; Gemini reading settings remain active.</dd>
+                    <dd data-i18n="helpWidthBody">Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Gemini and ChatGPT save width, limits, and presets separately; each unit has its own presets. Expand Range &amp; presets to edit them. The switch beside the width title pauses widening for that site and restores its original width. Your saved values and presets are kept; reading settings remain active.</dd>
                 </div>
                 <div>
                     <dt data-i18n="helpCodeTitle">Code wrapping</dt>
-                    <dd data-i18n="helpCodeBody">In the Gemini tab, turn on Code Auto Wrap to read long lines without as much horizontal scrolling. Turn it off to preserve unbroken code lines. ChatGPT keeps its native code formatting.</dd>
+                    <dd data-i18n="helpCodeBody">Gemini only: Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. In ChatGPT, use its own wrap button on each code block; the extension leaves it unchanged.</dd>
                 </div>
                 <div>
                     <dt data-i18n="helpReadingTitle">Text size & spacing</dt>
-                    <dd data-i18n="helpReadingBody">In the Gemini tab, adjust font size from 75% to 200% without zooming the whole page. At Auto density 0, native paragraph gaps and line-height proportions are preserved. Higher density gradually reduces native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. ChatGPT keeps its native text size and spacing.</dd>
+                    <dd data-i18n="helpReadingBody">Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. In ChatGPT, code lines, table rows, and formulas keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Gemini and ChatGPT keep separate reading settings.</dd>
                 </div>
             </dl>
             <p class="note" data-i18n="helpLiveSettings">Changes apply to open tabs for the selected site and are saved automatically. Sync across devices depends on your browser's sync settings.</p>
@@ -51,7 +51,7 @@
             <h2 id="troubleshootingTitle" data-i18n="helpTroubleshooting">Something looks wrong?</h2>
             <ol class="troubleshooting">
                 <li data-i18n="helpTroubleshootPage">Check that you are on gemini.google.com or chatgpt.com and Wider Gemini has access to that site. Chrome-installed site app windows use the same webpages. Native desktop apps and Chrome's built-in Gemini panel are not supported.</li>
-                <li data-i18n="helpTroubleshootRefresh">If a setting does not appear after installing or updating the extension, reload the affected page once. An unsupported-layout notice means widening is not applied to the current page, so its original width is preserved. You can also pause widening for just that site using its width switch.</li>
+                <li data-i18n="helpTroubleshootRefresh">If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the Enable switch below the site tabs to pause everything on a site; saved settings are kept.</li>
                 <li data-i18n="helpTroubleshootReport">If the problem continues, note the site, steps to reproduce it, and your window size. A screenshot with private content removed can help; mention any other extensions that change the page layout.</li>
             </ol>
             <a class="button primary" href="https://github.com/Planetes1mal/wider-gemini/issues/new/choose"

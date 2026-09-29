@@ -3,7 +3,7 @@
     "message": "Wider Gemini"
   },
   "appDesc": {
-    "message": "分別拓寬 Gemini 與 ChatGPT 的對話區域，支援像素與百分比寬度；Gemini 還可調整字級、閱讀密度及程式碼換行。"
+    "message": "分別加寬 Gemini 和 ChatGPT 的對話區域，依網站調整字型大小與閱讀密度，並可隨時暫停任一網站。"
   },
   "headerSubtitle": {
     "message": "讓對話介面更寬、更舒適"
@@ -133,19 +133,19 @@
     "message": "訊息區域寬度"
   },
   "helpWidthBody": {
-    "message": "選擇 px 使用固定寬度，選擇 % 跟隨視窗大小。拖曳滑桿或點選預設。Gemini 和 ChatGPT 分別儲存寬度、範圍與預設，每種單位也有獨立預設。展開「範圍與預設」即可編輯。寬度標題旁的開關可以單獨暫停該網站的加寬並恢復原站寬度，已儲存的數值與預設會保留，Gemini 閱讀設定仍然有效。"
+    "message": "選擇 px 使用固定寬度，選擇 % 跟隨視窗大小。拖曳滑桿或點選預設。Gemini 和 ChatGPT 分別儲存寬度、範圍與預設，每種單位也有獨立預設。展開「範圍與預設」即可編輯。寬度標題旁的開關可以單獨暫停該網站的加寬並恢復原站寬度，已儲存的數值與預設會保留，閱讀設定仍然有效。"
   },
   "helpCodeTitle": {
     "message": "程式碼換行"
   },
   "helpCodeBody": {
-    "message": "僅適用於 Gemini：開啟「程式碼自動換行」，減少閱讀長程式碼時的橫向捲動。關閉後保留不折行的程式碼顯示。"
+    "message": "僅適用於 Gemini：開啟「程式碼自動換行」，減少閱讀長程式碼時的橫向捲動。ChatGPT 請使用程式碼區塊內建的換行按鈕，擴充功能不會變更它。"
   },
   "helpReadingTitle": {
     "message": "字級與間距"
   },
   "helpReadingBody": {
-    "message": "僅適用於 Gemini：字級可在75%至200%之間調整，不必縮放整個頁面。自動密度為0時保留原生段距和行高比例，提高密度會逐漸收緊原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。"
+    "message": "字級可在75%至200%之間調整，不必縮放整個頁面，標題、程式碼和表格維持原有比例。自動密度為0時保留原生段距和行高，提高密度只會逐漸收緊正文。在 ChatGPT 中，程式碼行、表格列和公式維持原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。Gemini 與 ChatGPT 分別儲存閱讀設定。"
   },
   "helpLiveSettings": {
     "message": "設定會自動儲存並即時套用至所選網站已開啟的分頁。兩個網站的設定互相獨立，彈出視窗語言共用。跨裝置同步取決於瀏覽器的同步設定。"
@@ -160,7 +160,7 @@
     "message": "確認目前網站是 gemini.google.com 或 chatgpt.com，且 Wider Gemini 已啟用並獲准存取該網站。透過 Chrome 安裝的網頁應用程式（PWA）使用同一網頁。不支援原生桌面應用程式或 Chrome 內建的 Gemini 面板。"
   },
   "helpTroubleshootRefresh": {
-    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理對應頁面一次。出現版面尚未支援的提示時，目前頁面不會套用加寬，會保留原站寬度。你也可以透過寬度開關單獨暫停該網站的加寬。"
+    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理對應頁面一次。若彈出視窗提示頁面仍在執行舊版，請先在 chrome://extensions 重新載入擴充功能。出現版面尚未支援的提示時，目前頁面不會套用加寬。站點分頁下方的「啟用」開關可暫停該網站的所有效果，已儲存的設定會保留。"
   },
   "helpTroubleshootReport": {
     "message": "如果問題持續，請記錄網站、重現步驟與視窗大小。可附上已移除私人內容的螢幕截圖，並說明其他會調整網頁版面的擴充功能。"
@@ -222,17 +222,11 @@
   "taskLarge": {
     "message": "大字"
   },
-  "taskHint": {
-    "message": "遵守自訂寬度範圍。還原會將寬度、字級、間距及程式碼換行恢復至最近一次套用之前。"
-  },
   "taskApply": {
     "message": "套用"
   },
   "taskRestore": {
     "message": "還原套用前設定"
-  },
-  "taskPreview": {
-    "message": "寬度 {width} · 字級 {font}% · 原生間距 · 程式碼換行{wrap}"
   },
   "taskSaving": {
     "message": "正在儲存設定…"
@@ -250,7 +244,7 @@
     "message": "任務預設"
   },
   "helpTaskBody": {
-    "message": "僅適用於 Gemini：選擇長文閱讀、表格、程式碼或大字，查看設定摘要後點選套用。預設只調整寬度、字級、間距和程式碼換行，並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這四類設定的調整。"
+    "message": "選擇任務預設，查看摘要後點選套用。Gemini 提供長文閱讀、表格、程式碼和大字；ChatGPT 提供長文閱讀、寬螢幕（表格與程式碼）和大字。預設只調整寬度、字級和間距（Gemini 另含程式碼換行），並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上該網站最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這些設定的調整。"
   },
   "autoSpacingHint": {
     "message": "自動模式跟隨各則訊息的原生間距。移動任一滑桿後，將手動套用下方兩項數值。"
@@ -261,23 +255,11 @@
   "currentSite": {
     "message": "目前網頁"
   },
-  "chatgptWidthOnly": {
-    "message": "ChatGPT 目前支援調整對話寬度。"
-  },
   "widthOptions": {
     "message": "範圍與預設"
   },
   "readingSettings": {
     "message": "閱讀與排版"
-  },
-  "settingsSaveError": {
-    "message": "無法儲存設定，請重新開啟彈出視窗後再試。"
-  },
-  "widthEnabled": {
-    "message": "啟用加寬"
-  },
-  "widthPaused": {
-    "message": "已暫停加寬，寬度與預設已保留。"
   },
   "layoutUnsupported": {
     "message": "尚未支援目前的頁面版面，已保留原站寬度。"
@@ -287,5 +269,50 @@
   },
   "layoutUnavailable": {
     "message": "暫時無法讀取頁面狀態，請重新整理頁面後再試。"
+  },
+  "siteEnabled": {
+    "message": "在 {site} 上啟用"
+  },
+  "siteEnabledA11y": {
+    "message": "在 {site} 上啟用 Wider Gemini"
+  },
+  "widthEnabledSite": {
+    "message": "啟用 {site} 對話加寬"
+  },
+  "sitePaused": {
+    "message": "已暫停"
+  },
+  "savedWhilePaused": {
+    "message": "已儲存，待啟用"
+  },
+  "saveFailed": {
+    "message": "無法儲存，請再試一次"
+  },
+  "pageOutdated": {
+    "message": "設定已儲存，但此頁面仍在執行舊版擴充功能。請先在 chrome://extensions 重新載入擴充功能，再重新整理此頁面。"
+  },
+  "taskWide": {
+    "message": "寬螢幕（表格與程式碼）"
+  },
+  "taskSpacingNative": {
+    "message": "原生間距"
+  },
+  "taskWrapOn": {
+    "message": "程式碼換行"
+  },
+  "taskWrapOff": {
+    "message": "程式碼不換行"
+  },
+  "taskRestoredClamped": {
+    "message": "已還原。寬度已依目前範圍調整為 {width}。"
+  },
+  "taskUndoRecordError": {
+    "message": "已套用，但無法在此裝置儲存還原點。"
+  },
+  "taskUndoCleanupError": {
+    "message": "設定已還原，但無法清除還原點，下次開啟時會自動清理。"
+  },
+  "taskPendingUnknown": {
+    "message": "上次任務預設未完成，暫時無法還原。重新套用任務即可繼續。"
   }
 }

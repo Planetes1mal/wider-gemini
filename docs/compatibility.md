@@ -1,5 +1,17 @@
 # Compatibility record
 
+## Follow-up fix for the ChatGPT message structure — September 29, 2026
+
+Addresses the confirmed failure recorded below. **Not yet rechecked on the authenticated page**; the failure stays open until that recheck passes.
+
+- Reading targets now recognize both structures: assistant bodies via `[data-markdown-text-style="assistant-message"]` or the older role-based `.markdown`, and user bubbles via `[data-user-message-bubble]` or the older role-based bubble. User text owners are the elements that directly hold text inside the bubble.
+- User-message full width no longer relies on class names. It walks up from the bubble, skipping `display: contents`, and widens only elements narrower than the measured conversation column.
+- `getLayoutStatus()` reports `reading.status` (`active`, `unsupported`, `idle`, `paused`, `loading`) separately from width. When non-default reading settings meet a conversation with no recognized messages, the popup shows a notice (new key `readingUnsupported` in all six locales).
+
+Evidence: `e2e/chatgpt-reading.js` now includes the observed new structure (no role attributes, `data-*` body and bubble) alongside the older one, whose user bubble was updated to match a public share page read on this date (`display: contents` wrapper; the bubble itself carries `max-w-(--user-chat-width,70%)`). Run against the previous content script, the fixture fails as the live page did (new-structure paragraph 16px instead of 20px); with the fix it passes, including full-width bubbles for both structures and the `unsupported` reading status. On that public share page (older structure, signed out), the new selectors found the assistant body, the outer user bubble, and its text owner, with the seven code-block buttons inside the body excluded. The full unit/packaging suite, the 73 Gemini layout scenarios, 106-key locale parity, and the real-popup probe passed again.
+
+Limit: the new structure's inner nesting was not captured during the live run; only its two root attributes were recorded. Recheck on the signed-in test conversation: 140% font, density, manual spacing, full width at 1600px, native code wrap, and pause/resume.
+
 ## Non-macOS verification in the Codex in-app browser — September 29, 2026
 
 **Outcome: partial pass, with a confirmed ChatGPT reading-layout failure.** The current candidate is not fully compatible with the observed ChatGPT message structure. This round verifies and records behavior; it does not change extension runtime code or claim that the failure has been fixed. macOS was excluded by the user.

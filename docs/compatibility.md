@@ -1,5 +1,19 @@
 # Compatibility record
 
+## Long-history navigation follow-up — September 30, 2026
+
+**Open: the user rejects the rail's page-like behavior and reports stuttering.** Source remains runtime `2c3c2e1` on `chatgpt-width-support`, documentation base `89f4a8d`, version **`3.0.0-rc.1`**. The earlier short-chat positioning/jump passes do not establish usable navigation through a long history.
+
+| Finding | Evidence and limit |
+| --- | --- |
+| The rail itself hides already mounted messages | **Reproduced locally with the actual shared runtime.** All 40 user messages and all 40 buttons exist, but a 480px rail shows only 20 at once (`scrollHeight: 960px`). Moving the conversation to message 37 changes the visible range from 1–20 to 18–37 (`rail.scrollTop: 408px`). Returning the rail to its top shows 1–20 while the conversation remains at 37. Fixed 24px tick pitch, internal overflow and active-item reveal produce the page-like turnover. The old plan explicitly chose this design; it now requires revision to meet the user's clarified expectation. |
+| Dots initially omits older, unloaded history | **Reproduced in the signed-in Codex IAB with source-matched settings/navigation/ChatGPT scripts.** A fresh Dots tab started with 32 message rows and 10 recognized user turns/ticks. Successive earliest-tick jumps yielded 40 rows/13 turns, then 45 rows/14 turns. The observed older entries were prepended; all prior hashed user IDs remained. Each of these small rails showed all its mounted ticks, so this omission is independent of internal rail overflow. Neither the full historical count nor node eviction/virtualization was established. Ordinary ChatGPT and Gemini history-loading behavior still need their own evidence. |
+| Reported stutter / slow movement | **Open; root cause not established.** One repeated jump across already mounted Dots history reached its target at approximately 72px below the scroll-root top, traversing about 4,758px in 1,296ms with unchanged row count. This records smooth-scroll duration, not frame-jank attribution. A separate shared-runtime probe with 40/100/300 mounted turns measured 39/99/299 message-rectangle reads for a bottom-position update and 629/1,529/4,529 reads across 30 scroll updates. Those call counts establish linear work, not visible frame stalls or a proven native-site/extension culprit. |
+
+Required follow-up: replace the internally paged interaction with a whole-history overview design; separately define how unloaded messages become known and reachable. Dense targeting must remain usable, and any loading strategy must preserve the user's position and allow cancellation. Reproduce the reported stutter with a controlled comparison before choosing an optimization. A shorter tick pitch alone does not solve unloaded history, and a loaded-message count must not be presented as the complete conversation count. This is an open navigation acceptance issue; no runtime fix or `rc.2` promotion is claimed.
+
+Ignored evidence and agent handoff: `.scratch/navigation-long-history/spec.md`, `result.json`, `live-dots-samples.json`, `live-dots-jump.json`, `layout-read-results.json`, and the two temporary probe scripts. No private message text was stored for this investigation; ID equality was recorded using hashes. No formal tests, runtime code, settings, theme or viewport were changed. Temporary page instrumentation was removed. The documentation diff was checked with `git diff --check`.
+
 ## Signed-in recheck of the round 2 fixes — September 30, 2026
 
 Source: runtime `2c3c2e1`, documentation base `f13925b`, on `chatgpt-width-support`; version remains **`3.0.0-rc.1`**. **The seven previously reproduced defects passed the exercised live rechecks. Overall acceptance remains partial:** Page-chat navigation and the other gaps below are not closed. This section supersedes corresponding findings for older builds, without changing their historical records.

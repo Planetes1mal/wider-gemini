@@ -317,5 +317,14 @@
   },
   "readingUnsupported": {
     "message": "暂未识别此页面的消息结构，字号与间距未生效；宽度不受影响。"
+  },
+  "navigationLabel": {
+    "message": "消息导航"
+  },
+  "navigationMessage": {
+    "message": "第 {n} 条消息，共 {total} 条"
+  },
+  "navigationAttachment": {
+    "message": "附件"
   }
 }

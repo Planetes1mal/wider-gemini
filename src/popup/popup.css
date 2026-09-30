@@ -671,6 +671,49 @@ summary:hover {
     padding-bottom: 0;
 }
 
+/* 消息导航：与“阅读与排版”折叠行同高的一行开关；左侧三条短刻度呼应页面上的导航条。 */
+.nav-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+}
+
+.nav-glyph {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    width: 18px;
+    height: 18px;
+}
+
+.nav-glyph i {
+    display: block;
+    width: 8px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--subtle);
+}
+
+.nav-glyph i:nth-child(2) {
+    width: 13px;
+    background: var(--accent);
+}
+
+.nav-card-label {
+    flex: 1;
+    min-width: 0;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
 .language-card {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(140px, 56%);

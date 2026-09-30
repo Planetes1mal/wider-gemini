@@ -317,5 +317,14 @@
   },
   "readingUnsupported": {
     "message": "このページのメッセージ構造をまだ認識できないため、文字サイズと間隔は適用されていません。幅の調整には影響しません。"
+  },
+  "navigationLabel": {
+    "message": "メッセージナビゲーション"
+  },
+  "navigationMessage": {
+    "message": "{total} 件中 {n} 件目のメッセージ"
+  },
+  "navigationAttachment": {
+    "message": "添付ファイル"
   }
 }

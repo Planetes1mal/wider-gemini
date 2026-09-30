@@ -325,4 +325,15 @@ assert.ok(utils, 'settings utils are exposed');
     assert.strictEqual(utils.reconcileUndoRecord(restoring, values, 'chatgpt').record.state, 'ready');
 }
 
+// 消息导航：按网站独立、默认开启，不进入任务预设的受管字段。
+{
+    assert.strictEqual(utils.normalizeSiteSettings({}, 'gemini').navigationEnabled, true);
+    assert.strictEqual(utils.normalizeSiteSettings({ chatgptMessageNavigationEnabled: false }, 'chatgpt').navigationEnabled, false);
+    assert.strictEqual(utils.normalizeSiteSettings({ chatgptMessageNavigationEnabled: false }, 'gemini').navigationEnabled, true);
+    assert.deepStrictEqual(Object.keys(utils.getSiteNavigationPatch('gemini', false)), ['geminiMessageNavigationEnabled']);
+    assert.ok(utils.getSiteStorageKeys('chatgpt').includes('chatgptMessageNavigationEnabled'));
+    const managed = utils.getTaskManaged(utils.normalizeSiteSettings({}, 'chatgpt'), 'chatgpt');
+    assert.strictEqual(managed.navigationEnabled, undefined, 'navigation is not task-managed');
+}
+
 console.log('settings-utils tests passed');

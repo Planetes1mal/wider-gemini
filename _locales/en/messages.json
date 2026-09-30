@@ -317,5 +317,14 @@
   },
   "readingUnsupported": {
     "message": "Font size and spacing are not applied: this page's message layout is not recognized yet. Width is unaffected."
+  },
+  "navigationLabel": {
+    "message": "Message navigation"
+  },
+  "navigationMessage": {
+    "message": "Message {n} of {total}"
+  },
+  "navigationAttachment": {
+    "message": "Attachment"
   }
 }

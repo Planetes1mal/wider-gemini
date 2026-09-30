@@ -37,9 +37,11 @@
             ],
             "js": [
                 "src/shared/settings-utils.js",
+                "src/content/message-navigation.js",
                 "src/content/gemini-content.js"
             ],
             "css": [
+                "src/content/message-navigation.css",
                 "src/content/gemini-content.css"
             ],
             "run_at": "document_start"
@@ -50,9 +52,11 @@
             ],
             "js": [
                 "src/shared/settings-utils.js",
+                "src/content/message-navigation.js",
                 "src/content/chatgpt-content.js"
             ],
             "css": [
+                "src/content/message-navigation.css",
                 "src/content/chatgpt-content.css"
             ],
             "run_at": "document_start"

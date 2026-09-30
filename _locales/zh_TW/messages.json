@@ -317,5 +317,14 @@
   },
   "readingUnsupported": {
     "message": "暫未辨識此頁面的訊息結構，字型大小與間距未生效；寬度不受影響。"
+  },
+  "navigationLabel": {
+    "message": "訊息導覽"
+  },
+  "navigationMessage": {
+    "message": "第 {n} 則訊息，共 {total} 則"
+  },
+  "navigationAttachment": {
+    "message": "附件"
   }
 }

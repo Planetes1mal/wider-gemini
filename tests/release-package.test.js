@@ -20,6 +20,7 @@ const files = [
     'src/shared/settings-utils.js', 'src/help/help.html', 'src/help/help.css', 'src/help/help.js',
     'src/content/gemini-content.js', 'src/content/gemini-content.css', 'src/background.js', 'LICENSE',
     'src/content/chatgpt-content.js', 'src/content/chatgpt-content.css',
+    'src/content/message-navigation.js', 'src/content/message-navigation.css',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
     '_locales/en/messages.json', '_locales/zh_CN/messages.json', '_locales/zh_TW/messages.json',
     '_locales/ko/messages.json', '_locales/ja/messages.json', '_locales/es/messages.json'

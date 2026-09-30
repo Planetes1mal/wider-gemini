@@ -317,5 +317,14 @@
   },
   "readingUnsupported": {
     "message": "No se aplican el tamaño del texto ni el espaciado: aún no se reconoce la estructura de mensajes de esta página. El ancho no se ve afectado."
+  },
+  "navigationLabel": {
+    "message": "Navegación de mensajes"
+  },
+  "navigationMessage": {
+    "message": "Mensaje {n} de {total}"
+  },
+  "navigationAttachment": {
+    "message": "Archivo adjunto"
   }
 }

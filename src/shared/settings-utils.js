@@ -8,6 +8,8 @@
     const CHATGPT_READING_KEY = 'chatgptReadingSettings';
     const SITE_ENABLED_KEYS = { gemini: 'geminiEnabled', chatgpt: 'chatgptEnabled' };
     const TASK_UNDO_KEYS = { gemini: 'taskPresetUndo', chatgpt: 'chatgptTaskPresetUndo' };
+    // 消息导航按网站独立开关，不属于任务预设管理的字段。
+    const NAVIGATION_KEYS = { gemini: 'geminiMessageNavigationEnabled', chatgpt: 'chatgptMessageNavigationEnabled' };
     // 内容脚本协议版本：2 起支持总开关、阅读设置刷新与细分状态。
     const PROTOCOL_VERSION = 2;
     const DENSITY_KEYS = ['messageCompactness', 'messageSpacingCustom', 'messageLineHeight', 'messageParagraphSpacing'];
@@ -351,8 +353,10 @@
     }
 
     function getSiteStorageKeys(site) {
-        if (site === 'chatgpt') return [SITE_ENABLED_KEYS.chatgpt, CHATGPT_WIDTH_KEY, CHATGPT_READING_KEY];
-        return [SITE_ENABLED_KEYS.gemini, ...GEMINI_WIDTH_KEYS, ...READING_KEYS, 'codeWrap'];
+        if (site === 'chatgpt') {
+            return [SITE_ENABLED_KEYS.chatgpt, NAVIGATION_KEYS.chatgpt, CHATGPT_WIDTH_KEY, CHATGPT_READING_KEY];
+        }
+        return [SITE_ENABLED_KEYS.gemini, NAVIGATION_KEYS.gemini, ...GEMINI_WIDTH_KEYS, ...READING_KEYS, 'codeWrap'];
     }
 
     /** 一个站点的完整只读视图：总开关、宽度与阅读偏好。缺失字段取原生默认值。 */
@@ -361,6 +365,7 @@
         const settings = {
             site,
             siteEnabled: source[SITE_ENABLED_KEYS[site]] !== false,
+            navigationEnabled: source[NAVIGATION_KEYS[site]] !== false,
             ...normalizeSiteWidthSettings(source, site),
             ...normalizeReadingSettings(getReadingSource(source, site))
         };
@@ -370,6 +375,10 @@
 
     function getSiteEnabledPatch(site, enabled) {
         return { [SITE_ENABLED_KEYS[site]]: enabled === true };
+    }
+
+    function getSiteNavigationPatch(site, enabled) {
+        return { [NAVIGATION_KEYS[site]]: enabled === true };
     }
 
     /**
@@ -473,6 +482,7 @@
         CHATGPT_WIDTH_KEY,
         CHATGPT_READING_KEY,
         SITE_ENABLED_KEYS,
+        NAVIGATION_KEYS,
         TASK_UNDO_KEYS,
         TASK_PRESETS,
         PROTOCOL_VERSION,
@@ -489,6 +499,7 @@
         normalizeSiteSettings,
         getSiteStorageKeys,
         getSiteEnabledPatch,
+        getSiteNavigationPatch,
         getSiteReadingPatch,
         getTaskManaged,
         getTaskValues,

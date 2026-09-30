@@ -48,6 +48,7 @@ $files = @(
     'manifest.json', 'LICENSE', 'src/background.js', 'src/shared/settings-utils.js',
     'src/popup/popup.html', 'src/popup/popup.js', 'src/popup/popup.css',
     'src/help/help.html', 'src/help/help.css', 'src/help/help.js',
+    'src/content/message-navigation.js', 'src/content/message-navigation.css',
     'src/content/gemini-content.js', 'src/content/gemini-content.css',
     'src/content/chatgpt-content.js', 'src/content/chatgpt-content.css',
     'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',

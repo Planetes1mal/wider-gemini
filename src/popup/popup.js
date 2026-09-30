@@ -43,7 +43,7 @@ function localizeHtmlPage() {
         "customSpacing", "autoSpacing",
         "uiLanguageLabel", "uiLanguageAuto", "helpLink", "sourceLink",
         "taskPresets", "taskApply", "taskRestore",
-        "autoSpacingHint", "settingsSite", "currentSite", "widthOptions", "readingSettings"
+        "autoSpacingHint", "settingsSite", "currentSite", "widthOptions", "readingSettings", "navigationLabel"
     ];
 
     ids.forEach(id => {
@@ -291,6 +291,7 @@ const codeWrapToggle = document.getElementById('codeWrapToggle');
 const codeWrapStatus = document.getElementById('codeWrapStatus');
 const userFullWidthToggle = document.getElementById('userFullWidthToggle');
 const userFullWidthStatus = document.getElementById('userFullWidthStatus');
+const navigationToggle = document.getElementById('navigationToggle');
 const uiLanguageSelect = document.getElementById('uiLanguageSelect');
 const refreshNotice = document.getElementById('refreshNotice');
 const taskPresetSelect = document.getElementById('taskPresetSelect');
@@ -517,7 +518,9 @@ async function refreshLayoutStatus() {
         try {
             const result = await chrome.tabs.sendMessage(tab.id, { action: 'getLayoutStatus' });
             if (!result || result.site !== site) return;
-            if (!(result.protocolVersion >= settingsUtils.PROTOCOL_VERSION)) {
+            // 缺少 capabilities 的内容脚本来自不支持消息导航的旧版本。
+            if (!(result.protocolVersion >= settingsUtils.PROTOCOL_VERSION) ||
+                (!result.capabilities && siteSettings[site].navigationEnabled)) {
                 message = t('pageOutdated', 'Saved, but this page runs an older extension version.');
             } else if (result.siteEnabled && result.widthEnabled) {
                 message = { unsupported: t('layoutUnsupported'), loading: t('layoutLoading') }[result.status] || '';
@@ -672,6 +675,7 @@ function renderSite() {
     setToggleStatus(codeWrapStatus, codeWrapToggle.checked);
     userFullWidthToggle.checked = settings.userFullWidth;
     setToggleStatus(userFullWidthStatus, settings.userFullWidth);
+    navigationToggle.checked = settings.navigationEnabled;
     renderTaskState();
 }
 
@@ -1102,6 +1106,13 @@ codeWrapToggle.addEventListener('change', function () {
 userFullWidthToggle.addEventListener('change', function () {
     setToggleStatus(userFullWidthStatus, this.checked);
     scheduleReadingEdit({ userFullWidth: this.checked }, 0);
+});
+
+// 消息导航独立于宽度开关，不属于任务预设；暂停时保存也不会重新启用网站。
+navigationToggle.addEventListener('change', function () {
+    const site = selectedSite;
+    const enabled = this.checked;
+    writePatch(site, () => settingsUtils.getSiteNavigationPatch(site, enabled), { action: 'refreshSettings' });
 });
 
 uiLanguageSelect.addEventListener('change', async function () {

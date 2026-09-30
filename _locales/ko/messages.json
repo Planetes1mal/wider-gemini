@@ -317,5 +317,14 @@
   },
   "readingUnsupported": {
     "message": "이 페이지의 메시지 구조를 아직 인식하지 못해 글자 크기와 간격이 적용되지 않았습니다. 너비 조정에는 영향이 없습니다."
+  },
+  "navigationLabel": {
+    "message": "메시지 탐색"
+  },
+  "navigationMessage": {
+    "message": "메시지 {n}/{total}"
+  },
+  "navigationAttachment": {
+    "message": "첨부 파일"
   }
 }

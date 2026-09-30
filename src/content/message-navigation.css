@@ -1,0 +1,107 @@
+/* 消息导航条：对话窗格右侧的一列短刻度。当前项更亮更长；命中区域 24×24px。 */
+.wg-nav {
+    position: fixed;
+    z-index: 30;
+    width: 24px;
+    box-sizing: border-box;
+    --wg-nav-tick: rgba(15, 23, 42, 0.26);
+    --wg-nav-tick-hover: rgba(15, 23, 42, 0.55);
+    --wg-nav-tick-active: rgba(15, 23, 42, 0.86);
+    --wg-nav-focus: #2563eb;
+}
+
+.wg-nav[hidden],
+.wg-nav-preview[hidden] {
+    display: none !important;
+}
+
+.wg-nav-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    overscroll-behavior: contain;
+}
+
+.wg-nav-list::-webkit-scrollbar {
+    display: none;
+}
+
+.wg-nav-tick {
+    all: unset;
+    display: flex;
+    flex: 0 0 24px;
+    align-items: center;
+    justify-content: flex-end;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+    padding-right: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.wg-nav-tick > span {
+    display: block;
+    width: 10px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--wg-nav-tick);
+    transition: width 0.15s ease, background 0.15s ease;
+}
+
+.wg-nav-tick:hover > span {
+    width: 14px;
+    background: var(--wg-nav-tick-hover);
+}
+
+.wg-nav-tick[aria-current] > span {
+    width: 16px;
+    background: var(--wg-nav-tick-active);
+}
+
+.wg-nav-tick:focus-visible {
+    outline: 2px solid var(--wg-nav-focus);
+    outline-offset: -2px;
+}
+
+.wg-nav-preview {
+    position: fixed;
+    z-index: 31;
+    box-sizing: border-box;
+    padding: 6px 10px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.14);
+    color: #1f2937;
+    font: 500 12px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    pointer-events: none;
+}
+
+.wg-nav.wg-nav--dark {
+    --wg-nav-tick: rgba(255, 255, 255, 0.28);
+    --wg-nav-tick-hover: rgba(255, 255, 255, 0.6);
+    --wg-nav-tick-active: rgba(255, 255, 255, 0.9);
+    --wg-nav-focus: #60a5fa;
+}
+
+.wg-nav-preview.wg-nav--dark {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: #22262f;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    color: #e5e7eb;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wg-nav-tick > span {
+        transition: none;
+    }
+}

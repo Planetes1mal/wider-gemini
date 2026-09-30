@@ -326,5 +326,8 @@
   },
   "navigationAttachment": {
     "message": "첨부 파일"
+  },
+  "navigationEarlier": {
+    "message": "이전 메시지"
   }
 }

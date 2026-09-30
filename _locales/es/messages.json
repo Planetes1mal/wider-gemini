@@ -326,5 +326,8 @@
   },
   "navigationAttachment": {
     "message": "Archivo adjunto"
+  },
+  "navigationEarlier": {
+    "message": "Mensajes anteriores"
   }
 }

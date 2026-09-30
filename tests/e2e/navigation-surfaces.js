@@ -147,7 +147,9 @@
                 <div class="thread-scroll-container" id="quick-scroll"><div data-thread-user-message-navigation-content="true" class="relative flex flex-1 flex-col">
                     <div class="flex flex-col px-4"><div data-chatgpt-conversation-turn="true"><h4 class="sr-only">You said:</h4>
                         <div data-user-message-bubble="true"><div><div class="text-size-chat whitespace-pre-wrap" id="quick-user">Page chat question</div></div></div></div>
-                    <div data-chatgpt-conversation-turn="true"><div data-markdown-text-style="assistant-message"><p id="quick-p">Page chat answer.</p></div></div></div>
+                    <div data-chatgpt-conversation-turn="true"><div data-markdown-text-style="assistant-message"><p id="quick-p">Page chat answer.</p></div></div>
+                    <div data-chatgpt-conversation-turn="true"><div data-user-message-bubble="true"><div><div class="text-size-chat whitespace-pre-wrap">Second page question</div></div></div></div>
+                    <div data-chatgpt-conversation-turn="true"><div data-markdown-text-style="assistant-message"><p>Second page answer.</p></div></div></div>
                 </div></div>
                 <div data-pip-obstacle="thread-footer"><form data-composer-placement="thread" data-thread-find-composer="true">
                     <div role="textbox" contenteditable="true" aria-label="Work with ChatGPT"></div></form></div>
@@ -231,6 +233,22 @@
                 out.navOff = { gutter:document.documentElement.style.getPropertyValue('--wg-chatgpt-nav-gutter'),
                     rail:qa('.wg-nav').length, width:status().capabilities.width };
                 await save('chatgptMessageNavigationEnabled', true);
+                // 宽度关闭：原生列在窄窗格里占满宽度时，只为导航留白，列表与输入区仍对齐。
+                q('.thread-pane').style.cssText = 'width:700px; --thread-content-responsive-max-width:1000px';
+                await save('chatgptWidthSettings', { widthEnabled:false, chatWidthSetting:{ value:1000, unit:'px' } });
+                s = status();
+                await wait();
+                const offNav = q('.wg-nav') && !q('.wg-nav').hidden ? rect('.wg-nav') : null;
+                out.widthOff = { gutterClass:document.documentElement.classList.contains('wider-chatgpt-nav-gutter'),
+                    activeClass:document.documentElement.classList.contains('wider-chatgpt-width-active'), rail:!!offNav,
+                    railLeft:offNav && offNav.left, clientRight:scroller.getBoundingClientRect().left + scroller.clientLeft + scroller.clientWidth,
+                    contentRight:list.getBoundingClientRect().right - parseFloat(getComputedStyle(list).paddingRight),
+                    list:list.getBoundingClientRect().width, composer:rect('#dots-composer').width, width:s.capabilities.width };
+                await save('chatgptMessageNavigationEnabled', false);
+                out.widthOffNavOff = { gutterClass:document.documentElement.classList.contains('wider-chatgpt-nav-gutter'),
+                    owners:qa('[data-wgc-width]').length };
+                await save('chatgptMessageNavigationEnabled', true);
+                q('.thread-pane').style.cssText = '';
                 await save('chatgptWidthSettings', { widthEnabled:true, chatWidthSetting:{ value:1000, unit:'px' } });
 
                 // 6. 切回普通对话：标记转移，Dots 的排版标记撤回。
@@ -272,7 +290,11 @@
                 await wait();
                 out.quick = { surface:s.surface.kind, status:s.status, owners:qa('[data-wgc-width]').length,
                     width:s.capabilities.width, reading:s.capabilities.reading, answer:px('#quick-p','fontSize'),
-                    user:px('#quick-user','fontSize'), pageFont:px('#page-p','fontSize'), pageMarked:qa('#page-p[data-wgc-font]').length };
+                    user:px('#quick-user','fontSize'), pageFont:px('#page-p','fontSize'), pageMarked:qa('#page-p[data-wgc-font]').length,
+                    hostWidth:rect('#quick').width, rail:!!q('.wg-nav') && !q('.wg-nav').hidden,
+                    railInside:!!q('.wg-nav') && rect('.wg-nav').right <= rect('#quick-scroll').right + 0.5 &&
+                        rect('.wg-nav').left >= Math.max(...qa('#quick [data-markdown-text-style], #quick [data-user-message-bubble]').map(el => el.getBoundingClientRect().right)) - 0.5,
+                    inset:q('#quick [data-thread-user-message-navigation-content]').style.getPropertyValue('padding-inline-end') };
                 // 10. 未识别的可见对话（识别属性被去掉）且隐藏的已知对话仍存在。
                 show('ordinary');
                 q('#transcript').removeAttribute('data-thread-user-message-navigation-content');
@@ -295,6 +317,12 @@
         `)}</body></html>`;
 
     const c = run('chatgpt', chatgpt);
+    assert.deepStrictEqual([c.widthOff.gutterClass, c.widthOff.activeClass, c.widthOff.rail, c.widthOff.width],
+        [true, false, true, 'off'], `width off keeps a navigation-only gutter: ${JSON.stringify(c.widthOff)}`);
+    assert(c.widthOff.railLeft >= c.widthOff.contentRight - 0.5 && c.widthOff.railLeft + 24 <= c.widthOff.clientRight + 0.5,
+        `rail fits beside the native column: ${JSON.stringify(c.widthOff)}`);
+    near(c.widthOff.composer, c.widthOff.list, 'composer stays aligned in navigation-only gutter');
+    assert.deepStrictEqual([c.widthOffNavOff.gutterClass, c.widthOffNavOff.owners], [false, 0], 'navigation off releases it');
     assert.strictEqual(c.dots.surface, 'dots');
     assert.deepStrictEqual(c.dots.owners.sort(), ['dots-composer', 'dots-list'], 'only the visible Dots owners are marked');
     near(c.dots.font, 20, 'Dots prose scales from its own 16px baseline');
@@ -347,6 +375,9 @@
     assert.deepStrictEqual([c.quick.surface, c.quick.status, c.quick.owners, c.quick.width, c.quick.reading],
         ['quickChat', 'notApplicable', 0, 'notApplicable', 'active'], 'Page chat: host keeps its width, reading applies');
     near(c.quick.answer, 20, 'Page chat answer scales');
+    assert(c.quick.rail && c.quick.railInside, `Page chat rail fits inside the chat after the transcript inset: ${JSON.stringify(c.quick)}`);
+    assert(parseFloat(c.quick.inset) > 0, 'inset is added inside the transcript');
+    near(c.quick.hostWidth, 572, 'floating window size unchanged');
     near(c.quick.user, 20, 'Page chat user text scales');
     assert.deepStrictEqual([c.quick.pageFont, c.quick.pageMarked], [14, 0], 'Page document stays native beside the chat');
     assert.deepStrictEqual([c.unknown.surface, c.unknown.status, c.unknown.owners, c.unknown.markers, c.unknown.rail],
@@ -404,6 +435,93 @@
                 report(out);
             });
         `)}</body></html>`;
+
+    const overview = `<!doctype html><html><head><meta charset="utf-8"><style>
+        body { margin:0; font:16px/26px sans-serif; }
+        #pane { height:560px; overflow-y:auto; }
+        .turn { max-width:700px; margin:auto; }
+        .bubble { margin:16px 0; }
+        .answer { height:320px; }
+    </style><style>${read('src/content/message-navigation.css')}</style></head><body>
+        <div id="pane">${Array.from({ length: 40 }, (_, i) => `<div class="turn"><div class="bubble" id="u${i + 1}">Question ${i + 1}</div><div class="answer"></div></div>`).join('')}</div>
+        ${script(harness)}${script(read('src/content/message-navigation.js'))}
+        ${script(`
+            window.addEventListener('load', async () => {
+                const pane = q('#pane');
+                const turns = () => qa('.bubble').map(element => ({ element, text:element.textContent }));
+                const r = pane.getBoundingClientRect();
+                const bounds = { left:r.left, right:r.left + pane.clientWidth, top:r.top + 16, bottom:r.bottom - 8 };
+                const nav = widerMessageNavigation.create({ labels:{ rail:'Nav', message:(n, t) => n + '/' + t, attachment:'Att', older:'Earlier' },
+                    topInset:() => 16 });
+                pane.scrollTop = pane.scrollHeight;
+                nav.update({ turns:turns(), scrollRoot:pane, bounds });
+                await wait(200);
+                const out = {};
+                const ticks = () => qa('.wg-nav-tick');
+                const railRect = rect('.wg-nav');
+                out.all = { count:ticks().length, inside:ticks().every(b => { const t = b.getBoundingClientRect();
+                        return t.top + 12 >= railRect.top - 0.5 && t.top + 12 <= railRect.bottom + 0.5; }),
+                    railHeight:railRect.height, listScrolls:['auto', 'scroll'].includes(getComputedStyle(q('.wg-nav-list')).overflowY),
+                    active:ticks().findIndex(b => b.hasAttribute('aria-current')), older:!q('.wg-nav-older').hidden };
+                // 指针附近展开：命中的刻度与相邻刻度相距约 24px。
+                const list = q('.wg-nav-list');
+                const target = ticks()[17];
+                const y = target.getBoundingClientRect().top + 12;
+                list.dispatchEvent(new PointerEvent('pointermove', { clientY:y, clientX:railRect.left + 12, bubbles:true }));
+                await wait();
+                const centers = ticks().map(b => b.getBoundingClientRect().top + 12);
+                out.magnify = { gap:centers[18] - centers[17], farGap:centers[2] - centers[1],
+                    hovered:ticks().findIndex(b => b.classList.contains('wg-nav-hover')), preview:!q('.wg-nav-preview').hidden };
+                list.dispatchEvent(new MouseEvent('click', { clientY:centers[17], clientX:railRect.left + 12, detail:1, bubbles:true }));
+                await wait(300);
+                out.jump = { top:q('#u18').getBoundingClientRect().top - pane.getBoundingClientRect().top,
+                    active:ticks().findIndex(b => b.hasAttribute('aria-current')) };
+                list.dispatchEvent(new PointerEvent('pointerleave', { bubbles:false }));
+                // 滚动正文时导航条本身不移动。
+                const before = rect('.wg-nav-list').top;
+                q('#u37').scrollIntoView();
+                pane.scrollTop -= 16;
+                pane.dispatchEvent(new Event('scroll'));
+                await wait(200);
+                out.scrolled = { active:ticks().findIndex(b => b.hasAttribute('aria-current')), railMoved:rect('.wg-nav-list').top - before,
+                    tick37Visible:ticks()[36].getBoundingClientRect().top >= railRect.top - 12 };
+                // 更早的消息：不在顶部时显示；点击滚到开头；在顶部稳定后隐藏；插入更早消息后重新可用。
+                out.olderBefore = !q('.wg-nav-older').hidden;
+                q('.wg-nav-older').click();
+                await wait(200);
+                out.olderScrolled = pane.scrollTop;
+                pane.dispatchEvent(new Event('scroll'));
+                await wait(1800);
+                out.olderAfter = !q('.wg-nav-older').hidden;
+                const early = document.createElement('div');
+                early.className = 'turn';
+                early.innerHTML = '<div class="bubble" id="u0">Earlier question</div><div class="answer"></div>';
+                pane.prepend(early);
+                pane.scrollTop = 400;
+                nav.update({ turns:turns(), scrollRoot:pane, bounds });
+                await wait(200);
+                out.prepended = { count:ticks().length, older:!q('.wg-nav-older').hidden };
+                nav.destroy();
+                out.destroyed = qa('.wg-nav, .wg-nav-preview').length;
+                report(out);
+            });
+        `)}</body></html>`;
+    const o = run('overview', overview);
+    assert.strictEqual(o.all.count, 40);
+    assert(o.all.inside && !o.all.listScrolls, `all 40 ticks are visible at once without an inner scroll: ${JSON.stringify(o.all)}`);
+    assert.strictEqual(o.all.active, 39, 'bottom of the conversation marks the last message');
+    assert(o.magnify.gap >= 20 && o.magnify.farGap < 12, `pointer magnifies nearby ticks: ${JSON.stringify(o.magnify)}`);
+    assert.strictEqual(o.magnify.hovered, 17);
+    assert(o.magnify.preview);
+    near(o.jump.top, 16, 'pointer click on a compressed rail jumps to the nearest tick', 2);
+    assert.strictEqual(o.jump.active, 17);
+    assert.strictEqual(o.scrolled.active, 36, 'active tick follows the conversation (message 37)');
+    assert.strictEqual(o.scrolled.railMoved, 0, 'the rail itself never pages');
+    assert(o.olderBefore, 'earlier-messages marker shows away from the top');
+    assert.strictEqual(o.olderScrolled, 0, 'marker scrolls to the beginning');
+    assert.strictEqual(o.olderAfter, false, 'marker hides once the top is stable');
+    assert.deepStrictEqual(o.prepended, { count: 41, older: true }, 'a prepended batch re-enables the marker');
+    assert.strictEqual(o.destroyed, 0);
 
     const g = run('gemini', gemini);
     assert.deepStrictEqual(g.rail, { ticks: 3, visible: true }, 'one tick per outer user-query');

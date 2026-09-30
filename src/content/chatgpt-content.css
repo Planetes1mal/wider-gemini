@@ -2,7 +2,7 @@
    只在内容脚本识别并标记的当前可见宽度所有者（普通对话、Dots 消息列表与输入区、首页）上覆盖变量；
    隐藏的旧路由、:root/body、全局 form、表格与浮层都不受影响。
    显示消息导航且右侧空间不足时，--wg-chatgpt-nav-gutter 在两侧各留出所需宽度。 */
-:where(html.wider-chatgpt-width-active) [data-wgc-width] {
+:where(html.wider-chatgpt-width-active, html.wider-chatgpt-nav-gutter) [data-wgc-width] {
     --thread-content-responsive-max-width: min(var(--wg-chatgpt-width, 1000px),
         calc(var(--wg-chatgpt-available-width, 100%) - var(--thread-body-inline-padding, 0px) * 2 -
             var(--wg-chatgpt-nav-gutter, 0px) * 2)) !important;

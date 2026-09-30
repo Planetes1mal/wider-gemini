@@ -8,6 +8,8 @@
     const WIDTH_KEY = settingsUtils.CHATGPT_WIDTH_KEY;
     const STORAGE_KEYS = settingsUtils.getSiteStorageKeys('chatgpt');
     const ACTIVE_CLASS = 'wider-chatgpt-width-active';
+    // 宽度关闭时只为消息导航留白（以原生内容宽度为上限）。
+    const GUTTER_CLASS = 'wider-chatgpt-nav-gutter';
     const NATIVE_WIDTH = '[class~="max-w-(--thread-body-max-width)"]';
     const HOME_OWNER = `${NATIVE_WIDTH}:has(form[data-chatgpt-composer][data-composer-placement="home"])`;
     const EXCLUDED = '[role="dialog"], [role="menu"], dialog, [data-composer-overlay-floating-ui]';
@@ -57,6 +59,7 @@
     let ownerProperties = [];
     let rootProperty = null;
     let gutterProperty = null;
+    let insetProperty = null;
     let layoutFrame = null;
     let readingObserver = null;
     let readingScope = null;
@@ -179,22 +182,37 @@
         const next = discoverSurface();
         const changed = next.root !== surface.root || next.kind !== surface.kind;
         surface = next;
+        widthActive = siteActive && settings.widthEnabled !== false && surface.widthOwners.length > 0;
+        const railWanted = navigationWanted() && userTurns().length >= window.widerMessageNavigation.MIN_TURNS;
+        // 宽度关闭时先撤下本扩展为导航留白写入的标记与内边距，在同一任务内测量原生布局（不会闪烁）。
+        if (!widthActive && markedOwners.length) {
+            markedOwners.forEach(owner => owner.removeAttribute(WIDTH_ATTR));
+            markedOwners = [];
+            root.classList.remove(GUTTER_CLASS);
+        }
+        restoreProperty(insetProperty);
+        insetProperty = null;
         columnWidth = 0;
         if (surface.column) {
             const style = getComputedStyle(surface.column);
             columnWidth = surface.column.getBoundingClientRect().width -
                 parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
         }
-        widthActive = siteActive && settings.widthEnabled !== false && surface.widthOwners.length > 0;
+        // 宽度关闭但原生布局右侧不足 24px 时，只为导航留白：以原生内容宽度为上限，对称收窄，输入区保持对齐。
+        const nativeFree = railWanted ? navigationBounds().right - contentRight() : Infinity;
+        const gutterOnly = !widthActive && railWanted && surface.widthOwners.length > 0 &&
+            nativeFree < window.widerMessageNavigation.RAIL_WIDTH - 1;
+        const reserve = widthActive || gutterOnly;
         if (root.classList.contains(ACTIVE_CLASS) !== widthActive) root.classList.toggle(ACTIVE_CLASS, widthActive);
+        if (root.classList.contains(GUTTER_CLASS) !== gutterOnly) root.classList.toggle(GUTTER_CLASS, gutterOnly);
 
         // 宽度标记只写在当前界面已验证的所有者上，移走旧界面的标记。
-        const owners = widthActive ? surface.widthOwners : [];
+        const owners = reserve ? surface.widthOwners : [];
         markedOwners.filter(owner => !owners.includes(owner)).forEach(owner => owner.removeAttribute(WIDTH_ATTR));
         owners.forEach(owner => owner.setAttribute(WIDTH_ATTR, ''));
         markedOwners = owners;
 
-        const parent = widthActive && surface.column ? surface.column.parentElement : null;
+        const parent = reserve && surface.column ? surface.column.parentElement : null;
         if (parent !== measuredParent) {
             availableWidthObserver.disconnect();
             measuredParent = parent;
@@ -202,23 +220,38 @@
             if (surface.scroll) availableWidthObserver.observe(surface.scroll);
         }
 
-        if (!widthActive) {
+        if (!reserve) {
             restoreProperty(rootProperty);
             rootProperty = null;
             ownerProperties.forEach(restoreProperty);
             ownerProperties = [];
         } else {
-            rootProperty = writeProperty(rootProperty, root, '--wg-chatgpt-width',
-                settingsUtils.getWidthCssValue(settings.chatWidthSetting));
+            rootProperty = writeProperty(rootProperty, root, '--wg-chatgpt-width', widthActive
+                ? settingsUtils.getWidthCssValue(settings.chatWidthSetting) : `${columnWidth}px`);
             // 滚动区的双侧 gutter 不计入正文父容器，绝对定位的 footer/输入区却跨过 gutter。
             const available = parent ? `${parent.clientWidth}px` : null;
             const extra = surface.widthOwners.slice(1);
             ownerProperties.slice(extra.length).forEach(restoreProperty);
             ownerProperties = available ? extra.map((owner, i) =>
                 writeProperty(ownerProperties[i], owner, '--wg-chatgpt-available-width', available)) : [];
-            if (settings.userFullWidth && surface.column) markFullPaths(surface.column.querySelectorAll(USER_BUBBLE));
+            if (widthActive && settings.userFullWidth && surface.column) {
+                markFullPaths(surface.column.querySelectorAll(USER_BUBBLE));
+            }
         }
-        syncGutter();
+        // 导航需要的留白：宽度生效时按设定宽度计算；只为导航留白时补足原生缺口。
+        const gutter = !railWanted ? 0 : widthActive ? neededGutter()
+            : gutterOnly ? Math.ceil(window.widerMessageNavigation.RAIL_WIDTH - nativeFree) + 1 : 0;
+        if (gutter) {
+            gutterProperty = writeProperty(gutterProperty, root, '--wg-chatgpt-nav-gutter', `${gutter}px`);
+        } else {
+            restoreProperty(gutterProperty);
+            gutterProperty = null;
+        }
+        // Page 浮动对话没有原生宽度所有者：只在对话内容里加右内边距，不改浮窗尺寸。
+        if (railWanted && surface.kind === 'quickChat' && nativeFree < window.widerMessageNavigation.RAIL_WIDTH - 1) {
+            insetProperty = writeProperty(null, surface.column, 'padding-inline-end',
+                `${Math.ceil(window.widerMessageNavigation.RAIL_WIDTH - nativeFree) + 1}px`);
+        }
         if (changed && document.readyState !== 'loading') applyReading();
         queueNavigation();
     }
@@ -498,14 +531,11 @@
             isChatSurface() && Boolean(surface.scroll);
     }
 
-    function syncGutter() {
-        const gutter = widthActive && navigationWanted() && userTurns().length >= 2 ? neededGutter() : 0;
-        if (gutter) {
-            gutterProperty = writeProperty(gutterProperty, document.documentElement, '--wg-chatgpt-nav-gutter', `${gutter}px`);
-        } else {
-            restoreProperty(gutterProperty);
-            gutterProperty = null;
-        }
+    // 内容实际右缘：当前对话中最右侧的消息正文；没有消息时取对话列内容框。
+    function contentRight() {
+        const roots = [...surface.column.querySelectorAll(MESSAGE_ROOT)].slice(-40);
+        if (roots.length) return Math.max(...roots.map(node => node.getBoundingClientRect().right));
+        return surface.column.getBoundingClientRect().right - (parseFloat(getComputedStyle(surface.column).paddingRight) || 0);
     }
 
     function syncNavigation() {
@@ -517,19 +547,18 @@
         }
         const turns = userTurns();
         const bounds = navigationBounds();
-        // 宽度关闭且原生布局没有留出右侧空间时，窗格不可用，隐藏导航条。
-        const columnRight = surface.column.getBoundingClientRect().right -
-            (parseFloat(getComputedStyle(surface.column).paddingRight) || 0);
-        const fits = bounds.right - columnRight >= window.widerMessageNavigation.RAIL_WIDTH - 1;
+        // 留白后仍放不下 24px 导航条（窗格过窄）时隐藏。
+        const fits = bounds.right - contentRight() >= window.widerMessageNavigation.RAIL_WIDTH - 1;
         if (!navigation) {
             navigation = window.widerMessageNavigation.create({
                 labels: {
                     rail: chrome.i18n.getMessage('navigationLabel') || 'Message navigation',
                     message: (n, total) => (chrome.i18n.getMessage('navigationMessage') || 'Message {n} of {total}')
                         .replace('{n}', n).replace('{total}', total),
-                    attachment: chrome.i18n.getMessage('navigationAttachment') || 'Attachment'
+                    attachment: chrome.i18n.getMessage('navigationAttachment') || 'Attachment',
+                    older: chrome.i18n.getMessage('navigationEarlier') || 'Earlier messages'
                 },
-                topInset: () => 72,
+                topInset: () => (surface.kind === 'quickChat' ? 16 : 72),
                 onStale: queueNavigation
             });
         }

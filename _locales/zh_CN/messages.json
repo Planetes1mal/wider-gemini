@@ -326,5 +326,8 @@
   },
   "navigationAttachment": {
     "message": "附件"
+  },
+  "navigationEarlier": {
+    "message": "更早的消息"
   }
 }

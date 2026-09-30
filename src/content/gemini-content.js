@@ -487,7 +487,8 @@
                     rail: chrome.i18n.getMessage('navigationLabel') || 'Message navigation',
                     message: (n, total) => (chrome.i18n.getMessage('navigationMessage') || 'Message {n} of {total}')
                         .replace('{n}', n).replace('{total}', total),
-                    attachment: chrome.i18n.getMessage('navigationAttachment') || 'Attachment'
+                    attachment: chrome.i18n.getMessage('navigationAttachment') || 'Attachment',
+                    older: chrome.i18n.getMessage('navigationEarlier') || 'Earlier messages'
                 },
                 topInset: () => 16,
                 onStale: queueNavigation

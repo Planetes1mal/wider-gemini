@@ -326,5 +326,8 @@
   },
   "navigationAttachment": {
     "message": "附件"
+  },
+  "navigationEarlier": {
+    "message": "較早的訊息"
   }
 }

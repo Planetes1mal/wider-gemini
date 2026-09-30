@@ -326,5 +326,8 @@
   },
   "navigationAttachment": {
     "message": "Attachment"
+  },
+  "navigationEarlier": {
+    "message": "Earlier messages"
   }
 }

@@ -326,5 +326,8 @@
   },
   "navigationAttachment": {
     "message": "添付ファイル"
+  },
+  "navigationEarlier": {
+    "message": "以前のメッセージ"
   }
 }

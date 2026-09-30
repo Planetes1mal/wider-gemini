@@ -8,27 +8,22 @@
 }
 
 .wg-nav[hidden],
+.wg-nav-older[hidden],
 .wg-nav-preview[hidden] {
     display: none !important;
 }
 
+/* 所有刻度同时可见：列表高度固定为窗格可用高度，刻度按脚本计算的位置绝对定位，不内部滚动。 */
 .wg-nav-list {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-    scrollbar-width: none;
-    overscroll-behavior: contain;
-}
-
-.wg-nav-list::-webkit-scrollbar {
-    display: none;
+    position: relative;
+    cursor: pointer;
 }
 
 .wg-nav-tick {
     all: unset;
+    position: absolute;
+    left: 0;
     display: flex;
-    flex: 0 0 24px;
     align-items: center;
     justify-content: flex-end;
     width: 24px;
@@ -37,6 +32,7 @@
     padding-right: 4px;
     border-radius: 6px;
     cursor: pointer;
+    transition: top 0.09s ease-out;
 }
 
 .wg-nav-tick > span {
@@ -48,7 +44,7 @@
     transition: width 0.15s ease, background 0.15s ease;
 }
 
-.wg-nav-tick:hover > span {
+.wg-nav-tick.wg-nav-hover > span {
     width: 14px;
     background: color-mix(in srgb, var(--wg-nav-ink, #1f2937) 60%, transparent);
 }
@@ -59,6 +55,37 @@
 }
 
 .wg-nav-tick:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--wg-nav-ink, #1f2937) 70%, transparent);
+    outline-offset: -2px;
+}
+
+/* 更早的消息：顶部三个小点，点击滚到开头，让网站载入下一批。 */
+.wg-nav-older {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    width: 24px;
+    height: 24px;
+    box-sizing: border-box;
+    padding-right: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.wg-nav-older > span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--wg-nav-ink, #1f2937) 45%, transparent);
+}
+
+.wg-nav-older:hover > span {
+    background: color-mix(in srgb, var(--wg-nav-ink, #1f2937) 80%, transparent);
+}
+
+.wg-nav-older:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--wg-nav-ink, #1f2937) 70%, transparent);
     outline-offset: -2px;
 }
@@ -92,6 +119,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .wg-nav-tick,
     .wg-nav-tick > span {
         transition: none;
     }

@@ -1,5 +1,21 @@
 # Compatibility record
 
+## Fixes for the round 2 signed-in findings — September 30, 2026
+
+Source: `chatgpt-width-support` at `2c3c2e1`; manifest unchanged (`3.0.0-rc.1`). **Local checks only — every item below needs a signed-in recheck before rc.2.**
+
+| Finding | Change | Local evidence (`e2e/navigation-surfaces.js` unless noted) |
+| --- | --- | --- |
+| Rail hidden at full width (ChatGPT, Dots) | Bounds and fit checks use the scroll container's client box (`clientLeft` + `clientWidth`); gutter adds 1px for rounding | Dots fixture with `scrollbar-gutter: stable both-edges` at 100%: rail visible and inside the client box, composer aligned |
+| Dots Reply narrows the main column | The message list stays a width owner when the composer moves into the Reply dialog; the dialog stays native | Composer moved into `.reply-chain-panel[role=dialog]`: list width unchanged, only the list marked |
+| Gemini preview text corrupted/duplicated | Preview reads only `.query-text-line`; whitespace regex fixed | Hidden `h5.cdk-visually-hidden` label with duplicate text: label ends with the prompt once, `s` intact |
+| Unknown chat reported as not applicable | Space/Page identified only by a visible Page document or a `/space` route (ordinary `main` also has `data-app-shell-main-surface`) | Ordinary fixture `main` carries that marker; masked transcript reports `unknown` / `unsupported` |
+| Dark mode: invisible ticks, white preview, third line showing | Tick, focus and preview colors plus the preview font derive from the host's computed text color, surface and font; two-line clamp moved to an inner element | `data-theme="dark"` host: rail and preview adopt its colors; clamped preview ≤ 2 lines inside its padding. Light/dark demo screenshots reviewed locally |
+| Dots code stays 12px | `[data-markdown-copy="code-block"] code` (no `pre`) scales with proportional line height | 12px/20px → 15px/25px at 125%; toolbar label and horizontal scroll native |
+| Populated Page chat (partial capture) | Reading and navigation inside the confirmed quick-chat root only; host width and Page document native | One captured exchange: 16px → 20px at 125%, document text 14px unmarked, width `notApplicable` |
+
+Also passed: full unit/packaging suite, 73 Gemini layout scenarios, ChatGPT reading regression. The extended test fails against the previous runtime. Still unverified: real toolbar popup, no forced scroll during streaming, attachment-only Dots rows, two-message Page chat with code/table, and whether the Page chat rail fits its host (it is hidden when less than 24px remains).
+
 ## Round 2 signed-in IAB verification — September 30, 2026
 
 **Outcome: partial pass; confirmed live failures remain. Keep `3.0.0-rc.1`; this build has not met the `rc.2` acceptance gate.** These observations supersede only the corresponding pending rows in the historical offline record below.

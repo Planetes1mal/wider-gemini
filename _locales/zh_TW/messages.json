@@ -314,5 +314,8 @@
   },
   "taskPendingUnknown": {
     "message": "上次任務預設未完成，暫時無法還原。重新套用任務即可繼續。"
+  },
+  "readingUnsupported": {
+    "message": "暫未辨識此頁面的訊息結構，字型大小與間距未生效；寬度不受影響。"
   }
 }

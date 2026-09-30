@@ -14,20 +14,25 @@
         '[data-pip-obstacle="thread-footer"], form[data-chatgpt-composer], ' + HOME_OWNER;
     const EXCLUDED = '[role="dialog"], [role="menu"], dialog, [data-composer-overlay-floating-ui]';
 
-    // 阅读排版只作用于消息正文里的文字拥有者，不给 .markdown 根设字号，
+    // 阅读排版只作用于消息正文里的文字拥有者，不给正文根设字号，
     // 以免 font: inherit 的复制/展开按钮、引用标签跟着变大。
-    const USER_TEXT = '[data-message-author-role="user"] .whitespace-pre-wrap';
-    const MESSAGE_ROOT = `:is([data-message-author-role="assistant"] .markdown, ${USER_TEXT})`;
-    const FONT_TARGET = `p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre code, ${USER_TEXT}`;
+    // 同时识别新版（data-markdown-text-style / data-user-message-bubble）与旧版（按角色）消息结构。
+    const ASSISTANT_ROOT = ':is([data-markdown-text-style="assistant-message"], ' +
+        '[data-message-author-role="assistant"] .markdown)';
+    const USER_BUBBLE = ':is([data-user-message-bubble], [data-message-author-role="user"] .user-message-bubble-color, ' +
+        '[data-message-author-role="user"] .whitespace-pre-wrap)';
+    const MESSAGE_ROOT = `:is(${ASSISTANT_ROOT}, ${USER_BUBBLE})`;
+    const FONT_TARGET = 'p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre code';
     // 密度只压缩正文行框；代码、表格行保持原生行高，只随字号等比缩放。
-    const PROSE_LINE = `p, li, h1, h2, h3, h4, h5, h6, blockquote, ${USER_TEXT}`;
+    const PROSE_LINE = 'p, li, h1, h2, h3, h4, h5, h6, blockquote';
     const FIXED_LINE = 'pre, td, th';
     const BLOCK_SPACING = 'p, ul, ol, blockquote, h1, h2, h3, h4, h5, h6, hr';
     const READING_TARGET = `${FONT_TARGET}, ${FIXED_LINE}, ${BLOCK_SPACING}`;
     const READING_EXCLUDED = `${EXCLUDED}, form, button, textarea, [contenteditable], .katex, svg, canvas, iframe`;
     const READING_ATTR = 'data-wgc-reading';
     const FULL_ATTR = 'data-wgc-full';
-    const NODE_MARKERS = ['data-wgc-font', 'data-wgc-line', 'data-wgc-space'];
+    const PATH_ATTR = 'data-wgc-full-path';
+    const NODE_MARKERS = ['data-wgc-font', 'data-wgc-line', 'data-wgc-space', PATH_ATTR];
     const NODE_PROPERTIES = ['--wgc-font', '--wgc-line', '--wgc-line-cut', '--wgc-mt', '--wgc-mb'];
     const ROOT_PROPERTIES = ['--wgc-font-scale', '--wgc-density', '--wgc-space-scale',
         '--wgc-manual-line', '--wgc-manual-gap'];
@@ -39,6 +44,8 @@
     let readToken = 0;
     let siteActive = false;
     let supported = false;
+    let transcriptOwner = null;
+    let columnWidth = 0;
     let measuredParent = null;
     let footerProperty = null;
     let rootProperty = null;
@@ -89,8 +96,17 @@
         const footer = scrollArea && findVisibleOwner('[data-pip-obstacle="thread-footer"]', scrollArea);
         const home = findVisibleOwner(`main ${HOME_OWNER}`);
         supported = Boolean((transcript && footer) || home);
+        transcriptOwner = transcript || null;
+        if (transcript) {
+            const style = getComputedStyle(transcript);
+            columnWidth = transcript.getBoundingClientRect().width -
+                parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        } else {
+            columnWidth = 0;
+        }
         const active = siteActive && settings.widthEnabled !== false && supported;
         if (root.classList.contains(ACTIVE_CLASS) !== active) root.classList.toggle(ACTIVE_CLASS, active);
+        if (active && settings.userFullWidth) markFullPaths(document.querySelectorAll(USER_BUBBLE));
 
         const parent = active && footer ? transcript.parentElement : null;
         if (parent !== measuredParent || (footerProperty && footerProperty.element !== footer)) {
@@ -142,18 +158,47 @@
 
     // ---- 阅读排版 ----
 
+    function outerBubble(node) {
+        let bubble = node.closest(USER_BUBBLE);
+        while (bubble && bubble.parentElement && bubble.parentElement.closest(USER_BUBBLE)) {
+            bubble = bubble.parentElement.closest(USER_BUBBLE);
+        }
+        return bubble;
+    }
+
+    // 用户气泡内部的类名在不同版本间变化，按“直接包含文字的元素”识别文字拥有者。
+    function collectUserText(bubble, add) {
+        const walker = document.createTreeWalker(bubble, NodeFilter.SHOW_TEXT);
+        for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+            if (text.textContent.trim()) add(text.parentElement);
+        }
+    }
+
     function collectReadingNodes(scopes) {
         const nodes = new Set();
+        const bubbles = new Set();
         const add = node => {
-            if (node && node.nodeType === 1 && node.isConnected && node.matches(READING_TARGET) &&
-                node.closest(MESSAGE_ROOT) && !node.closest(READING_EXCLUDED)) nodes.add(node);
+            if (!node || node.nodeType !== 1 || !node.isConnected || node.closest(READING_EXCLUDED)) return;
+            if (node.closest(USER_BUBBLE) ||
+                (node.matches(READING_TARGET) && node.closest(ASSISTANT_ROOT))) nodes.add(node);
+        };
+        const addBubble = node => {
+            const bubble = outerBubble(node);
+            if (bubble && !bubbles.has(bubble)) {
+                bubbles.add(bubble);
+                collectUserText(bubble, add);
+            }
         };
         for (const scope of scopes) {
             if (!scope || scope.nodeType !== 1 || !scope.isConnected) continue;
-            const inside = scope.closest(MESSAGE_ROOT);
+            if (scope.closest(USER_BUBBLE)) {
+                addBubble(scope);
+                continue;
+            }
+            scope.querySelectorAll(USER_BUBBLE).forEach(addBubble);
+            const inside = scope.closest(ASSISTANT_ROOT);
             add(scope);
-            scope.querySelectorAll(inside ? READING_TARGET : `${MESSAGE_ROOT}, ${MESSAGE_ROOT} :is(${READING_TARGET})`)
-                .forEach(add);
+            scope.querySelectorAll(inside ? READING_TARGET : `${ASSISTANT_ROOT} :is(${READING_TARGET})`).forEach(add);
             // 新增或移除段落会改变相邻块的 :first-child / :last-child 原生外边距。
             if (inside) {
                 for (const sibling of [scope.previousElementSibling, scope.nextElementSibling]) {
@@ -162,12 +207,39 @@
                 }
             }
         }
-        return [...nodes].filter(node => !measuredNodes.has(node));
+        return { nodes: [...nodes].filter(node => !measuredNodes.has(node)), bubbles: [...bubbles] };
+    }
+
+    // 用户消息铺满：从气泡向上逐级测量，标记所有比对话列窄的祖先（跳过 display:contents），
+    // 直到遇到与列同宽的容器。未渲染或找不到列边界时不标记，下次布局同步再试。
+    function markFullPaths(bubbles) {
+        if (!(columnWidth > 0)) return;
+        for (const node of bubbles) {
+            const bubble = outerBubble(node);
+            if (!bubble || bubble.hasAttribute(PATH_ATTR) || bubble.closest(READING_EXCLUDED)) continue;
+            const path = [];
+            let reachedColumn = false;
+            for (let el = bubble; el && path.length < 8; el = el.parentElement) {
+                if (el === transcriptOwner) {
+                    reachedColumn = true;
+                    break;
+                }
+                if (getComputedStyle(el).display === 'contents') continue;
+                if (el.getBoundingClientRect().width >= columnWidth - 1) {
+                    reachedColumn = true;
+                    break;
+                }
+                path.push(el);
+            }
+            if (!reachedColumn) continue;
+            path.forEach(el => el.setAttribute(PATH_ATTR, el === bubble ? 'bubble' : ''));
+        }
     }
 
     // 采样前临时撤下本扩展的排版规则，同一任务内恢复；先批量读取再批量写入。
     function measureReading(scopes) {
-        const pending = collectReadingNodes(scopes);
+        const { nodes: pending, bubbles } = collectReadingNodes(scopes);
+        if (settings.userFullWidth) markFullPaths(bubbles);
         if (!pending.length) return;
         const root = document.documentElement;
         const tokens = root.getAttribute(READING_ATTR);
@@ -186,17 +258,18 @@
             if (tokens !== null) root.setAttribute(READING_ATTR, tokens);
         }
         for (const { node, display, font, line, top, bottom } of metrics) {
-            if (node.matches(FONT_TARGET) && font > 0) {
+            const user = !node.closest(ASSISTANT_ROOT);
+            if ((user || node.matches(FONT_TARGET)) && font > 0) {
                 node.style.setProperty('--wgc-font', `${font}px`);
                 node.setAttribute('data-wgc-font', '');
             }
-            if (line > 0 && node.matches(`${PROSE_LINE}, ${FIXED_LINE}`)) {
-                const prose = node.matches(PROSE_LINE);
+            if (line > 0 && (user || node.matches(`${PROSE_LINE}, ${FIXED_LINE}`))) {
+                const prose = user || node.matches(PROSE_LINE);
                 node.style.setProperty('--wgc-line', `${line}px`);
                 if (prose) node.style.setProperty('--wgc-line-cut', `${line - Math.min(line, Math.max(font * 1.15, line * 0.82))}px`);
                 node.setAttribute('data-wgc-line', prose ? 'prose' : 'fixed');
             }
-            if (node.matches(BLOCK_SPACING) && display !== 'inline' && display !== 'contents' &&
+            if (!user && node.matches(BLOCK_SPACING) && display !== 'inline' && display !== 'contents' &&
                 Number.isFinite(top) && Number.isFinite(bottom)) {
                 node.style.setProperty('--wgc-mt', `${top}px`);
                 node.style.setProperty('--wgc-mb', `${bottom}px`);
@@ -300,11 +373,16 @@
         const status = !settingsLoaded ? 'loading' : pauseReason === 'site' ? 'sitePaused'
             : pauseReason === 'width' ? 'paused' : supported ? 'active'
                 : document.readyState === 'loading' ? 'loading' : 'unsupported';
+        // 阅读识别与宽度识别分开报告：对话已有内容却找不到任何消息正文时，阅读设置不会生效。
+        const messages = !!document.querySelector(MESSAGE_ROOT);
+        const conversation = !!(transcriptOwner && transcriptOwner.textContent.trim());
+        const readingStatus = !settingsLoaded ? 'loading' : !settings.siteEnabled ? 'paused'
+            : messages ? 'active' : conversation ? 'unsupported' : 'idle';
         return {
             site: 'chatgpt', protocolVersion: settingsUtils.PROTOCOL_VERSION,
             siteEnabled: settings.siteEnabled, widthEnabled, enabled: widthEnabled, supported, status, pauseReason,
             width: { active: document.documentElement.classList.contains(ACTIVE_CLASS) },
-            reading: { active: siteActive, messages: siteActive && !!document.querySelector(MESSAGE_ROOT) }
+            reading: { active: siteActive && messages, status: readingStatus }
         };
     }
 

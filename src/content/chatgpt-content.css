@@ -49,13 +49,14 @@
     margin-top: var(--wgc-manual-gap) !important;
 }
 
-/* 用户消息铺满对话列：仅在宽度生效时，保留原生气泡外观与复制/编辑按钮；
-   编辑中的消息、图片与附件保持原生。 */
-:where(html.wider-chatgpt-width-active[data-wgc-full]) [data-message-author-role="user"]
-    [class*="max-w-(--user-chat-width"]:has(.user-message-bubble-color):not(:has(textarea)),
-:where(html.wider-chatgpt-width-active[data-wgc-full]) [data-message-author-role="user"]
-    .user-message-bubble-color:not(:has(textarea)) {
+/* 用户消息铺满对话列：仅在宽度生效时。内容脚本从气泡向上测量，标记比对话列窄的
+   气泡及其包装层；保留原生气泡外观与复制/编辑按钮，编辑中的消息保持原生。 */
+:where(html.wider-chatgpt-width-active[data-wgc-full])
+    [data-wgc-full-path]:not(:has(textarea, [contenteditable="true"])) {
     width: 100% !important;
     max-width: 100% !important;
+}
+
+:where(html.wider-chatgpt-width-active[data-wgc-full]) [data-wgc-full-path="bubble"] {
     text-align: start !important;
 }

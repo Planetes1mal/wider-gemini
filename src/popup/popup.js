@@ -489,6 +489,11 @@ function notifySiteTabs(site, message) {
     }).catch(error => console.error('[Wider Gemini] Could not query site tabs:', error));
 }
 
+function hasReadingEffect(settings) {
+    return settings.messageFontSize !== 100 || settings.messageCompactness > 0 ||
+        settings.messageSpacingCustom || settings.userFullWidth;
+}
+
 function getTabSite(tab) {
     const url = tab && tab.url || '';
     if (/^https:\/\/chatgpt\.com\//.test(url)) return 'chatgpt';
@@ -516,6 +521,11 @@ async function refreshLayoutStatus() {
                 message = t('pageOutdated', 'Saved, but this page runs an older extension version.');
             } else if (result.siteEnabled && result.widthEnabled) {
                 message = { unsupported: t('layoutUnsupported'), loading: t('layoutLoading') }[result.status] || '';
+            }
+            // 宽度正常但消息结构未识别时，阅读设置不会生效；只在设置了非默认阅读效果时提示。
+            if (!message && result.siteEnabled && result.reading && result.reading.status === 'unsupported' &&
+                hasReadingEffect(siteSettings[site])) {
+                message = t('readingUnsupported', 'Message layout not recognized; font size and spacing are not applied.');
             }
         } catch (error) {
             message = t('layoutUnavailable', 'Page status unavailable. Refresh the page and try again.');

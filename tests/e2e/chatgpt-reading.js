@@ -26,8 +26,12 @@
             max-width:var(--thread-body-max-width); margin:auto; padding-inline:var(--thread-body-inline-padding);
             box-sizing:border-box;
         }
-        .max-w-\\(--user-chat-width\\,70\\%\\) { max-width:70%; margin-left:auto; }
-        .user-message-bubble-color { width:fit-content; margin-left:auto; padding:8px 16px; background:#eee; }
+        .contents { display:contents; }
+        .uflex { display:flex; width:100%; flex-direction:column; align-items:flex-end; }
+        .max-w-\\(--user-chat-width\\,70\\%\\) { max-width:70%; }
+        .user-message-bubble-color, [data-user-message-bubble] { padding:10px 16px; background:#eee; line-height:24px; }
+        [data-markdown-text-style] p { margin:0 0 16px; }
+        [data-markdown-text-style] pre { margin:0; font-size:12px; line-height:20px; }
         .markdown p { margin:0 0 16px; }
         .markdown h3 { font-size:20px; line-height:28px; margin:16px 0 8px; }
         .markdown li { margin:4px 0; }
@@ -43,12 +47,12 @@
     </style><style>${read('src/content/chatgpt-content.css')}</style></head><body>
         <main><div data-app-action-timeline-scroll style="width:1600px">
             <div data-thread-user-message-navigation-content class="max-w-(--thread-body-max-width)">
-                <article data-testid="conversation-turn-1"><div data-message-author-role="user">
-                    <div class="max-w-(--user-chat-width,70%)" data-user-wrapper>
-                        <div class="user-message-bubble-color" data-bubble>
+                <article data-testid="conversation-turn-1"><div data-message-author-role="user" class="uflex">
+                    <div class="uflex"><div class="contents max-w-(--user-chat-width,70%)" data-user-wrapper>
+                        <div class="user-message-bubble-color max-w-(--user-chat-width,70%)" data-bubble>
                             <div class="whitespace-pre-wrap" data-user>Short user question</div>
                         </div>
-                    </div>
+                    </div></div>
                     <div data-toolbar><button>Edit</button></div>
                 </div></article>
                 <article data-testid="conversation-turn-2"><div data-message-author-role="assistant">
@@ -68,6 +72,16 @@
                     </div>
                     <div data-toolbar><button>Copy</button></div>
                 </div></article>
+                <!-- 2026-09 登录后观察到的新版结构：无角色属性，正文与气泡用 data-* 标识。 -->
+                <section data-turn="user"><div class="uflex"><div class="uflex">
+                    <div data-user-message-bubble class="max-w-(--user-chat-width,70%)" data-new-bubble>
+                        <span data-new-user>New structure question</span></div>
+                </div></div></section>
+                <section data-turn="assistant"><div data-markdown-text-style="assistant-message" data-new-md>
+                    <p data-new-p>New structure answer</p>
+                    <div><button data-new-copy>Copy</button></div>
+                    <pre><code data-new-code>const x = 1;</code></pre>
+                </div></section>
             </div>
             <div data-pip-obstacle="thread-footer" class="max-w-(--thread-body-max-width)">
                 <form data-chatgpt-composer><textarea data-composer style="font-size:16px"></textarea></form>
@@ -101,6 +115,9 @@
                 copy:px('[data-copy]','fontSize'), tableBtn:px('[data-table-btn]','fontSize'),
                 toolbar:px('[data-toolbar] button','fontSize'), composer:px('[data-composer]','fontSize'),
                 bubble:q('[data-bubble]').getBoundingClientRect().width,
+                newP:px('[data-new-p]','fontSize'), newUser:px('[data-new-user]','fontSize'),
+                newCode:px('[data-new-code]','fontSize'), newCopy:px('[data-new-copy]','fontSize'),
+                newBubble:q('[data-new-bubble]').getBoundingClientRect().width,
                 column:q('[data-md]').getBoundingClientRect().width
             });
             window.addEventListener('unhandledrejection', event => {
@@ -171,6 +188,9 @@
                 await save('chatgptEnabled', true);
                 out.resumed = snapshot();
                 window.deliver({ action:'getLayoutStatus' }, {}, r => { out.status = r; });
+                // 对话有内容但没有可识别的消息正文：阅读状态单独报告为 unsupported。
+                q('[data-thread-user-message-navigation-content]').innerHTML = '<div><div>Unknown message layout</div></div>';
+                window.deliver({ action:'getLayoutStatus' }, {}, r => { out.unknownStatus = r; });
 
                 const pre = document.createElement('pre');
                 pre.id = 'results';
@@ -200,7 +220,10 @@
     }
 
     // 字号：各元素按原生比例缩放；控件、工具栏、输入框保持原生。
-    for (const key of ['p', 'h', 'code', 'td', 'user', 'li']) near(r.font[key], n[key] * 1.25, `font ${key}`);
+    for (const key of ['p', 'h', 'code', 'td', 'user', 'li', 'newP', 'newUser', 'newCode']) {
+        near(r.font[key], n[key] * 1.25, `font ${key}`);
+    }
+    near(r.font.newCopy, n.newCopy, 'new-structure copy button stays native');
     near(r.font.inline, r.font.p * 0.875, 'inline code keeps its em ratio');
     near(r.font.katex, r.font.p * 1.21, 'math scales only through its text context');
     near(r.font.preLine, n.preLine * 1.25, 'code line height scales with font only');
@@ -224,7 +247,9 @@
 
     // 用户消息铺满：依赖宽度生效；宽度关闭时保留偏好但不生效，阅读排版仍在。
     near(r.full.bubble, r.full.column, 'user bubble fills the conversation column');
+    near(r.full.newBubble, r.full.column, 'new-structure user bubble fills the conversation column');
     assert(r.fullWidthOff.bubble < r.full.column - 100, 'full width is gated by effective width');
+    assert(r.fullWidthOff.newBubble < r.full.column - 100, 'new-structure full width is gated by effective width');
     near(r.widthOffFont, n.p * 1.25, 'reading stays active with width off');
 
     assert(r.geometry.tableScroll && r.geometry.tableOverflow === 'auto', 'table keeps native inner scroll');
@@ -242,6 +267,8 @@
     near(r.resumed.p, 18 * 1.25, 'resume samples the new native size');
     near(r.resumed.h, n.h * 1.25, 'resume does not compound scaling');
     assert.strictEqual(r.status.status, 'active');
-    assert.strictEqual(r.status.reading.messages, true);
+    assert.strictEqual(r.status.reading.status, 'active');
+    assert.strictEqual(r.unknownStatus.reading.status, 'unsupported', 'unrecognized messages are reported');
+    assert.strictEqual(r.unknownStatus.status, 'active', 'width recognition is reported separately');
     console.log(`Passed ChatGPT reading regression (${temp}).`);
 })();

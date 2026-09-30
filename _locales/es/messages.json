@@ -314,5 +314,8 @@
   },
   "taskPendingUnknown": {
     "message": "El último preajuste no terminó, así que no se puede restaurar. Aplica una tarea de nuevo para continuar."
+  },
+  "readingUnsupported": {
+    "message": "No se aplican el tamaño del texto ni el espaciado: aún no se reconoce la estructura de mensajes de esta página. El ancho no se ve afectado."
   }
 }

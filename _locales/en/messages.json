@@ -314,5 +314,8 @@
   },
   "taskPendingUnknown": {
     "message": "The last task preset did not finish, so restoring is unavailable. Apply a task again to continue."
+  },
+  "readingUnsupported": {
+    "message": "Font size and spacing are not applied: this page's message layout is not recognized yet. Width is unaffected."
   }
 }

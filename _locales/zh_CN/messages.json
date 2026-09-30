@@ -314,5 +314,8 @@
   },
   "taskPendingUnknown": {
     "message": "上次任务预设未完成，暂时无法恢复。重新应用任务即可继续。"
+  },
+  "readingUnsupported": {
+    "message": "暂未识别此页面的消息结构，字号与间距未生效；宽度不受影响。"
   }
 }

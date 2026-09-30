@@ -1,8 +1,40 @@
 # Compatibility record
 
+## Authenticated ChatGPT reading recheck — September 29, 2026
+
+**Outcome: pass for the requested live recheck. The earlier ChatGPT message-recognition and user-full-width failure is closed for the observed authenticated layout.** This does not close the remaining platform and feature gaps below.
+
+Source under test: code commit `3aaefff` on `chatgpt-width-support`, with documentation at `9274e2f`; manifest `3.0.0` / `3.0.0-rc.1`. Testing used the existing signed-in layout-test conversation in the **Codex in-app browser on Windows**, reporting Chrome `154.0.0.0`. The browser initially still loaded the pre-fix script. After the user re-imported the workspace and a full page reload, the loaded ChatGPT content script and shared settings script matched the local files exactly after line-ending normalization. Pre-import measurements are not fix-acceptance evidence. The injected stylesheet text was not available through the browser debugger; CSS behavior was checked through computed styles and geometry.
+
+### Actual message nesting
+
+The page had two assistant roots with `data-markdown-text-style="assistant-message"`, two user bubbles with `data-user-message-bubble`, and no `data-message-author-role` nodes. Assistant paragraphs were direct children of their recognized Markdown root. User text was five elements below the bubble: a flex wrapper, a typography wrapper, a search-target wrapper, a plain wrapper, then the text-owning `div`. That innermost element had native **16px font / 26px line height**, whereas the bubble itself had a 24px line height.
+
+The fix marked both actual user text owners and the assistant targets: **18 font targets**, with no font markers inside buttons, forms or editable regions. For full width, only the two bubbles received `data-wgc-full-path="bubble"`; each immediate parent already matched the conversation column. Bubble padding remained 16px per side. The complete ancestor path, including the more distant `display: contents` wrappers, is retained in the local evidence. The synthetic new-layout fixture's shallow `span` still differs from this real nesting; this live check supplies the previously missing evidence for the actual text owner and 26px baseline.
+
+### Measured results
+
+| Area | Evidence and outcome |
+| --- | --- |
+| Font 140% | **Pass.** Assistant paragraphs and both user text owners changed from 16px/26px to **22.4px/36.4px**. Code changed from 12px/20px to 16.8px/28px. Table cells changed from 14px/26px to 19.6px/36.4px; headers retained their separate native line-height ratio (16px → 22.4px). |
+| Auto density 100 | **Pass.** At 140%, prose/user line height became **29.848px**. The first paragraph's 4px bottom margin became 0.5px; the second paragraph's 16px margins became 2px, and the visible paragraph gap became 2px. Code and table line heights stayed at their font-scaled values. |
+| Manual spacing | **Pass.** At 140%, line height 1.6 produced **35.84px** in prose and user text. Paragraph separation measured **9px**, then **0px** when configured as zero (within subpixel rounding). Code and table line heights stayed unchanged by manual spacing. |
+| User full width | **Pass.** At a 1600 × 1000 viewport with configured width 1600px, the available reply column, both bubbles and composer measured approximately **1495.2px**. With width 80%, all measured **1280px**; at 480 × 900 they measured **384px**. Returning to the wide viewport and leaving message-edit mode retained matching widths. Bubble text width stayed column minus 32px padding. No measured state caused page-level horizontal overflow. |
+| Independent width switch | **Pass.** Turning width off returned the column/composer to native 768px and bubbles to 537.6px (70%), while the 140% typography and manual spacing stayed active. |
+| Native code wrap | **Pass.** The native button changed `pre` from `pre` to `pre-wrap`, including at the narrow viewport; its pressed state survived width changes, master pause, configuration edits while paused, and resume. Turning it off restored `pre`. Code text content stayed identical in every measured state. This did not exercise clipboard payloads. |
+| Master pause and saved edits | **Pass.** Pause removed all font/line/spacing/full-path markers, root reading attributes and owned root variables; original typography and native width returned. Saving 125% font, 1.3 line height, 9px gap and 700px width while paused left the page native. Resume applied **20px/26px prose, 9px gap, 700px column/bubbles/composer** without compounding. |
+| Protected controls and editors | **Pass for exercised elements.** Composer, existing writing editor, message copy/edit buttons, table-expand button and model button kept their native 16px font throughout; the code-wrap button kept 14px. The native user-message edit field had no extension markers, and Cancel restored the enhanced message without submitting an edit. |
+| Native table surfaces | **Pass for this sample.** At 480px, the enlarged three-column table retained one internal horizontal scroll owner (about 394px content inside 384px), with no document overflow. At 1600px, Expand table opened the full-viewport native preview with 14px cells and zero reading markers; Close worked. |
+
+Settings changes were made through the loaded extension's `chrome.storage.sync` API, so this verifies live storage-to-content behavior rather than browser-toolbar popup interaction or the popup's new unsupported-message notice. The three changed ChatGPT keys were restored to their original absent/default state, the native wrap button returned to off, and the viewport returned to 759 × 964. Composer remained empty; edit/preview surfaces were closed. No message or edited message was submitted.
+
+No runtime code or formal tests were added for this recheck, and the user's already-passed unit/package suites were not rerun. Local evidence is under ignored `.scratch/chatgpt-reading-retest-3aaefff/`: `live-results.json` contains every measured state, protected-control checks, code-text equality and the post-fix DOM path; `observed-dom-before-reimport.json` records the native nesting; screenshots show the wide reading view and narrow native-wrap view. These files are not committed or packaged.
+
+**Still unverified:** macOS and true installed-PWA behavior; live streaming/newly generated rich blocks (cancel-edit remounting is not streaming); unexercised attachment/Canvas variants and clipboard payloads; actual toolbar-popup transport and the new reading-unsupported notice. Earlier Gemini, drag-and-drop, Deep Research, Sources-chip and old-content/new-popup gaps remain scoped as recorded below. Passing this conversation does not establish compatibility with every future ChatGPT layout.
+
 ## Follow-up fix for the ChatGPT message structure — September 29, 2026
 
-Addresses the confirmed failure recorded below. **Not yet rechecked on the authenticated page**; the failure stays open until that recheck passes.
+Addresses the confirmed failure recorded below. This fix was initially pending authenticated verification; the recheck above now closes that failure for the observed layout.
 
 - Reading targets now recognize both structures: assistant bodies via `[data-markdown-text-style="assistant-message"]` or the older role-based `.markdown`, and user bubbles via `[data-user-message-bubble]` or the older role-based bubble. User text owners are the elements that directly hold text inside the bubble.
 - User-message full width no longer relies on class names. It walks up from the bubble, skipping `display: contents`, and widens only elements narrower than the measured conversation column.
@@ -10,9 +42,11 @@ Addresses the confirmed failure recorded below. **Not yet rechecked on the authe
 
 Evidence: `e2e/chatgpt-reading.js` now includes the observed new structure (no role attributes, `data-*` body and bubble) alongside the older one, whose user bubble was updated to match a public share page read on this date (`display: contents` wrapper; the bubble itself carries `max-w-(--user-chat-width,70%)`). Run against the previous content script, the fixture fails as the live page did (new-structure paragraph 16px instead of 20px); with the fix it passes, including full-width bubbles for both structures and the `unsupported` reading status. On that public share page (older structure, signed out), the new selectors found the assistant body, the outer user bubble, and its text owner, with the seven code-block buttons inside the body excluded. The full unit/packaging suite, the 73 Gemini layout scenarios, 106-key locale parity, and the real-popup probe passed again.
 
-Limit: the new structure's inner nesting was not captured during the live run; only its two root attributes were recorded. Recheck on the signed-in test conversation: 140% font, density, manual spacing, full width at 1600px, native code wrap, and pause/resume.
+At fix time, the new structure's inner nesting had not been captured; only its two root attributes were recorded. The recheck above now supplies that nesting and live measurements for 140% font, density, manual spacing, full width at 1600px, native code wrap, and pause/resume.
 
 ## Non-macOS verification in the Codex in-app browser — September 29, 2026
+
+Historical checkpoint against `9941d38`: the reading failure below was subsequently fixed and closed by the authenticated `3aaefff` recheck above. Other gaps remain open unless explicitly covered by later evidence.
 
 **Outcome: partial pass, with a confirmed ChatGPT reading-layout failure.** The current candidate is not fully compatible with the observed ChatGPT message structure. This round verifies and records behavior; it does not change extension runtime code or claim that the failure has been fixed. macOS was excluded by the user.
 

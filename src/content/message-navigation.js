@@ -53,6 +53,10 @@
         preview.id = `wg-nav-preview-${Math.random().toString(36).slice(2)}`;
         preview.setAttribute('role', 'tooltip');
         preview.hidden = true;
+        // 两行截断放在无内边距的内层元素上，避免第三行从外层的下内边距里露出。
+        const previewText = document.createElement('span');
+        previewText.className = 'wg-nav-preview-text';
+        preview.append(previewText);
 
         let turns = [];
         let scrollRoot = null;
@@ -136,7 +140,7 @@
         function showPreview(index) {
             const turn = turns[index];
             if (!turn || !bounds) return;
-            preview.textContent = textOf(turn);
+            previewText.textContent = textOf(turn);
             preview.hidden = false;
             turn.button.setAttribute('aria-describedby', preview.id);
             const tick = turn.button.getBoundingClientRect();
@@ -197,6 +201,24 @@
             browsing = rail.contains(event.relatedTarget) || rail.matches(':hover');
         });
 
+        // 颜色与字体取自宿主页面的实际表面，而不是猜测主题类名：跟随 data-theme、系统主题与实时切换。
+        function adoptHostStyle() {
+            let background = '';
+            for (let el = scrollRoot; el; el = el.parentElement) {
+                const color = getComputedStyle(el).backgroundColor;
+                if (color && color !== 'transparent' && !/^rgba\(.*,\s*0\)$/.test(color)) {
+                    background = color;
+                    break;
+                }
+            }
+            const style = getComputedStyle(scrollRoot);
+            for (const target of [rail, preview]) {
+                target.style.setProperty('--wg-nav-ink', style.color);
+                target.style.setProperty('--wg-nav-surface', background || '#ffffff');
+                target.style.setProperty('--wg-nav-font', style.fontFamily);
+            }
+        }
+
         function setScrollRoot(next) {
             if (next === scrollRoot) return;
             if (scrollRoot) scrollRoot.removeEventListener('scroll', queueActive);
@@ -250,8 +272,7 @@
                 turn.button.tabIndex = i === focusIndex ? 0 : -1;
                 turn.button.setAttribute('aria-label', `${labels.message(i + 1, turns.length)}: ${textOf(turn).slice(0, 80)}`);
             });
-            rail.classList.toggle('wg-nav--dark', Boolean(source.dark));
-            preview.classList.toggle('wg-nav--dark', Boolean(source.dark));
+            adoptHostStyle();
             rail.hidden = false;
             place();
             updateActive();

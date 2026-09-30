@@ -303,7 +303,7 @@
         }
         // 显示消息导航且对话几乎占满窗格时，两侧各留出导航条宽度；保存的宽度值不变。
         const scroller = navigationReserved && findChatScroller();
-        if (scroller) widthCssValue = `min(${widthCssValue}, ${scroller.clientWidth - NAV_GUTTER * 2}px)`;
+        if (scroller) widthCssValue = `min(${widthCssValue}, ${scroller.clientWidth - (NAV_GUTTER + 1) * 2}px)`;
 
         setWidthProperty(root, '--gemini-chat-width', widthCssValue, '');
         modifyElementStyles(widthCssValue);
@@ -449,10 +449,12 @@
     function geminiTurns(scroller) {
         return [...scroller.querySelectorAll('user-query')]
             .filter(query => !query.parentElement.closest('user-query'))
-            .map(element => ({
-                element,
-                text: (element.querySelector('.query-text') || element).textContent.replace(/s+/g, ' ').trim()
-            }));
+            .map(element => {
+                // 只取可见的提问行；.query-text 里还有屏幕阅读器用的“你说”标题及重复全文。
+                const lines = [...element.querySelectorAll('.query-text-line')];
+                const text = lines.length ? lines.map(line => line.textContent).join(' ') : '';
+                return { element, text: text.replace(/\s+/g, ' ').trim() };
+            });
     }
 
     function requestedWidthPx() {
@@ -491,15 +493,16 @@
                 onStale: queueNavigation
             });
         }
+        // 使用滚动容器的 client box（左右滚动条占位都已扣除）。
         const rect = scroller.getBoundingClientRect();
-        const right = rect.right - (scroller.offsetWidth - scroller.clientWidth);
+        const left = rect.left + scroller.clientLeft;
+        const right = left + scroller.clientWidth;
         const column = scroller.querySelector('.conversation-container, conversation-container');
         // 窗格右侧放不下 24px 导航条（例如宽度关闭的窄窗口）时隐藏。
         const fits = !column || right - column.getBoundingClientRect().right >= NAV_GUTTER - 1;
         navigation.update(shown && fits ? {
             turns, scrollRoot: scroller,
-            bounds: { left: rect.left, right, top: rect.top + 16, bottom: rect.bottom - 8 },
-            dark: document.body.classList.contains('dark-theme')
+            bounds: { left, right, top: rect.top + scroller.clientTop + 16, bottom: rect.bottom - 8 }
         } : null);
     }
 

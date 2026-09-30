@@ -95,7 +95,13 @@
         [data-user-message-bubble] > div { max-width:70%; padding:10px 16px; background:#eee; line-height:24px; }
         [data-markdown-text-style] p { margin:0 0 16px; min-height:150px; }
         .thread-pane { --thread-content-responsive-max-width:640px; display:flex; flex-direction:column; height:640px; }
-        .messages-scroll { overflow-y:auto; height:560px; }
+        .messages-scroll { overflow-y:auto; height:560px; scrollbar-gutter:stable both-edges; }
+        html[data-theme="dark"] body, html[data-theme="dark"] .thread-pane { background:rgb(14, 14, 14); color:rgb(236, 236, 236); }
+        /* 2026-09-30 采集：Dots 代码块没有 pre，块级 code 显式 12px/20px，外层 DIV 负责横向滚动 */
+        [data-markdown-copy="code-block"] code { display:block; font-size:12px; line-height:20px; white-space:pre; font-family:monospace; }
+        [data-markdown-copy="exclude"] { font-size:14px; }
+        section[data-pip-obstacle="quick-chat"] { position:fixed; right:20px; bottom:20px; width:572px; height:420px; display:flex; flex-direction:column; background:#fff; }
+        .thread-scroll-container { overflow-y:auto; flex:1; }
         .message-row { display:flex; margin:4px 0; }
         .message-row.self { justify-content:flex-end; }
         .message-bubble-wrap { position:relative; max-width:min(88%, 100% - 73px); }
@@ -106,7 +112,7 @@
         [data-page-document-selection] [role="textbox"] { font:14px/22.75px sans-serif; }
     </style><style>${read('src/content/message-navigation.css')}</style>
     <style>${read('src/content/chatgpt-content.css')}</style></head><body>
-        <div class="route" id="ordinary" hidden-route><main><div data-app-action-timeline-scroll>
+        <div class="route" id="ordinary" hidden-route><main data-app-shell-main-surface="shell"><div data-app-action-timeline-scroll>
             <div data-pip-obstacle="thread-footer" class="${native}"><form data-chatgpt-composer><div role="textbox" contenteditable="true"></div></form></div>
             <div data-thread-user-message-navigation-content class="${native}" id="transcript">
                 ${ordinaryTurn('First ordinary question', 'Ordinary answer one')}
@@ -122,19 +128,27 @@
                     ${dotsRow('d3', false, dotsText('Dot answers'))}
                     ${dotsRow('d4', true, '<div class="mt-2"><span>Call ended</span></div><div role="status">Read</div>')}
                     ${dotsRow('d5', true, dotsText('Second dots question'))}
-                    ${dotsRow('d6', false, dotsText('Dot answers again'))}
+                    ${dotsRow('d6', false, '<div class="message-surface"><div class="message-bubble"><div class="message-text"><div data-markdown-text-style="assistant-message"><p>Code follows</p>' +
+                        '<div data-markdown-copy="code-block"><div data-markdown-copy="exclude"><div id="code-label">JavaScript</div><button aria-label="Enable word wrap">W</button></div>' +
+                        '<div id="code-scroll" style="overflow:auto"><code id="dots-code"><span><span class="hljs-keyword">const</span> sample = "' + 'x'.repeat(300) + '";</span></code></div></div></div></div></div></div>')}
                     ${dotsRow('d7', true, dotsText('Third dots question'))}
                 </div>
             </div></div>
-            <div class="conversation-footer"><div data-role="composer"><div data-codex-composer-root>
+            <div class="conversation-footer" id="dots-footer"><div data-role="composer" id="dots-composer-host"><div data-codex-composer-root>
                 <div class="relative ${native}" id="dots-composer"><div role="textbox" contenteditable="true"></div></div>
             </div></div></div>
+            <div class="reply-chain-panel" role="dialog" id="reply-panel" hidden-route></div>
         </main></div></div></div>
         <div class="route" id="page" hidden-route><div data-page-document-selection="true" role="presentation">
             <div role="textbox" aria-label="Page document" contenteditable="true">
                 <div data-page-block-row data-page-block-type="paragraph"><div data-page-block-viewport><p id="page-p">Document text</p></div></div>
             </div></div>
             <section role="dialog" data-pip-obstacle="quick-chat" data-quick-chat-drag-handle="true" id="quick" hidden-route class="route">
+                <div class="thread-scroll-container" id="quick-scroll"><div data-thread-user-message-navigation-content="true" class="relative flex flex-1 flex-col">
+                    <div class="flex flex-col px-4"><div data-chatgpt-conversation-turn="true"><h4 class="sr-only">You said:</h4>
+                        <div data-user-message-bubble="true"><div><div class="text-size-chat whitespace-pre-wrap" id="quick-user">Page chat question</div></div></div></div>
+                    <div data-chatgpt-conversation-turn="true"><div data-markdown-text-style="assistant-message"><p id="quick-p">Page chat answer.</p></div></div></div>
+                </div></div>
                 <div data-pip-obstacle="thread-footer"><form data-composer-placement="thread" data-thread-find-composer="true">
                     <div role="textbox" contenteditable="true" aria-label="Work with ChatGPT"></div></form></div>
             </section>
@@ -155,6 +169,8 @@
                     owners:qa('[data-wgc-width]').map(el => el.id || el.className.split(' ')[0]),
                     font:px('#dots-list .message-row.self p','fontSize'), line:px('#dots-list .message-row.self p','lineHeight'),
                     hiddenMarked:qa('#ordinary [data-wgc-font]').length, nav:qa('.wg-nav-tick').length,
+                    code:px('#dots-code','fontSize'), codeLine:px('#dots-code','lineHeight'), codeLabel:px('#code-label','fontSize'),
+                    codeScrolls:q('#code-scroll').scrollWidth > q('#code-scroll').clientWidth,
                     navVisible:!q('.wg-nav').hidden, reading:s.capabilities.reading, navigation:s.capabilities.navigation };
                 // 2. Dots 用户消息铺满：保留 Reply/Reaction 的原生空间。
                 await save('chatgptReadingSettings', { messageFontSize:125, userFullWidth:true });
@@ -173,6 +189,10 @@
                 q('.wg-nav-list').dispatchEvent(new KeyboardEvent('keydown', { key:'ArrowDown', bubbles:true }));
                 out.keyboard = { focused:qa('.wg-nav-tick').indexOf(document.activeElement), tabbable:qa('.wg-nav-tick').filter(b => b.tabIndex === 0).length,
                     preview:!q('.wg-nav-preview').hidden };
+                const clamp = q('.wg-nav-preview-text');
+                clamp.textContent = 'long preview '.repeat(40);
+                out.keyboard.clamp = { inner:clamp.clientHeight, clipped:clamp.scrollHeight > clamp.clientHeight + 1,
+                    outer:q('.wg-nav-preview').getBoundingClientRect().height };
                 q('.wg-nav-list').dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true }));
                 out.keyboard.previewAfterEscape = !q('.wg-nav-preview').hidden;
                 document.activeElement.blur();
@@ -186,7 +206,27 @@
                 out.gutter = { value:document.documentElement.style.getPropertyValue('--wg-chatgpt-nav-gutter'),
                     railLeft:nav.left, railRight:nav.right, paneRight:scroller.getBoundingClientRect().right,
                     contentRight:list.getBoundingClientRect().right - parseFloat(listStyle.paddingRight),
-                    composer:rect('#dots-composer').width, list:list.getBoundingClientRect().width };
+                    composer:rect('#dots-composer').width, list:list.getBoundingClientRect().width,
+                    visible:!q('.wg-nav').hidden, clientRight:scroller.getBoundingClientRect().left + scroller.clientLeft + scroller.clientWidth };
+                // 深色主题：刻度与预览取宿主的文字色和表面色。
+                document.documentElement.setAttribute('data-theme', 'dark');
+                status();
+                await wait();
+                out.dark = { ink:q('.wg-nav').style.getPropertyValue('--wg-nav-ink'), surface:q('.wg-nav-preview').style.getPropertyValue('--wg-nav-surface') };
+                document.documentElement.removeAttribute('data-theme');
+                // Reply：输入区移入回复对话框，主列表保持拓宽，对话框保持原生。
+                const widthBefore = list.getBoundingClientRect().width;
+                const host = q('#dots-composer-host');
+                q('#reply-panel').removeAttribute('hidden-route');
+                q('#reply-panel').appendChild(host);
+                s = status();
+                await wait();
+                out.reply = { surface:s.surface.kind, before:widthBefore, after:list.getBoundingClientRect().width,
+                    owners:qa('[data-wgc-width]').map(el => el.id), width:s.capabilities.width };
+                q('#dots-footer').appendChild(host);
+                q('#reply-panel').setAttribute('hidden-route', '');
+                status();
+                await wait();
                 await save('chatgptMessageNavigationEnabled', false);
                 out.navOff = { gutter:document.documentElement.style.getPropertyValue('--wg-chatgpt-nav-gutter'),
                     rail:qa('.wg-nav').length, width:status().capabilities.width };
@@ -229,7 +269,10 @@
                 // 9. Page 关联的空浮动对话：宿主决定宽度，保持原生。
                 q('#quick').removeAttribute('hidden-route');
                 s = status();
-                out.quick = { surface:s.surface.kind, status:s.status, owners:qa('[data-wgc-width]').length };
+                await wait();
+                out.quick = { surface:s.surface.kind, status:s.status, owners:qa('[data-wgc-width]').length,
+                    width:s.capabilities.width, reading:s.capabilities.reading, answer:px('#quick-p','fontSize'),
+                    user:px('#quick-user','fontSize'), pageFont:px('#page-p','fontSize'), pageMarked:qa('#page-p[data-wgc-font]').length };
                 // 10. 未识别的可见对话（识别属性被去掉）且隐藏的已知对话仍存在。
                 show('ordinary');
                 q('#transcript').removeAttribute('data-thread-user-message-navigation-content');
@@ -260,6 +303,10 @@
     assert.strictEqual(c.dots.nav, 3, 'Dots navigation counts user messages and skips the call row');
     assert(c.dots.navVisible);
     assert.strictEqual(c.dots.navigation, 'active');
+    near(c.dots.code, 15, 'Dots block code scales from its explicit 12px');
+    near(c.dots.codeLine, 25, 'Dots code line height scales with font only');
+    near(c.dots.codeLabel, 14, 'Dots code toolbar stays native');
+    assert(c.dots.codeScrolls, 'Dots code keeps its native horizontal scroll');
     near(c.dotsFull.wrap, c.dotsFull.row - 73, 'Dots full width keeps the 73px action allowance');
     assert(c.dotsFull.actionsLeft >= 0, 'Dots reply/reaction group stays inside the row');
     near(c.dotsJump.targetTop, 72, 'jump places the target below the top inset', 2);
@@ -268,10 +315,19 @@
     assert.strictEqual(c.keyboard.tabbable, 1, 'one Tab stop');
     assert.strictEqual(c.keyboard.preview, true);
     assert.strictEqual(c.keyboard.previewAfterEscape, false, 'Escape dismisses the preview');
-    assert.strictEqual(c.gutter.value, '8px', 'gutter reserves only the missing space beyond native padding');
-    assert(c.gutter.railRight <= c.gutter.paneRight + 0.5 && c.gutter.railLeft >= c.gutter.contentRight - 0.5,
+    assert(c.keyboard.clamp.clipped && c.keyboard.clamp.inner <= 36, `preview clamps to two lines: ${JSON.stringify(c.keyboard.clamp)}`);
+    assert(c.keyboard.clamp.outer <= 36 + 12 + 2 + 0.5, 'no third line shows inside the preview padding');
+    assert.strictEqual(c.gutter.value, '9px', 'gutter reserves only the missing space beyond native padding');
+    assert(c.gutter.visible, 'rail stays visible at 100% width with both-edge scrollbar gutters');
+    assert(c.gutter.railRight <= c.gutter.clientRight + 0.5 && c.gutter.railLeft >= c.gutter.contentRight - 0.5,
         `rail fits between column and pane edge: ${JSON.stringify(c.gutter)}`);
     near(c.gutter.composer, c.gutter.list, 'Dots composer stays aligned with the list');
+    assert.strictEqual(c.dark.ink, 'rgb(236, 236, 236)', 'ticks follow the dark host text color');
+    assert.strictEqual(c.dark.surface, 'rgb(14, 14, 14)', 'preview follows the dark host surface');
+    assert.strictEqual(c.reply.surface, 'dots');
+    near(c.reply.after, c.reply.before, 'Reply keeps the main Dots column width');
+    assert.deepStrictEqual(c.reply.owners, ['dots-list'], 'the relocated reply composer stays native');
+    assert.strictEqual(c.reply.width, 'active');
     assert.strictEqual(c.navOff.gutter, '', 'navigation off releases the gutter');
     assert.strictEqual(c.navOff.rail, 0);
     assert.strictEqual(c.ordinary.surface, 'chat');
@@ -288,7 +344,11 @@
     assert.deepStrictEqual([c.page.surface, c.page.status, c.page.width, c.page.reading],
         ['notApplicable', 'notApplicable', 'notApplicable', 'notApplicable']);
     assert.deepStrictEqual([c.page.owners, c.page.markers, c.page.pageFont, c.page.rail], [0, 0, 14, 0], 'Page stays native');
-    assert.deepStrictEqual([c.quick.surface, c.quick.status, c.quick.owners], ['quickChat', 'notApplicable', 0]);
+    assert.deepStrictEqual([c.quick.surface, c.quick.status, c.quick.owners, c.quick.width, c.quick.reading],
+        ['quickChat', 'notApplicable', 0, 'notApplicable', 'active'], 'Page chat: host keeps its width, reading applies');
+    near(c.quick.answer, 20, 'Page chat answer scales');
+    near(c.quick.user, 20, 'Page chat user text scales');
+    assert.deepStrictEqual([c.quick.pageFont, c.quick.pageMarked], [14, 0], 'Page document stays native beside the chat');
     assert.deepStrictEqual([c.unknown.surface, c.unknown.status, c.unknown.owners, c.unknown.markers, c.unknown.rail],
         ['unknown', 'unsupported', 0, 0, 0], 'unknown visible chat stays native despite the hidden known route');
     assert.strictEqual(c.recovered.surface, 'chat');
@@ -299,7 +359,8 @@
     // ---- Gemini：infinite-scroller.chat-history 内的 user-query ----
     const geminiTurn = (i, long) => `<div class="conversation-container" id="c${i}"><user-query><span class="user-query-container">
         <user-query-content><div class="user-query-container"><div class="query-content"><span class="user-query-bubble-with-background">
-        <div class="query-text${long ? ' collapsed' : ''}"><p class="query-text-line">Gemini question ${i}${long ? ' '.repeat(1) + 'long '.repeat(80) : ''}</p></div>
+        <div class="query-text${long ? ' collapsed' : ''}"><h5 class="cdk-visually-hidden screen-reader-user-query-label"><span>You said</span> Gemini question ${i} sassy</h5>
+        <p class="query-text-line">Gemini question ${i} sassy${long ? ' ' + 'long '.repeat(80) : ''}</p></div>
         </span></div></div></user-query-content></span></user-query>
         <model-response><div class="markdown"><p>${'Answer text. '.repeat(400)}</p></div></model-response></div>`;
     const gemini = `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -325,6 +386,7 @@
                 const scroller = q('infinite-scroller');
                 if (!q('.wg-nav')) { report({ error:'no Gemini rail; errors=' + JSON.stringify(out.errors) }); return; }
                 out.rail = { ticks:qa('.wg-nav-tick').length, visible:!q('.wg-nav').hidden };
+                out.label = qa('.wg-nav-tick')[1].getAttribute('aria-label');
                 qa('.wg-nav-tick')[1].click();
                 await wait(400);
                 out.jump = { targetTop:q('#c2 user-query').getBoundingClientRect().top - scroller.getBoundingClientRect().top,
@@ -345,6 +407,7 @@
 
     const g = run('gemini', gemini);
     assert.deepStrictEqual(g.rail, { ticks: 3, visible: true }, 'one tick per outer user-query');
+    assert(g.label.endsWith(': Gemini question 2 sassy'), `preview keeps text once without hidden labels: ${g.label}`);
     near(g.jump.targetTop, 16, 'Gemini jump uses the chat-history scroller', 2);
     assert.strictEqual(g.jump.collapsed, true, 'collapsed long message is not expanded');
     assert(/^min\(100vw, \d+px\)$/.test(g.gutter.width), `Gemini caps width for the rail: ${g.gutter.width}`);

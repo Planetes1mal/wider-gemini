@@ -1,13 +1,10 @@
-/* 消息导航条：对话窗格右侧的一列短刻度。当前项更亮更长；命中区域 24×24px。 */
+/* 消息导航条：对话窗格右侧的一列短刻度。当前项更亮更长；命中区域 24×24px。
+   --wg-nav-ink / --wg-nav-surface / --wg-nav-font 由脚本取自宿主页面，因此深浅主题都与原站一致。 */
 .wg-nav {
     position: fixed;
     z-index: 30;
     width: 24px;
     box-sizing: border-box;
-    --wg-nav-tick: rgba(15, 23, 42, 0.26);
-    --wg-nav-tick-hover: rgba(15, 23, 42, 0.55);
-    --wg-nav-tick-active: rgba(15, 23, 42, 0.86);
-    --wg-nav-focus: #2563eb;
 }
 
 .wg-nav[hidden],
@@ -47,57 +44,51 @@
     width: 10px;
     height: 2px;
     border-radius: 2px;
-    background: var(--wg-nav-tick);
+    background: color-mix(in srgb, var(--wg-nav-ink, #1f2937) 30%, transparent);
     transition: width 0.15s ease, background 0.15s ease;
 }
 
 .wg-nav-tick:hover > span {
     width: 14px;
-    background: var(--wg-nav-tick-hover);
+    background: color-mix(in srgb, var(--wg-nav-ink, #1f2937) 60%, transparent);
 }
 
 .wg-nav-tick[aria-current] > span {
     width: 16px;
-    background: var(--wg-nav-tick-active);
+    background: color-mix(in srgb, var(--wg-nav-ink, #1f2937) 92%, transparent);
 }
 
 .wg-nav-tick:focus-visible {
-    outline: 2px solid var(--wg-nav-focus);
+    outline: 2px solid color-mix(in srgb, var(--wg-nav-ink, #1f2937) 70%, transparent);
     outline-offset: -2px;
 }
 
+/* 预览沿用宿主的表面色、文字色与字体，只做轻微抬升；不另加品牌色。 */
 .wg-nav-preview {
     position: fixed;
     z-index: 31;
     box-sizing: border-box;
     padding: 6px 10px;
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    border-radius: 8px;
-    background: #ffffff;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.14);
-    color: #1f2937;
-    font: 500 12px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    border: 1px solid color-mix(in srgb, var(--wg-nav-ink, #1f2937) 12%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--wg-nav-surface, #ffffff) 94%, var(--wg-nav-ink, #1f2937));
+    box-shadow: 0 4px 14px color-mix(in srgb, #000000 14%, transparent);
+    color: var(--wg-nav-ink, #1f2937);
+    font-family: var(--wg-nav-font, system-ui, sans-serif);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    pointer-events: none;
+}
+
+.wg-nav-preview-text {
     display: -webkit-box;
+    max-height: 36px;
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow-wrap: anywhere;
     white-space: normal;
-    pointer-events: none;
-}
-
-.wg-nav.wg-nav--dark {
-    --wg-nav-tick: rgba(255, 255, 255, 0.28);
-    --wg-nav-tick-hover: rgba(255, 255, 255, 0.6);
-    --wg-nav-tick-active: rgba(255, 255, 255, 0.9);
-    --wg-nav-focus: #60a5fa;
-}
-
-.wg-nav-preview.wg-nav--dark {
-    border-color: rgba(255, 255, 255, 0.14);
-    background: #22262f;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    color: #e5e7eb;
 }
 
 @media (prefers-reduced-motion: reduce) {

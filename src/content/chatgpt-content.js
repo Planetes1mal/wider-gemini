@@ -25,10 +25,12 @@
     const USER_BUBBLE = ':is([data-user-message-bubble], [data-message-author-role="user"] .user-message-bubble-color, ' +
         '[data-message-author-role="user"] .whitespace-pre-wrap, article.message-row.self .message-surface > .message-bubble)';
     const MESSAGE_ROOT = `:is(${ASSISTANT_ROOT}, ${USER_BUBBLE})`;
-    const FONT_TARGET = 'p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre code';
+    // Dots 的代码块没有 pre：代码表面 [data-markdown-copy="code-block"] 内是显式 12px/20px 的块级 code。
+    const BLOCK_CODE = '[data-markdown-copy="code-block"] code';
+    const FONT_TARGET = `p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre code, ${BLOCK_CODE}`;
     // 密度只压缩正文行框；代码、表格行保持原生行高，只随字号等比缩放。
     const PROSE_LINE = 'p, li, h1, h2, h3, h4, h5, h6, blockquote';
-    const FIXED_LINE = 'pre, td, th';
+    const FIXED_LINE = `pre, td, th, ${BLOCK_CODE}`;
     const BLOCK_SPACING = 'p, ul, ol, blockquote, h1, h2, h3, h4, h5, h6, hr';
     const READING_TARGET = `${FONT_TARGET}, ${FIXED_LINE}, ${BLOCK_SPACING}`;
     const READING_EXCLUDED = `${EXCLUDED}, form, button, textarea, [contenteditable], .katex, svg, canvas, iframe`;
@@ -107,19 +109,38 @@
 
     const nativeOwner = node => node.matches(NATIVE_WIDTH) && !node.closest(EXCLUDED);
 
+    // 排除对话框/菜单/编辑区；唯一的例外是已确认的 Page 浮动对话根本身，其内部的浮层仍被排除。
+    function isExcluded(node) {
+        const hit = node.closest(READING_EXCLUDED);
+        return Boolean(hit) && !(surface.kind === 'quickChat' && hit === surface.host);
+    }
+
+    function scrollOwner(node, limit) {
+        for (let el = node.parentElement; el && el !== limit.parentElement; el = el.parentElement) {
+            const overflow = getComputedStyle(el).overflowY;
+            if ((overflow === 'auto' || overflow === 'scroll') && el.scrollHeight > el.clientHeight) return el;
+        }
+        return null;
+    }
+
     /**
      * 返回当前可见对话的边界：root（阅读与导航范围）、column（对话列）、scroll（滚动容器）、
      * widthOwners（原生宽度变量所有者）。未知结构保持原生。
      */
+    function isChatSurface() {
+        return Boolean(surface.root) && ['chat', 'dots', 'quickChat'].includes(surface.kind);
+    }
+
     function discoverSurface() {
         const dotsList = findVisible('.messaging-root .thread-pane .message-list', document, nativeOwner);
         if (dotsList) {
             const pane = dotsList.closest('.thread-pane');
+            // 点 Reply 后输入区移入回复对话框（保持原生），主消息列表仍单独拓宽。
             const composer = findVisible(`[data-codex-composer-root] ${NATIVE_WIDTH}`, pane, nativeOwner);
             return {
                 kind: 'dots', root: dotsList, column: dotsList,
                 scroll: dotsList.closest('[data-role="messages-scroll"]') || pane,
-                footer: null, widthOwners: composer ? [dotsList, composer] : []
+                footer: null, widthOwners: composer ? [dotsList, composer] : [dotsList]
             };
         }
         const transcript = findVisible('main [data-thread-user-message-navigation-content]', document, nativeOwner);
@@ -131,12 +152,21 @@
                 footer, widthOwners: footer ? [transcript, footer] : []
             };
         }
-        // Page 关联的浮动对话：宽度由宿主窗口决定；消息结构尚未观察到，保持原生。
+        // Page 关联的浮动对话：宽度由宿主窗口决定，不改；有消息时对其正文做阅读排版与导航。
         const quickChat = findVisible('section[data-pip-obstacle="quick-chat"]');
-        if (quickChat) return { kind: 'quickChat', root: quickChat, widthOwners: [] };
+        if (quickChat) {
+            const transcript = findVisible('[data-thread-user-message-navigation-content]', quickChat);
+            const footer = findVisible('[data-pip-obstacle="thread-footer"]', quickChat);
+            return {
+                kind: 'quickChat', host: quickChat, root: transcript, column: transcript,
+                scroll: transcript && (scrollOwner(transcript, quickChat) || transcript.parentElement),
+                footer, widthOwners: []
+            };
+        }
         const home = findVisible(`main ${HOME_OWNER}`, document, nativeOwner);
         if (home) return { kind: 'home', root: null, widthOwners: [home] };
-        if (findVisible('[data-page-document-selection], main[data-app-shell-main-surface]')) {
+        // 普通对话的 main 也带 data-app-shell-main-surface，只能用 Page 文档或 Space 路由正向判断。
+        if (findVisible('[data-page-document-selection]') || /^\/space(\/|$)/.test(location.pathname)) {
             return { kind: 'notApplicable', root: null, widthOwners: [] };
         }
         return { kind: 'unknown', root: null, widthOwners: [] };
@@ -210,7 +240,7 @@
             if (changed) queueLayout();
         }).observe(document.documentElement, {
             childList: true, subtree: true, attributes: true,
-            attributeFilter: ['class', 'hidden', 'inert', 'role', 'data-thread-user-message-navigation-content',
+            attributeFilter: ['class', 'hidden', 'inert', 'role', 'data-theme', 'data-thread-user-message-navigation-content',
                 'data-pip-obstacle', 'data-composer-placement', 'data-app-action-timeline-scroll',
                 'data-chatgpt-composer', 'data-composer-overlay-floating-ui']
         });
@@ -242,7 +272,7 @@
         const bubbles = new Set();
         const add = node => {
             if (!node || node.nodeType !== 1 || !node.isConnected || !readingScope.contains(node) ||
-                node.closest(READING_EXCLUDED)) return;
+                isExcluded(node)) return;
             if (node.closest(USER_BUBBLE) ||
                 (node.matches(READING_TARGET) && node.closest(ASSISTANT_ROOT))) nodes.add(node);
         };
@@ -281,7 +311,7 @@
         if (!(columnWidth > 0) || !surface.column) return;
         for (const node of bubbles) {
             const bubble = outerBubble(node);
-            if (!bubble || bubble.hasAttribute(PATH_ATTR) || bubble.closest(READING_EXCLUDED)) continue;
+            if (!bubble || bubble.hasAttribute(PATH_ATTR) || isExcluded(bubble)) continue;
             const path = [];
             let reachedColumn = false;
             for (let el = bubble; el && path.length < 10; el = el.parentElement) {
@@ -402,7 +432,7 @@
         }
         startReading();
         // 对话界面变化（包括返回缓存的旧对话）时撤回旧标记，按新界面的原生样式重新采样。
-        const scope = surface.kind === 'chat' || surface.kind === 'dots' ? surface.root : null;
+        const scope = isChatSurface() ? surface.root : null;
         if (scope !== readingScope) {
             clearReadingMarkers();
             readingScope = scope;
@@ -435,17 +465,19 @@
         const elements = surface.kind === 'dots'
             ? [...surface.column.querySelectorAll(DOTS_USER_ROW)]
             : [...new Set([...surface.column.querySelectorAll(USER_BUBBLE)].map(outerBubble))];
-        return elements.filter(element => element && !element.closest(READING_EXCLUDED)).map(element => {
+        return elements.filter(element => element && !isExcluded(element)).map(element => {
             const text = (element.querySelector('.message-text') || element).textContent.replace(/\s+/g, ' ').trim();
             return { element, text };
         });
     }
 
     function navigationBounds() {
+        // 使用滚动容器的 client box：scrollbar-gutter: stable both-edges 时两侧都有占位。
         const rect = surface.scroll.getBoundingClientRect();
-        const scrollbar = surface.scroll.offsetWidth - surface.scroll.clientWidth;
+        const left = rect.left + surface.scroll.clientLeft;
         const footerTop = surface.footer ? surface.footer.getBoundingClientRect().top : rect.bottom;
-        return { left: rect.left, right: rect.right - scrollbar, top: rect.top + 56, bottom: Math.min(rect.bottom, footerTop) - 8 };
+        const top = rect.top + surface.scroll.clientTop + (surface.kind === 'quickChat' ? 8 : 56);
+        return { left, right: left + surface.scroll.clientWidth, top, bottom: Math.min(rect.bottom, footerTop) - 8 };
     }
 
     // 对话列与窗格右缘之间不足 24px 时，在宽度生效的前提下对称收窄对话列，为导航条留出空间。
@@ -456,13 +488,14 @@
         const setting = settings.chatWidthSetting;
         const requested = setting.unit === 'percent' ? innerWidth * setting.value / 100 : setting.value;
         const side = (available - Math.min(requested, available - padding * 2)) / 2;
+        // 多留 1px，抵消小数像素取整。
         return side >= window.widerMessageNavigation.RAIL_WIDTH ? 0
-            : Math.max(0, window.widerMessageNavigation.RAIL_WIDTH - padding);
+            : Math.max(0, Math.ceil(window.widerMessageNavigation.RAIL_WIDTH - padding) + 1);
     }
 
     function navigationWanted() {
         return siteActive && settings.navigationEnabled && Boolean(window.widerMessageNavigation) &&
-            (surface.kind === 'chat' || surface.kind === 'dots') && Boolean(surface.scroll);
+            isChatSurface() && Boolean(surface.scroll);
     }
 
     function syncGutter() {
@@ -500,10 +533,7 @@
                 onStale: queueNavigation
             });
         }
-        navigation.update(fits ? {
-            turns, scrollRoot: surface.scroll, bounds,
-            dark: document.documentElement.classList.contains('dark')
-        } : null);
+        navigation.update(fits ? { turns, scrollRoot: surface.scroll, bounds } : null);
     }
 
     function queueNavigation() {
@@ -542,7 +572,7 @@
         syncLayout();
         const widthEnabled = settings.widthEnabled !== false;
         const pauseReason = !settings.siteEnabled ? 'site' : !widthEnabled ? 'width' : null;
-        const chatSurface = surface.kind === 'chat' || surface.kind === 'dots';
+        const chatSurface = isChatSurface();
         const nativeOnly = surface.kind === 'notApplicable' || surface.kind === 'quickChat';
         const supported = surface.widthOwners.length > 0;
         const status = !settingsLoaded ? 'loading' : pauseReason === 'site' ? 'sitePaused'

@@ -33,3 +33,5 @@ jobs:
           node tests/e2e/message-width.js
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           node tests/e2e/chatgpt-reading.js
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node tests/e2e/navigation-surfaces.js

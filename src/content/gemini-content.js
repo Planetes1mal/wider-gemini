@@ -301,6 +301,9 @@
             console.log('[Wider Gemini] Deep Research page detected, using 1600px width');
             widthCssValue = '1600px';
         }
+        // 显示消息导航且对话几乎占满窗格时，两侧各留出导航条宽度；保存的宽度值不变。
+        const scroller = navigationReserved && findChatScroller();
+        if (scroller) widthCssValue = `min(${widthCssValue}, ${scroller.clientWidth - NAV_GUTTER * 2}px)`;
 
         setWidthProperty(root, '--gemini-chat-width', widthCssValue, '');
         modifyElementStyles(widthCssValue);
@@ -422,6 +425,86 @@
         applyUserFullWidth(currentRangeSettings.userFullWidth);
         applyDensitySettings(currentRangeSettings);
         alignImageCaptions();
+        queueNavigation();
+    }
+
+    // ---- 消息导航 ----
+
+    const NAV_GUTTER = window.widerMessageNavigation ? window.widerMessageNavigation.RAIL_WIDTH : 24;
+    let navigation = null;
+    let navigationTimer = null;
+    let navigationReserved = false;
+
+    function isVisible(element) {
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+    }
+
+    // 实际的纵向滚动容器是 chat-window 内的 infinite-scroller.chat-history。
+    function findChatScroller() {
+        return [...document.querySelectorAll('chat-window infinite-scroller.chat-history')].find(isVisible) || null;
+    }
+
+    // 外层 user-query 与内层 user-query-content 只算一条；折叠的长消息定位到外层，不展开。
+    function geminiTurns(scroller) {
+        return [...scroller.querySelectorAll('user-query')]
+            .filter(query => !query.parentElement.closest('user-query'))
+            .map(element => ({
+                element,
+                text: (element.querySelector('.query-text') || element).textContent.replace(/s+/g, ' ').trim()
+            }));
+    }
+
+    function requestedWidthPx() {
+        if (document.querySelector('#extended-response-message-content')) return 1600;
+        const setting = currentRangeSettings.chatWidthSetting;
+        return setting.unit === 'percent' ? innerWidth * setting.value / 100 : setting.value;
+    }
+
+    function syncNavigation() {
+        navigationTimer = null;
+        const wanted = siteActive && storedSettings[settingsUtils.NAVIGATION_KEYS.gemini] !== false &&
+            Boolean(window.widerMessageNavigation);
+        const scroller = wanted ? findChatScroller() : null;
+        const turns = scroller ? geminiTurns(scroller) : [];
+        const shown = turns.length >= window.widerMessageNavigation?.MIN_TURNS;
+        const reserve = Boolean(shown && widthActive &&
+            (scroller.clientWidth - Math.min(requestedWidthPx(), scroller.clientWidth)) / 2 < NAV_GUTTER);
+        if (reserve !== navigationReserved) {
+            navigationReserved = reserve;
+            applyWidthStyle(currentRangeSettings.chatWidthSetting);
+        }
+        if (!scroller) {
+            if (navigation) navigation.destroy();
+            navigation = null;
+            return;
+        }
+        if (!navigation) {
+            navigation = window.widerMessageNavigation.create({
+                labels: {
+                    rail: chrome.i18n.getMessage('navigationLabel') || 'Message navigation',
+                    message: (n, total) => (chrome.i18n.getMessage('navigationMessage') || 'Message {n} of {total}')
+                        .replace('{n}', n).replace('{total}', total),
+                    attachment: chrome.i18n.getMessage('navigationAttachment') || 'Attachment'
+                },
+                topInset: () => 16,
+                onStale: queueNavigation
+            });
+        }
+        const rect = scroller.getBoundingClientRect();
+        const right = rect.right - (scroller.offsetWidth - scroller.clientWidth);
+        const column = scroller.querySelector('.conversation-container, conversation-container');
+        // 窗格右侧放不下 24px 导航条（例如宽度关闭的窄窗口）时隐藏。
+        const fits = !column || right - column.getBoundingClientRect().right >= NAV_GUTTER - 1;
+        navigation.update(shown && fits ? {
+            turns, scrollRoot: scroller,
+            bounds: { left: rect.left, right, top: rect.top + 16, bottom: rect.bottom - 8 },
+            dark: document.body.classList.contains('dark-theme')
+        } : null);
+    }
+
+    function queueNavigation() {
+        if (navigationTimer === null) navigationTimer = setTimeout(syncNavigation, 0);
     }
 
     // 读取期间若收到更新的 storage 事件，旧读取结果作废（事件本身已合并）。
@@ -577,6 +660,7 @@
 
             // 暂停时新插入的内容保持原生，不做排版采样。
             if (siteActive) prepareReadingLayout(readingScopes);
+            if (readingScopes.length || mutations.some(mutation => mutation.type === 'attributes')) queueNavigation();
             if (settingsLoaded && (shouldUpdate || widthActive !== isWidthEffective())) {
                 applyWidthStyle(currentRangeSettings.chatWidthSetting);
                 alignImageCaptions();
@@ -664,6 +748,7 @@
         window.addEventListener('resize', function () {
             if (captionResizeTimer) clearTimeout(captionResizeTimer);
             captionResizeTimer = setTimeout(alignImageCaptions, 150);
+            queueNavigation();
         });
 
         console.log('[Wider Gemini] MutationObserver and drag listeners started');

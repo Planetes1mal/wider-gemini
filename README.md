@@ -21,6 +21,7 @@ This branch is the internal **3.0.0-rc.1** candidate, including ChatGPT width an
 - **Adjust the width**: Select Gemini or ChatGPT, set pixels (`px`) or a percentage of the window (`%`), and save separate limits and presets for each site.
 - **Enable or pause by site**: The Enable switch below the site tabs pauses every effect on that site and restores the original page, while all settings stay editable and saved. A separate width switch turns off only widening. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
 - **Adjust text size and spacing**: On both sites, scale message text from 75% to 200% while keeping headings, code, and tables in proportion, tighten spacing with reading density, or set line height and paragraph spacing manually.
+- **Message navigation**: A thin column of ticks beside the conversation jumps to each of your messages on Gemini and ChatGPT, with a short preview and keyboard support. Turn it off per site in the popup.
 - **Task presets**: Apply a reading, wide, or large-text setup in one step and restore the previous settings for that site.
 - **Wrap Gemini code**: Keep long lines of code within the conversation area. ChatGPT keeps its own per-block wrap button.
 - **Full-width user messages**: Left-align your messages and give them the full conversation width, just like the replies.

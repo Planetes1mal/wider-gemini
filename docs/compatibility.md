@@ -1,5 +1,30 @@
 # Compatibility record
 
+## Round 2 offline implementation: active surfaces, Dots and message navigation — September 30, 2026
+
+Implemented without authenticated browser access, from the sanitized 2026-09-29 captures (ordinary ChatGPT, Dots, Gemini, Space catalog, Page document, empty Page quick chat). Source: `chatgpt-width-support` at `7d3a360`, manifest `3.0.0` / `3.0.0-rc.1` (unchanged). **Every live acceptance row below is pending**; these results do not claim compatibility with the authenticated site.
+
+| Capability | Implementation | Local verification | Live acceptance |
+| --- | --- | --- | --- |
+| Active-surface discovery (hidden cached routes ignored; width markers only on visible verified owners; reading resampled per surface) | complete | passed — `e2e/navigation-surfaces.js`: Dots visible with a hidden ordinary route, route switch both ways, marker transfer | pending |
+| Dots width and composer alignment | complete | passed — list/composer marked, aligned at 100% width including scrollbar | pending |
+| Dots reading (own 16px/22px baseline) | complete for prose | passed — 125% gives 20px/27.5px | pending; Dots code renderer not captured (G2) |
+| Dots user full width | partial — keeps the native 73px Reply/Reaction allowance | passed — wrapper = row − 73px, action group inside the row | pending hover/focus geometry (G4) |
+| Space catalog / Page document | complete — native, reported `notApplicable` | passed — no markers, 14px document text unchanged, no rail | pending |
+| Page quick chat | partial — empty shell recognized as `notApplicable`; populated messages not adapted | passed for the empty shell | pending; populated structure not captured (G1) |
+| Unknown visible chat with a hidden known route | complete — stays native, `unsupported`; recovers when markers return | passed | pending live fault injection |
+| Streaming into initially empty text owners | complete | passed — synthetic late text in assistant paragraph and user text owner | pending real generation (G5) |
+| Status `surface` + `capabilities` (width, reading, fullWidth, navigation) | complete | passed in content; popup reports an older page when `capabilities` is missing | pending real popup transport (G9) |
+| Message navigation — ChatGPT ordinary chat | complete | passed — 3 turns, signed `column-reverse` jump, late user message joins, pause removes the rail | pending; native equivalent not surveyed (G6) |
+| Message navigation — Dots | complete for text messages | passed — call row excluded, jump, keyboard, Escape preview | pending; attachment-only rows not captured (G3) |
+| Message navigation — Gemini | complete | passed — outer `user-query` only, collapsed message not expanded, jump in `infinite-scroller.chat-history` | pending; special layouts (G10) |
+| Navigation gutter | complete — reserves only the missing space (ChatGPT: 24px minus native padding per side; Gemini: width capped to pane − 48px) and releases it when navigation is off/paused | passed on both sites | pending (G8) |
+| Popup navigation row and per-site setting | complete | passed — 109-key locale parity, real-popup probe, light/dark and long-locale screenshots | pending toolbar popup |
+
+Also passed: full unit/packaging suite (15 packaging checks), the 73 Gemini layout scenarios, the ChatGPT reading regression, and the extracted 25-file ZIP load check. Environment: Windows, Chrome 154, Node 24.
+
+Not verified and not claimed: authenticated ordinary/Dots/Page chats with this build, real streaming, native message-navigation equivalents, Dots code blocks and attachment-only messages, populated Page chat, virtualization/ID stability over long histories, and macOS/PWA. The version stays `3.0.0-rc.1`; an `rc.2` candidate should follow live acceptance.
+
 ## Authenticated ChatGPT reading recheck — September 29, 2026
 
 **Outcome: pass for the requested live recheck. The earlier ChatGPT message-recognition and user-full-width failure is closed for the observed authenticated layout.** This does not close the remaining platform and feature gaps below.

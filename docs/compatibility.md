@@ -1,5 +1,19 @@
 # Compatibility record
 
+## Long-history navigation redesign and remaining gutters — September 30, 2026
+
+Source: `chatgpt-width-support` at `9234b15`; version unchanged (`3.0.0-rc.1`). Design choices confirmed by the user: compress + magnify, loaded messages plus an earlier-messages marker, and padding inside tight panes. **Local checks only; signed-in recheck pending.**
+
+| Item | Change | Local evidence |
+| --- | --- | --- |
+| Rail paged through 20 of 40 ticks | Every loaded user message has a tick at all times. Ticks compress to the rail height and spread dock-style to 24px spacing near the pointer or keyboard focus; pointer hits resolve to the nearest tick. The 24px vertical hit pitch now applies near the pointer only, by design | Ignored long-history turnover probe: 40/40 ticks visible before and after scrolling to message 37, rail never scrolls (previously FAIL). `e2e/navigation-surfaces.js` overview: 40 ticks, magnified gap ≥ 20px vs compressed < 12px, pointer jump, active follows the conversation |
+| Unloaded history (Dots batches) | Only loaded messages get ticks. A three-dot marker appears when not at the top; it scrolls to the beginning so the site loads its next batch. It hides after the top stays stable for 1.5s and returns when older messages are prepended. No automatic traversal or history fetching | Marker shown, scrolls to 0, hides when stable, re-enabled after a prepend (synthetic) |
+| Possible stutter source | Positions cached per layout (invalidated by content height/width changes, turn changes or detached nodes); scrolling uses a binary search | Ignored layout-read probe: per-30-scroll-step message reads 629/1,529/4,529 → 0/0/0 for 40/100/300 turns. This removes one hypothesis; the reported stutter is not confirmed fixed |
+| Width off, no room for the rail (ChatGPT) | The width rule is applied with the measured native width only to reserve the gutter; transcript and composer stay aligned; the width capability still reports `off` | Narrow Dots pane with width off: rail beside the native column, composer aligned, released with navigation off |
+| Page chat rail hidden | Padding added inside the transcript only when it is too tight; the floating window keeps its size | Two-turn Page chat fixture (per the recheck capture): rail inside the chat, host 572px unchanged |
+
+Gemini with width off still hides the rail when its native column leaves under 24px. Still unverified: toolbar popup, no forced scroll during streaming, attachment-only Dots rows, live long conversations on each site, and macOS/PWA.
+
 ## Long-history navigation follow-up — September 30, 2026
 
 **Open: the user rejects the rail's page-like behavior and reports stuttering.** Source remains runtime `2c3c2e1` on `chatgpt-width-support`, documentation base `89f4a8d`, version **`3.0.0-rc.1`**. The earlier short-chat positioning/jump passes do not establish usable navigation through a long history.

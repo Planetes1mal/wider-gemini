@@ -14,6 +14,11 @@
     // 滚动到顶部后若在此时间内没有载入更早的消息，视为已到开头，隐藏“更早的消息”标记。
     const OLDER_SETTLE_MS = 1500;
     const MIN_TURNS = 2;
+    // 同时显示的刻度上限：当前位置附近一段，长对话不显示全部消息。
+    const MAX_VISIBLE = 20;
+    // 跳到已卸载的消息：滚到记录位置后等待站点挂载，最多重试几次。
+    const RELOCATE_MS = 250;
+    const RELOCATE_TRIES = 4;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     // rAF 在后台标签页与无头环境中可能暂停；以短定时器兜底，二者先到者执行一次。
@@ -70,16 +75,22 @@
         previewText.className = 'wg-nav-preview-text';
         preview.append(previewText);
 
+        // pool：已挂载与记住的消息（按对话顺序）；turns：其中正在显示的一段，从 pool[start] 开始。
+        let pool = [];
         let turns = [];
+        let start = 0;
+        let measured = null;
+        let pending = null;
+        let path = location.pathname;
         let scrollRoot = null;
         let bounds = null;
+        let railTop = 0;
         let pitch = MAX_PITCH;
         let activeIndex = -1;
         let focusIndex = 0;
         let hoverIndex = -1;
         let pointerY = null;
         let cancelActive = null;
-        let offsets = null;
         let olderExhausted = false;
         let olderTimer = null;
         let destroyed = false;
@@ -106,21 +117,23 @@
             const base = turns.map((turn, i) => MAX_PITCH / 2 + pitch * i);
             const center = magnifyCenter();
             if (center === null || pitch >= MAX_PITCH || n < 2) return base;
+            // 展开范围按刻度个数计（两侧各 MAGNIFY_RADIUS / 24 个），与消息总数无关。
+            const reach = MAGNIFY_RADIUS / MAX_PITCH;
+            const index = (center - MAX_PITCH / 2) / pitch;
             const weights = [];
-            for (let i = 0; i < n - 1; i++) {
-                const mid = MAX_PITCH / 2 + pitch * (i + 0.5);
-                weights.push(Math.max(0, 1 - Math.abs(mid - center) / MAGNIFY_RADIUS));
-            }
+            for (let i = 0; i < n - 1; i++) weights.push(Math.max(0, 1 - Math.abs(i + 0.5 - index) / reach));
             const total = weights.reduce((sum, w) => sum + w, 0);
             const span = pitch * (n - 1);
-            // 展开区间用 24px（空间不足时按比例缩小），其余间距均匀压缩，总长度不变。
-            const spread = Math.min(MAX_PITCH, span / Math.max(total, 1));
-            const rest = Math.max(0, (span - spread * total) / Math.max(n - 1 - total, 1e-6));
+            if (n - 1 - total < 0.5) return base;
+            // 展开区间用 24px，但最多占总长度的一半；其余间距均匀压缩且保持为正，刻度不重叠、顺序不变。
+            const spread = Math.min(MAX_PITCH, span / 2 / Math.max(total, 1e-6));
+            const rest = (span - spread * total) / (n - 1 - total);
             const positions = [base[0]];
             for (let i = 0; i < n - 1; i++) positions.push(positions[i] + rest + (spread - rest) * weights[i]);
             return positions;
         }
 
+        // bounds 为容器坐标：挂在根元素时即视口坐标；挂进宿主浮窗时相对宿主，浮窗移动时导航条随之移动。
         function layout() {
             if (!bounds || !turns.length) return;
             const olderShown = !older.hidden;
@@ -129,8 +142,9 @@
             pitch = n * MAX_PITCH <= available ? MAX_PITCH : Math.max(0, (available - MAX_PITCH) / Math.max(n - 1, 1));
             const height = pitch * (n - 1) + MAX_PITCH;
             const total = height + (olderShown ? OLDER_SIZE : 0);
+            railTop = bounds.top + Math.max(0, (bounds.bottom - bounds.top - total) / 2);
             rail.style.left = `${bounds.right - RAIL_WIDTH}px`;
-            rail.style.top = `${bounds.top + Math.max(0, (bounds.bottom - bounds.top - total) / 2)}px`;
+            rail.style.top = `${railTop}px`;
             rail.style.height = `${total}px`;
             list.style.height = `${height}px`;
             rail.classList.toggle('wg-nav--dense', pitch < MAX_PITCH);
@@ -140,22 +154,118 @@
             });
         }
 
-        // ---- 当前位置：缓存各条消息在滚动内容中的偏移，滚动时二分查找 ----
+        // ---- 消息池：已挂载的消息，加上站点已卸载但带稳定 key、此前见过的消息（有上限） ----
+        // 每条记录的 offset 为消息顶部在滚动内容中的位置，与 scrollTop 同一坐标系；
+        // 已卸载的记录保留最后一次测得的位置，作为跳转时的估计。
 
-        function readOffsets() {
+        // 测量已挂载消息；它们相对上次测量的位移中位数同样施加到已卸载记录上（流式输出、历史插入等整体位移）。
+        function measure() {
             const rootRect = scrollRoot.getBoundingClientRect();
-            offsets = {
-                height: scrollRoot.scrollHeight,
-                width: scrollRoot.clientWidth,
-                values: turns.map(turn => turn.element.getBoundingClientRect().top - rootRect.top + scrollRoot.scrollTop)
-            };
+            const shifts = [];
+            pool.forEach(entry => {
+                // 站点刚卸载、尚未重新同步的节点保留上次的位置。
+                if (!entry.element || !entry.element.isConnected) return;
+                const offset = entry.element.getBoundingClientRect().top - rootRect.top + scrollRoot.scrollTop;
+                if (entry.offset !== null) shifts.push(offset - entry.offset);
+                entry.offset = offset;
+            });
+            if (shifts.length) {
+                shifts.sort((a, b) => a - b);
+                const shift = shifts[shifts.length >> 1];
+                if (shift) pool.forEach(entry => { if (!entry.element && entry.offset !== null) entry.offset += shift; });
+            }
+            measured = { height: scrollRoot.scrollHeight, width: scrollRoot.clientWidth };
         }
 
-        // 内容高度或宽度变化（字号、宽度、图片、流式输出、载入更早消息）时缓存失效。
-        function currentOffsets() {
-            if (!offsets || offsets.height !== scrollRoot.scrollHeight || offsets.width !== scrollRoot.clientWidth ||
-                !turns.every(turn => turn.element.isConnected)) readOffsets();
-            return offsets.values;
+        // 内容高度或宽度变化（字号、宽度、图片、流式输出、载入更早消息）时重新测量。
+        function ensureMeasured() {
+            if (!measured || measured.height !== scrollRoot.scrollHeight || measured.width !== scrollRoot.clientWidth ||
+                pool.some(entry => entry.offset === null)) measure();
+        }
+
+        /**
+         * 合并站点本次给出的已挂载消息（连续的一段）与已记住的记录：
+         * 记录按位置排在这一段之前或之后；落在这一段内部的记录已过时，丢弃。
+         */
+        function merge(mounted) {
+            const previous = new Map(pool.map(entry => [entry.id, entry]));
+            const current = mounted.map(turn => {
+                const id = turn.key || turn.element;
+                const entry = previous.get(id) || { id, key: turn.key || null, offset: null, y: 0, button: null };
+                entry.element = turn.element;
+                entry.text = turn.text;
+                return entry;
+            });
+            const ids = new Set(current.map(entry => entry.id));
+            const remembered = pool.filter(entry => entry.key && !ids.has(entry.id) && entry.offset !== null);
+            remembered.forEach(entry => { entry.element = null; });
+            pool = current.concat(remembered);
+            if (!current.length) {
+                pool = [];
+                return;
+            }
+            measure();
+            const first = current[0].offset;
+            const last = current[current.length - 1].offset;
+            const sorted = remembered.sort((a, b) => a.offset - b.offset);
+            pool = sorted.filter(entry => entry.offset < first).concat(current, sorted.filter(entry => entry.offset > last));
+        }
+
+        function forget() {
+            pool = [];
+            start = 0;
+            measured = null;
+            pending = null;
+        }
+
+        // ---- 显示窗口：当前位置附近最多 MAX_VISIBLE 条 ----
+
+        // 超出上限时先丢弃离当前位置最远的已卸载记录；仍超出（已挂载消息本身很多）时只显示附近一段，
+        // 当前项接近窗口边缘才移动窗口。
+        function selectWindow(index) {
+            const activeEntry = pool[index];
+            while (pool.length > MAX_VISIBLE) {
+                let far = -1;
+                pool.forEach((entry, i) => {
+                    if (!entry.element && entry !== pending?.entry &&
+                        (far < 0 || Math.abs(i - index) > Math.abs(far - index))) far = i;
+                });
+                if (far < 0) break;
+                pool.splice(far, 1);
+                index = pool.indexOf(activeEntry);
+            }
+            const size = Math.min(MAX_VISIBLE, pool.length);
+            const edge = Math.min(3, size >> 2);
+            if (start > pool.length - size || index < start + edge || index >= start + size - edge) {
+                start = clamp(index - (size >> 1), 0, pool.length - size);
+            }
+            render(pool.slice(start, start + size));
+            return index;
+        }
+
+        // 只有显示的消息集合或顺序变化才重建按钮，保留焦点所在的已有节点。
+        function render(visible) {
+            const same = visible.length === turns.length && visible.every((entry, i) => entry === turns[i]);
+            if (!same) {
+                const focused = turns.find(turn => turn.button === document.activeElement);
+                const hadFocus = rail.contains(document.activeElement);
+                setActive(-1);
+                setHover(-1);
+                turns = visible;
+                turns.forEach(turn => { if (!turn.button) turn.button = makeButton(turn); });
+                const keep = new Set(turns.map(turn => turn.button));
+                [...list.children].forEach(button => { if (!keep.has(button)) button.remove(); });
+                turns.forEach((turn, i) => {
+                    if (list.children[i] !== turn.button) list.insertBefore(turn.button, list.children[i] || null);
+                });
+                focusIndex = focused && turns.includes(focused) ? turns.indexOf(focused) : clamp(focusIndex, 0, turns.length - 1);
+                if (hadFocus && !rail.contains(document.activeElement)) focusTurn(focusIndex);
+                layout();
+            }
+            turns.forEach((turn, i) => {
+                turn.button.tabIndex = i === focusIndex ? 0 : -1;
+                turn.button.setAttribute('aria-label', `${labels.message(i + 1, turns.length)}: ${textOf(turn).slice(0, 80)}`);
+            });
         }
 
         function setActive(index) {
@@ -166,26 +276,32 @@
             if (turns[index]) turns[index].button.setAttribute('aria-current', 'location');
         }
 
+        // ---- 当前位置：按缓存的位置二分查找 ----
+
         function updateActive() {
             cancelActive = null;
-            if (!scrollRoot || !turns.length) return;
-            const values = currentOffsets();
+            if (!scrollRoot || !pool.length) return;
+            ensureMeasured();
             const line = scrollRoot.scrollTop + topInset() + 8;
             let low = 0;
-            let high = values.length - 1;
+            let high = pool.length - 1;
             let index = 0;
             while (low <= high) {
                 const mid = (low + high) >> 1;
-                if (values[mid] <= line) {
+                if (pool[mid].offset <= line) {
                     index = mid;
                     low = mid + 1;
                 } else {
                     high = mid - 1;
                 }
             }
-            // 已滚到对话末尾时，最后一条消息即当前位置（它的顶部可能到不了标记线）。
-            if (scrollRoot.scrollTop >= scrollRange()[1] - 1) index = values.length - 1;
-            setActive(index);
+            // 已滚到对话末尾时，最后一条已挂载的消息即当前位置（它的顶部可能到不了标记线）。
+            if (scrollRoot.scrollTop >= scrollRange()[1] - 1) {
+                const lastMounted = pool.findLastIndex(entry => entry.element);
+                if (lastMounted >= 0) index = lastMounted;
+            }
+            index = selectWindow(index);
+            setActive(index - start);
             updateOlder();
         }
 
@@ -208,10 +324,10 @@
         function updateOlder() {
             const shown = options.olderHistory !== false && !olderExhausted && !atTop();
             if (atTop() && !olderExhausted && olderTimer === null) {
-                const count = turns.length;
+                const first = pool[0];
                 olderTimer = setTimeout(() => {
                     olderTimer = null;
-                    if (scrollRoot && atTop() && turns.length === count) olderExhausted = true;
+                    if (scrollRoot && atTop() && pool[0] === first) olderExhausted = true;
                     updateOlder();
                 }, OLDER_SETTLE_MS);
             }
@@ -228,18 +344,62 @@
         // ---- 跳转 ----
 
         // 按实际滚动方向计算有效范围：column-reverse 的 scrollTop 为负值。
+        function scrollToElement(element, behavior) {
+            const rootRect = scrollRoot.getBoundingClientRect();
+            const delta = element.getBoundingClientRect().top - rootRect.top - topInset();
+            const [min, max] = scrollRange();
+            scrollRoot.scrollTo({ top: clamp(scrollRoot.scrollTop + delta, min, max), behavior });
+        }
+
         function scrollToTurn(index) {
             const turn = turns[index];
             if (!turn || !scrollRoot) return;
-            if (!turn.element.isConnected) {
+            clearPending();
+            if (turn.element && turn.element.isConnected) {
+                scrollToElement(turn.element, reducedMotion.matches ? 'auto' : 'smooth');
+                setActive(index);
+                return;
+            }
+            if (!turn.key) {
                 if (options.onStale) options.onStale();
                 return;
             }
-            const rootRect = scrollRoot.getBoundingClientRect();
-            const delta = turn.element.getBoundingClientRect().top - rootRect.top - topInset();
-            const [min, max] = scrollRange();
-            scrollRoot.scrollTo({ top: clamp(scrollRoot.scrollTop + delta, min, max), behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+            // 站点已卸载这条消息：先瞬时滚到记录的位置让站点挂载它，挂载后按 key 精确对齐。
+            pending = { entry: turn, tries: 0, timer: null };
+            relocate();
             setActive(index);
+        }
+
+        function clearPending() {
+            if (pending) clearTimeout(pending.timer);
+            pending = null;
+        }
+
+        function relocate() {
+            const [min, max] = scrollRange();
+            scrollRoot.scrollTo({ top: clamp(pending.entry.offset - topInset(), min, max), behavior: 'auto' });
+            pending.timer = setTimeout(() => {
+                if (!pending) return;
+                // 让站点重新收集已挂载消息；update 中挂载到了即完成对齐。
+                if (options.onStale) options.onStale();
+                pending.timer = setTimeout(() => {
+                    if (!pending) return;
+                    if (++pending.tries >= RELOCATE_TRIES || !pool.includes(pending.entry)) clearPending();
+                    else relocate();
+                }, RELOCATE_MS);
+            }, RELOCATE_MS);
+        }
+
+        function resolvePending() {
+            if (!pending || !pending.entry.element || !pending.entry.element.isConnected) return;
+            const element = pending.entry.element;
+            clearPending();
+            scrollToElement(element, 'auto');
+        }
+
+        // 用户自己滚动或操作时放弃未完成的重新定位。
+        function cancelRelocation(event) {
+            if (pending && !rail.contains(event.target)) clearPending();
         }
 
         // ---- 预览 ----
@@ -251,12 +411,12 @@
             preview.hidden = false;
             turns.forEach(item => item.button.removeAttribute('aria-describedby'));
             turn.button.setAttribute('aria-describedby', preview.id);
-            const railRect = rail.getBoundingClientRect();
-            const tickY = list.getBoundingClientRect().top + turn.y;
+            // 与导航条同一容器坐标，不读取视口位置。
+            const tickY = railTop + (older.hidden ? 0 : OLDER_SIZE) + turn.y;
             const width = Math.min(280, Math.max(120, bounds.right - bounds.left - RAIL_WIDTH - 24));
             preview.style.maxWidth = `${width}px`;
             const rect = preview.getBoundingClientRect();
-            preview.style.left = `${Math.max(bounds.left + 8, railRect.left - rect.width - 8)}px`;
+            preview.style.left = `${Math.max(bounds.left + 8, bounds.right - RAIL_WIDTH - rect.width - 8)}px`;
             preview.style.top = `${clamp(tickY - rect.height / 2, bounds.top, Math.max(bounds.top, bounds.bottom - rect.height))}px`;
         }
 
@@ -372,71 +532,87 @@
             }
         }
 
+        const CANCEL_EVENTS = ['wheel', 'touchstart', 'keydown', 'pointerdown'];
+
+        // 换了滚动容器（换对话或换界面）时，记住的消息全部作废。
         function setScrollRoot(next) {
             if (next === scrollRoot) return;
-            if (scrollRoot) scrollRoot.removeEventListener('scroll', queueActive);
+            if (scrollRoot) {
+                scrollRoot.removeEventListener('scroll', queueActive);
+                CANCEL_EVENTS.forEach(type => scrollRoot.removeEventListener(type, cancelRelocation, true));
+            }
             scrollRoot = next;
-            offsets = null;
+            clearPending();
+            forget();
             olderExhausted = false;
             clearTimeout(olderTimer);
             olderTimer = null;
-            if (scrollRoot) scrollRoot.addEventListener('scroll', queueActive, { passive: true });
+            if (scrollRoot) {
+                scrollRoot.addEventListener('scroll', queueActive, { passive: true });
+                CANCEL_EVENTS.forEach(type => scrollRoot.addEventListener(type, cancelRelocation, { capture: true, passive: true }));
+            }
         }
 
+        // 挂进站点浮窗（如 Page 对话）时与宿主同一层叠上下文，并随宿主移动；否则挂在根元素上固定定位。
+        function mount(container) {
+            const hosted = container !== document.documentElement;
+            if (rail.parentNode !== container || preview.parentNode !== container) container.append(rail, preview);
+            rail.classList.toggle('wg-nav--hosted', hosted);
+            preview.classList.toggle('wg-nav--hosted', hosted);
+        }
+
+        // 视口坐标换算为导航条所在容器的坐标：在 (0, 0) 处测量一次实际位置。
+        function toContainer(viewportBounds) {
+            rail.style.left = '0px';
+            rail.style.top = '0px';
+            const origin = rail.getBoundingClientRect();
+            return {
+                left: viewportBounds.left - origin.left, right: viewportBounds.right - origin.left,
+                top: viewportBounds.top - origin.top, bottom: viewportBounds.bottom - origin.top
+            };
+        }
+
+        // 宿主浮窗可能以整个窗体作为拖动手柄；导航条上的按下不交给它。
+        rail.addEventListener('pointerdown', event => {
+            if (rail.classList.contains('wg-nav--hosted')) event.stopPropagation();
+        });
+
         /**
-         * 每次站点识别结果变化时调用。只有用户消息集合或顺序变化才重建按钮，
-         * 流式输出回复时不会丢失焦点。
-         * @param {{ turns: {element: Element, text: string}[], scrollRoot: Element,
-         *   bounds: {left: number, top: number, right: number, bottom: number} } | null} source
+         * 每次站点识别结果变化时调用。turns 为当前已挂载的用户消息（按顺序、连续的一段）；
+         * key 为站点提供的稳定标识，有 key 的消息被站点卸载后仍保留刻度（总数有上限）。
+         * 只有显示的消息集合或顺序变化才重建按钮，流式输出回复时不会丢失焦点。
+         * @param {{ turns: {element: Element, text: string, key?: string}[], scrollRoot: Element,
+         *   bounds: {left: number, top: number, right: number, bottom: number}, container?: Element } | null} source
+         *   bounds 为视口坐标；container 为站点浮窗时导航条挂在其中。
          */
         function update(source) {
             if (destroyed) return;
-            if (!source || source.turns.length < MIN_TURNS || !source.scrollRoot) {
+            if (!source || !source.scrollRoot) {
                 hide();
                 return;
             }
-            if (!rail.isConnected) document.documentElement.append(rail, preview);
-            setScrollRoot(source.scrollRoot);
-            bounds = source.bounds;
-            const same = source.turns.length === turns.length &&
-                source.turns.every((turn, i) => turn.element === turns[i].element);
-            if (same) {
-                source.turns.forEach((turn, i) => { turns[i].text = turn.text; });
-            } else {
-                // 更早的消息被插到开头时，可能还有更多，重新允许显示“更早的消息”。
-                if (turns.length && source.turns[0].element !== turns[0].element) olderExhausted = false;
-                const previous = new Map(turns.map(turn => [turn.element, turn]));
-                const hadFocus = rail.contains(document.activeElement);
-                turns = source.turns.map(turn => {
-                    const kept = previous.get(turn.element);
-                    if (kept) {
-                        kept.text = turn.text;
-                        return kept;
-                    }
-                    const created = { element: turn.element, text: turn.text, y: 0 };
-                    created.button = makeButton(created);
-                    return created;
-                });
-                const keep = new Set(turns.map(turn => turn.button));
-                [...list.children].forEach(button => { if (!keep.has(button)) button.remove(); });
-                // 只插入顺序不对的按钮，保留焦点所在的已有节点。
-                turns.forEach((turn, i) => {
-                    if (list.children[i] !== turn.button) list.insertBefore(turn.button, list.children[i] || null);
-                });
-                activeIndex = -1;
-                hoverIndex = -1;
-                offsets = null;
-                focusIndex = clamp(focusIndex, 0, turns.length - 1);
-                if (hadFocus && !rail.contains(document.activeElement)) focusTurn(focusIndex);
+            // 同一滚动容器里换了对话（单页路由）时，记住的消息作废。
+            if (location.pathname !== path) {
+                path = location.pathname;
+                clearPending();
+                forget();
             }
-            turns.forEach((turn, i) => {
-                turn.button.tabIndex = i === focusIndex ? 0 : -1;
-                turn.button.setAttribute('aria-label', `${labels.message(i + 1, turns.length)}: ${textOf(turn).slice(0, 80)}`);
-            });
+            setScrollRoot(source.scrollRoot);
+            const first = pool[0];
+            merge(source.turns);
+            // 更早的消息被插到开头时，可能还有更多，重新允许显示“更早的消息”。
+            if (first && pool.indexOf(first) > 0) olderExhausted = false;
+            if (pool.length < MIN_TURNS) {
+                hide();
+                return;
+            }
+            mount(source.container || document.documentElement);
             adoptHostStyle();
             rail.hidden = false;
+            bounds = toContainer(source.bounds);
             layout();
             updateActive();
+            resolvePending();
         }
 
         function hide() {

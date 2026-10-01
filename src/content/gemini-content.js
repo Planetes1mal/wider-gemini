@@ -434,6 +434,7 @@
     let navigation = null;
     let navigationTimer = null;
     let navigationReserved = false;
+    let navigationGutter = { scroller: null, input: null, amount: 0, records: [] };
 
     function isVisible(element) {
         const rect = element.getBoundingClientRect();
@@ -457,6 +458,29 @@
             });
     }
 
+    // 宽度关闭时为导航留白：对话列表与输入区在原生内边距上对称增加同样宽度，二者保持对齐；撤销时恢复原值。
+    function setNavigationGutter(scroller, amount) {
+        const chat = scroller && scroller.closest('chat-window');
+        const input = chat && chat.querySelector('input-container');
+        if (scroller === navigationGutter.scroller && amount === navigationGutter.amount &&
+            (!amount || input === navigationGutter.input)) return;
+        navigationGutter.records.forEach(({ element, property, value, priority }) => {
+            if (value) element.style.setProperty(property, value, priority);
+            else element.style.removeProperty(property);
+        });
+        navigationGutter = { scroller, input, amount, records: [] };
+        if (!scroller || !amount) return;
+        for (const element of [scroller, input].filter(Boolean)) {
+            const style = getComputedStyle(element);
+            for (const property of ['padding-inline-start', 'padding-inline-end']) {
+                const native = parseFloat(style.getPropertyValue(property)) || 0;
+                navigationGutter.records.push({ element, property, value: element.style.getPropertyValue(property),
+                    priority: element.style.getPropertyPriority(property) });
+                element.style.setProperty(property, `${native + amount}px`, 'important');
+            }
+        }
+    }
+
     function requestedWidthPx() {
         if (document.querySelector('#extended-response-message-content')) return 1600;
         const setting = currentRangeSettings.chatWidthSetting;
@@ -477,6 +501,7 @@
             applyWidthStyle(currentRangeSettings.chatWidthSetting);
         }
         if (!scroller) {
+            setNavigationGutter(null, 0);
             if (navigation) navigation.destroy();
             navigation = null;
             return;
@@ -499,8 +524,13 @@
         const left = rect.left + scroller.clientLeft;
         const right = left + scroller.clientWidth;
         const column = scroller.querySelector('.conversation-container, conversation-container');
-        // 窗格右侧放不下 24px 导航条（例如宽度关闭的窄窗口）时隐藏。
-        const fits = !column || right - column.getBoundingClientRect().right >= NAV_GUTTER - 1;
+        const free = () => (column ? right - column.getBoundingClientRect().right : Infinity);
+        // 宽度关闭且原生对话右侧不足 24px 时，只为导航留白：已加的留白使对话右缘左移等量，扣除即为原生余量。
+        const nativeFree = free() - (navigationGutter.scroller === scroller ? navigationGutter.amount : 0);
+        const amount = shown && !widthActive && nativeFree < NAV_GUTTER - 1 ? Math.ceil(NAV_GUTTER - nativeFree) + 1 : 0;
+        setNavigationGutter(scroller, amount);
+        // 留白后仍放不下 24px 导航条时隐藏。
+        const fits = free() >= NAV_GUTTER - 1;
         navigation.update(shown && fits ? {
             turns, scrollRoot: scroller,
             bounds: { left, right, top: rect.top + scroller.clientTop + 16, bottom: rect.bottom - 8 }

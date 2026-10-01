@@ -55,7 +55,7 @@
     let widthActive = false;
     let columnWidth = 0;
     let markedOwners = [];
-    let measuredParent = null;
+    let observedTargets = [];
     let ownerProperties = [];
     let rootProperty = null;
     let gutterProperty = null;
@@ -212,12 +212,13 @@
         owners.forEach(owner => owner.setAttribute(WIDTH_ATTR, ''));
         markedOwners = owners;
 
+        // 滚动容器与 Page 浮窗始终观察：浮窗缩放后导航条按新边界重新布局。
         const parent = reserve && surface.column ? surface.column.parentElement : null;
-        if (parent !== measuredParent) {
+        const observed = [parent, surface.scroll, surface.host].filter(Boolean);
+        if (observed.length !== observedTargets.length || observed.some((el, i) => el !== observedTargets[i])) {
             availableWidthObserver.disconnect();
-            measuredParent = parent;
-            if (parent) availableWidthObserver.observe(parent);
-            if (surface.scroll) availableWidthObserver.observe(surface.scroll);
+            observedTargets = observed;
+            observed.forEach(el => availableWidthObserver.observe(el));
         }
 
         if (!reserve) {
@@ -247,10 +248,11 @@
             restoreProperty(gutterProperty);
             gutterProperty = null;
         }
-        // Page 浮动对话没有原生宽度所有者：只在对话内容里加右内边距，不改浮窗尺寸。
+        // Page 浮动对话没有原生宽度所有者：只在对话内容里补足右内边距（原生值加缺口），不改浮窗尺寸。
         if (railWanted && surface.kind === 'quickChat' && nativeFree < window.widerMessageNavigation.RAIL_WIDTH - 1) {
+            const nativePadding = parseFloat(getComputedStyle(surface.column).paddingInlineEnd) || 0;
             insetProperty = writeProperty(null, surface.column, 'padding-inline-end',
-                `${Math.ceil(window.widerMessageNavigation.RAIL_WIDTH - nativeFree) + 1}px`);
+                `${nativePadding + Math.ceil(window.widerMessageNavigation.RAIL_WIDTH - nativeFree) + 1}px`);
         }
         if (changed && document.readyState !== 'loading') applyReading();
         queueNavigation();
@@ -498,9 +500,12 @@
         const elements = surface.kind === 'dots'
             ? [...surface.column.querySelectorAll(DOTS_USER_ROW)]
             : [...new Set([...surface.column.querySelectorAll(USER_BUBBLE)].map(outerBubble))];
+        // 稳定标识：普通对话与 Page 的轮次 data-turn-key（站点卸载屏外轮次后仍可重新定位），Dots 的 data-message-id。
         return elements.filter(element => element && !isExcluded(element)).map(element => {
             const text = (element.querySelector('.message-text') || element).textContent.replace(/\s+/g, ' ').trim();
-            return { element, text };
+            const owner = element.closest('[data-turn-key], [data-message-id]');
+            const key = owner && (owner.getAttribute('data-turn-key') || owner.getAttribute('data-message-id'));
+            return key ? { element, text, key } : { element, text };
         });
     }
 
@@ -562,7 +567,10 @@
                 onStale: queueNavigation
             });
         }
-        navigation.update(fits ? { turns, scrollRoot: surface.scroll, bounds } : null);
+        // Page 浮窗在站点的高层 portal 中：导航条挂进浮窗，避免被遮挡并随拖动移动。
+        const container = surface.kind === 'quickChat'
+            ? (surface.host !== surface.scroll ? surface.host : surface.host.parentElement) : null;
+        navigation.update(fits ? { turns, scrollRoot: surface.scroll, bounds, container } : null);
     }
 
     function queueNavigation() {

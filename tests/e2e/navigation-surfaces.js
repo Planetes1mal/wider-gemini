@@ -102,6 +102,10 @@
         [data-markdown-copy="exclude"] { font-size:14px; }
         section[data-pip-obstacle="quick-chat"] { position:fixed; right:20px; bottom:20px; width:572px; height:420px; display:flex; flex-direction:column; background:#fff; }
         .thread-scroll-container { overflow-y:auto; flex:1; }
+        /* 2026-10-01 实测：Page 浮窗位于带 transform 的 z50 portal 内；转录区原生右内边距的变体取 16px */
+        #quick-portal { position:fixed; inset:0; z-index:50; transform:translateZ(0); pointer-events:none; }
+        #quick-portal > section { pointer-events:auto; }
+        #quick [data-thread-user-message-navigation-content] { padding-inline-end:16px; }
         .message-row { display:flex; margin:4px 0; }
         .message-row.self { justify-content:flex-end; }
         .message-bubble-wrap { position:relative; max-width:min(88%, 100% - 73px); }
@@ -143,7 +147,7 @@
             <div role="textbox" aria-label="Page document" contenteditable="true">
                 <div data-page-block-row data-page-block-type="paragraph"><div data-page-block-viewport><p id="page-p">Document text</p></div></div>
             </div></div>
-            <section role="dialog" data-pip-obstacle="quick-chat" data-quick-chat-drag-handle="true" id="quick" hidden-route class="route">
+            <div id="quick-portal"><section role="dialog" data-pip-obstacle="quick-chat" data-quick-chat-drag-handle="true" id="quick" hidden-route class="route">
                 <div class="thread-scroll-container" id="quick-scroll"><div data-thread-user-message-navigation-content="true" class="relative flex flex-1 flex-col">
                     <div class="flex flex-col px-4"><div data-chatgpt-conversation-turn="true"><h4 class="sr-only">You said:</h4>
                         <div data-user-message-bubble="true"><div><div class="text-size-chat whitespace-pre-wrap" id="quick-user">Page chat question</div></div></div></div>
@@ -153,7 +157,7 @@
                 </div></div>
                 <div data-pip-obstacle="thread-footer"><form data-composer-placement="thread" data-thread-find-composer="true">
                     <div role="textbox" contenteditable="true" aria-label="Work with ChatGPT"></div></form></div>
-            </section>
+            </section></div>
         </div>
         ${script(`window.initialStore = { chatgptWidthSettings:{ widthEnabled:true, chatWidthSetting:{ value:1000, unit:'px' } },
             chatgptReadingSettings:{ messageFontSize:125 } };` + harness)}
@@ -295,6 +299,34 @@
                     railInside:!!q('.wg-nav') && rect('.wg-nav').right <= rect('#quick-scroll').right + 0.5 &&
                         rect('.wg-nav').left >= Math.max(...qa('#quick [data-markdown-text-style], #quick [data-user-message-bubble]').map(el => el.getBoundingClientRect().right)) - 0.5,
                     inset:q('#quick [data-thread-user-message-navigation-content]').style.getPropertyValue('padding-inline-end') };
+                // 9b. 浮窗在 z50 portal 内：刻度中心实际命中导航条；拖动与缩放后导航条仍在浮窗内。
+                const hits = () => qa('.wg-nav-tick').map(b => { const r = b.getBoundingClientRect();
+                    const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !!el && el.closest('.wg-nav') !== null; });
+                const quickRail = () => { const host = rect('#quick'), nav = rect('.wg-nav'), sc = q('#quick-scroll');
+                    const sr = sc.getBoundingClientRect();
+                    return { inside:nav.left >= host.left - 0.5 && nav.right <= sr.left + sc.clientLeft + sc.clientWidth + 0.5 &&
+                        nav.top >= host.top - 0.5 && nav.bottom <= host.bottom + 0.5, hits:hits() }; };
+                out.quickStack = { parent:q('.wg-nav').parentElement.id, ...quickRail() };
+                const quickList = q('.wg-nav-list');
+                const firstTick = qa('.wg-nav-tick')[0].getBoundingClientRect();
+                quickList.dispatchEvent(new PointerEvent('pointermove', { clientX:firstTick.left + 12, clientY:firstTick.top + 12, bubbles:true }));
+                const pv = rect('.wg-nav-preview'), hostRect = rect('#quick');
+                out.quickStack.preview = !q('.wg-nav-preview').hidden && pv.left >= hostRect.left && pv.right <= hostRect.right;
+                quickList.dispatchEvent(new PointerEvent('pointerleave', { bubbles:false }));
+                const railBefore = rect('.wg-nav'), hostBefore = rect('#quick');
+                q('#quick').style.right = '180px';
+                q('#quick').style.bottom = '100px';
+                await wait();
+                out.quickMove = { hostDx:rect('#quick').left - hostBefore.left, railDx:rect('.wg-nav').left - railBefore.left,
+                    hostDy:rect('#quick').top - hostBefore.top, railDy:rect('.wg-nav').top - railBefore.top, ...quickRail() };
+                // 虚拟时间下不产生渲染帧，ResizeObserver 不触发；这里用状态请求同步一次布局，只验证重新布局的几何。
+                q('#quick').style.width = '480px';
+                q('#quick').style.height = '360px';
+                status();
+                await wait(200);
+                out.quickResize = { hostWidth:rect('#quick').width, ...quickRail() };
+                q('#quick').style.cssText = '';
+                await wait(200);
                 // 10. 未识别的可见对话（识别属性被去掉）且隐藏的已知对话仍存在。
                 show('ordinary');
                 q('#transcript').removeAttribute('data-thread-user-message-navigation-content');
@@ -378,6 +410,15 @@
     assert(c.quick.rail && c.quick.railInside, `Page chat rail fits inside the chat after the transcript inset: ${JSON.stringify(c.quick)}`);
     assert(parseFloat(c.quick.inset) > 0, 'inset is added inside the transcript');
     near(c.quick.hostWidth, 572, 'floating window size unchanged');
+    assert(parseFloat(c.quick.inset) > 16, `inset adds to the native 16px end padding: ${c.quick.inset}`);
+    assert.deepStrictEqual(c.quickStack, { parent: 'quick', inside: true, hits: [true, true], preview: true },
+        'Page chat rail is mounted in the floating chat above its portal and is pointer-reachable');
+    assert(Math.abs(c.quickMove.hostDx) > 100 && Math.abs(c.quickMove.hostDy) > 50, `host moved: ${JSON.stringify(c.quickMove)}`);
+    near(c.quickMove.railDx, c.quickMove.hostDx, 'rail follows the moved floating chat horizontally');
+    near(c.quickMove.railDy, c.quickMove.hostDy, 'rail follows the moved floating chat vertically');
+    assert(c.quickMove.inside && c.quickMove.hits.every(Boolean), `rail stays inside after the move: ${JSON.stringify(c.quickMove)}`);
+    near(c.quickResize.hostWidth, 480, 'floating chat resized');
+    assert(c.quickResize.inside && c.quickResize.hits.every(Boolean), `rail relayouts inside the resized chat: ${JSON.stringify(c.quickResize)}`);
     near(c.quick.user, 20, 'Page chat user text scales');
     assert.deepStrictEqual([c.quick.pageFont, c.quick.pageMarked], [14, 0], 'Page document stays native beside the chat');
     assert.deepStrictEqual([c.unknown.surface, c.unknown.status, c.unknown.owners, c.unknown.markers, c.unknown.rail],
@@ -430,7 +471,27 @@
                 await save('geminiMessageNavigationEnabled', false);
                 out.off = { rail:qa('.wg-nav').length, width:getComputedStyle(document.documentElement).getPropertyValue('--gemini-chat-width').trim() };
                 await save('geminiMessageNavigationEnabled', true);
+                // 宽度关闭的窄窗格：原生对话占满宽度时只为导航留白，对话与输入区对称内缩、保持原生对齐。
+                q('chat-window').style.width = '640px';
+                await save('widthEnabled', false);
+                await save('geminiMessageNavigationEnabled', false);
+                const edges = () => { const col = rect('#c1'), area = rect('.input-area-container');
+                    return { left:area.left - col.left, right:area.right - col.right }; };
+                out.widthOffNative = { edges:edges(), free:scroller.getBoundingClientRect().right - rect('#c1').right };
+                await save('geminiMessageNavigationEnabled', true);
+                await wait(100);
+                const offRail = q('.wg-nav') && !q('.wg-nav').hidden ? rect('.wg-nav') : null;
+                out.widthOff = { rail:!!offRail, railLeft:offRail && offRail.left, columnRight:rect('#c1').right, edges:edges(),
+                    widthClass:document.documentElement.classList.contains('wider-gemini-width-enabled') };
+                await save('widthEnabled', true);
+                await wait(100);
+                out.widthOnAgain = { padding:scroller.style.getPropertyValue('padding-inline-end'),
+                    input:q('input-container').style.getPropertyValue('padding-inline-end') };
+                await save('widthEnabled', false);
+                await wait(100);
                 await save('geminiEnabled', false);
+                out.pausedGutter = { padding:scroller.style.getPropertyValue('padding-inline-end'),
+                    input:q('input-container').style.getPropertyValue('padding-inline-start') };
                 out.paused = { rail:qa('.wg-nav').length };
                 report(out);
             });
@@ -450,7 +511,8 @@
                 const pane = q('#pane');
                 const turns = () => qa('.bubble').map(element => ({ element, text:element.textContent }));
                 const r = pane.getBoundingClientRect();
-                const bounds = { left:r.left, right:r.left + pane.clientWidth, top:r.top + 16, bottom:r.bottom - 8 };
+                // 导航区域只有约 300px：20 个刻度需要压缩，用来检查指针展开。
+                const bounds = { left:r.left, right:r.left + pane.clientWidth, top:r.top + 16, bottom:r.top + 330 };
                 const nav = widerMessageNavigation.create({ labels:{ rail:'Nav', message:(n, t) => n + '/' + t, attachment:'Att', older:'Earlier' },
                     topInset:() => 16 });
                 pane.scrollTop = pane.scrollHeight;
@@ -458,33 +520,41 @@
                 await wait(200);
                 const out = {};
                 const ticks = () => qa('.wg-nav-tick');
+                const text = i => ticks()[i].getAttribute('aria-label').split(': ')[1];
                 const railRect = rect('.wg-nav');
-                out.all = { count:ticks().length, inside:ticks().every(b => { const t = b.getBoundingClientRect();
+                out.all = { count:ticks().length, first:text(0), last:text(ticks().length - 1), inside:ticks().every(b => { const t = b.getBoundingClientRect();
                         return t.top + 12 >= railRect.top - 0.5 && t.top + 12 <= railRect.bottom + 0.5; }),
-                    railHeight:railRect.height, listScrolls:['auto', 'scroll'].includes(getComputedStyle(q('.wg-nav-list')).overflowY),
+                    listScrolls:['auto', 'scroll'].includes(getComputedStyle(q('.wg-nav-list')).overflowY),
                     active:ticks().findIndex(b => b.hasAttribute('aria-current')), older:!q('.wg-nav-older').hidden };
                 // 指针附近展开：命中的刻度与相邻刻度相距约 24px。
                 const list = q('.wg-nav-list');
-                const target = ticks()[17];
+                const target = ticks()[12];
                 const y = target.getBoundingClientRect().top + 12;
                 list.dispatchEvent(new PointerEvent('pointermove', { clientY:y, clientX:railRect.left + 12, bubbles:true }));
                 await wait();
                 const centers = ticks().map(b => b.getBoundingClientRect().top + 12);
-                out.magnify = { gap:centers[18] - centers[17], farGap:centers[2] - centers[1],
+                out.magnify = { gap:centers[13] - centers[12], farGap:centers[2] - centers[1],
+                    minGap:Math.min(...centers.slice(1).map((c, i) => c - centers[i])),
                     hovered:ticks().findIndex(b => b.classList.contains('wg-nav-hover')), preview:!q('.wg-nav-preview').hidden };
-                list.dispatchEvent(new MouseEvent('click', { clientY:centers[17], clientX:railRect.left + 12, detail:1, bubbles:true }));
+                list.dispatchEvent(new MouseEvent('click', { clientY:centers[12], clientX:railRect.left + 12, detail:1, bubbles:true }));
                 await wait(300);
-                out.jump = { top:q('#u18').getBoundingClientRect().top - pane.getBoundingClientRect().top,
+                out.jump = { top:q('#u33').getBoundingClientRect().top - pane.getBoundingClientRect().top,
                     active:ticks().findIndex(b => b.hasAttribute('aria-current')) };
                 list.dispatchEvent(new PointerEvent('pointerleave', { bubbles:false }));
-                // 滚动正文时导航条本身不移动。
+                // 滚动正文时导航条本身不移动；当前项仍在窗口内时窗口不动。
                 const before = rect('.wg-nav-list').top;
                 q('#u37').scrollIntoView();
                 pane.scrollTop -= 16;
                 pane.dispatchEvent(new Event('scroll'));
                 await wait(200);
                 out.scrolled = { active:ticks().findIndex(b => b.hasAttribute('aria-current')), railMoved:rect('.wg-nav-list').top - before,
-                    tick37Visible:ticks()[36].getBoundingClientRect().top >= railRect.top - 12 };
+                    first:text(0) };
+                // 当前项接近窗口上缘：窗口移到当前位置附近，仍最多 20 个。
+                q('#u12').scrollIntoView();
+                pane.scrollTop -= 16;
+                pane.dispatchEvent(new Event('scroll'));
+                await wait(200);
+                out.slid = { count:ticks().length, current:text(ticks().findIndex(b => b.hasAttribute('aria-current'))), first:text(0) };
                 // 更早的消息：不在顶部时显示；点击滚到开头；在顶部稳定后隐藏；插入更早消息后重新可用。
                 out.olderBefore = !q('.wg-nav-older').hidden;
                 q('.wg-nav-older').click();
@@ -507,21 +577,93 @@
             });
         `)}</body></html>`;
     const o = run('overview', overview);
-    assert.strictEqual(o.all.count, 40);
-    assert(o.all.inside && !o.all.listScrolls, `all 40 ticks are visible at once without an inner scroll: ${JSON.stringify(o.all)}`);
-    assert.strictEqual(o.all.active, 39, 'bottom of the conversation marks the last message');
-    assert(o.magnify.gap >= 20 && o.magnify.farGap < 12, `pointer magnifies nearby ticks: ${JSON.stringify(o.magnify)}`);
-    assert.strictEqual(o.magnify.hovered, 17);
+    assert.deepStrictEqual([o.all.count, o.all.first, o.all.last], [20, 'Question 21', 'Question 40'],
+        `at most 20 ticks, around the current (last) message: ${JSON.stringify(o.all)}`);
+    assert(o.all.inside && !o.all.listScrolls, `all shown ticks fit without an inner scroll: ${JSON.stringify(o.all)}`);
+    assert.strictEqual(o.all.active, 19, 'bottom of the conversation marks the last message');
+    assert(o.magnify.gap >= 20 && o.magnify.farGap < 16 && o.magnify.minGap > 0.5, `pointer magnifies nearby ticks: ${JSON.stringify(o.magnify)}`);
+    assert.strictEqual(o.magnify.hovered, 12);
     assert(o.magnify.preview);
     near(o.jump.top, 16, 'pointer click on a compressed rail jumps to the nearest tick', 2);
-    assert.strictEqual(o.jump.active, 17);
-    assert.strictEqual(o.scrolled.active, 36, 'active tick follows the conversation (message 37)');
+    assert.strictEqual(o.jump.active, 12);
+    assert.deepStrictEqual([o.scrolled.active, o.scrolled.first], [16, 'Question 21'], 'active follows message 37 inside the same window');
     assert.strictEqual(o.scrolled.railMoved, 0, 'the rail itself never pages');
+    assert.strictEqual(o.slid.count, 20);
+    assert.strictEqual(o.slid.current, 'Question 12', `window follows the current message: ${JSON.stringify(o.slid)}`);
     assert(o.olderBefore, 'earlier-messages marker shows away from the top');
     assert.strictEqual(o.olderScrolled, 0, 'marker scrolls to the beginning');
     assert.strictEqual(o.olderAfter, false, 'marker hides once the top is stable');
-    assert.deepStrictEqual(o.prepended, { count: 41, older: true }, 'a prepended batch re-enables the marker');
+    assert.deepStrictEqual(o.prepended, { count: 20, older: true }, 'a prepended batch re-enables the marker');
     assert.strictEqual(o.destroyed, 0);
+
+    // ---- 虚拟列表（2026-10-01 实测 ChatGPT 长对话：固定总高度，只挂载附近几轮，轮次带 data-turn-key） ----
+    const virtual = `<!doctype html><html><head><meta charset="utf-8"><style>
+        body { margin:0; font:16px/26px sans-serif; }
+        #pane { height:560px; overflow-y:auto; }
+        #spacer { position:relative; height:${60 * 400}px; }
+        #win { position:absolute; left:0; right:0; }
+        .item { height:400px; max-width:700px; margin:auto; }
+    </style><style>${read('src/content/message-navigation.css')}</style></head><body>
+        <div id="pane"><div id="spacer"><div id="win"></div></div></div>
+        ${script(harness)}${script(read('src/content/message-navigation.js'))}
+        ${script(`
+            window.addEventListener('load', async () => {
+                const pane = q('#pane');
+                const r = pane.getBoundingClientRect();
+                const bounds = { left:r.left, right:r.left + pane.clientWidth, top:r.top + 16, bottom:r.bottom - 8 };
+                let nav = null;
+                // 只挂载视口附近的轮次；虚拟时间下没有滚动事件，滚动后手动重新渲染。
+                function render() {
+                    const first = Math.max(0, Math.floor(pane.scrollTop / 400) - 1);
+                    const last = Math.min(59, Math.floor((pane.scrollTop + 560) / 400) + 1);
+                    q('#win').style.top = first * 400 + 'px';
+                    q('#win').innerHTML = Array.from({ length:last - first + 1 }, (_, i) => first + i)
+                        .map(i => '<div class="item" data-turn-key="k' + i + '"><div class="bubble">Question ' + i + '</div></div>').join('');
+                    nav.update({ turns:qa('.bubble').map(element => ({ element, text:element.textContent,
+                        key:element.closest('[data-turn-key]').getAttribute('data-turn-key') })), scrollRoot:pane, bounds });
+                }
+                nav = widerMessageNavigation.create({ labels:{ rail:'Nav', message:(n, t) => n + '/' + t, attachment:'Att', older:'Earlier' },
+                    topInset:() => 16, onStale:() => render() });
+                const ticks = () => qa('.wg-nav-tick');
+                const text = i => ticks()[i].getAttribute('aria-label').split(': ')[1];
+                const out = {};
+                pane.scrollTop = pane.scrollHeight;
+                render();
+                await wait(200);
+                out.initial = { mounted:qa('.bubble').length, ticks:ticks().length };
+                // 向上滚动：卸载的轮次保留刻度，总数不超过 20。
+                for (let i = 55; i >= 30; i -= 2) {
+                    pane.scrollTop = i * 400 - 16;
+                    render();
+                    pane.dispatchEvent(new Event('scroll'));
+                    await wait(150);
+                }
+                const labels = ticks().map((b, i) => text(i));
+                out.scrolled = { mounted:qa('.bubble').length, ticks:labels.length, first:labels[0], last:labels[labels.length - 1],
+                    ordered:labels.every((l, i) => i === 0 || +l.split(' ')[1] > +labels[i - 1].split(' ')[1]),
+                    current:text(ticks().findIndex(b => b.hasAttribute('aria-current'))) };
+                // 点击一个已卸载的刻度：滚到记录位置，站点挂载后按 key 对齐到顶部。
+                const targetIndex = labels.length - 1;
+                const targetText = labels[targetIndex];
+                out.targetMountedBefore = qa('.bubble').some(b => b.textContent === targetText);
+                ticks()[targetIndex].click();
+                await wait(1500);
+                const target = qa('.bubble').find(b => b.textContent === targetText);
+                out.relocated = { text:targetText, mounted:!!target,
+                    top:target ? target.getBoundingClientRect().top - pane.getBoundingClientRect().top : null,
+                    current:text(ticks().findIndex(b => b.hasAttribute('aria-current'))) };
+                nav.destroy();
+                report(out);
+            });
+        `)}</body></html>`;
+    const v = run('virtual', virtual);
+    assert(v.initial.mounted < 6 && v.initial.ticks === v.initial.mounted, `only mounted turns at first: ${JSON.stringify(v.initial)}`);
+    assert(v.scrolled.mounted < 6 && v.scrolled.ticks === 20 && v.scrolled.ordered,
+        `remembered unmounted turns keep ticks, capped at 20 and ordered: ${JSON.stringify(v.scrolled)}`);
+    assert.strictEqual(v.scrolled.current, 'Question 31');
+    assert.strictEqual(v.targetMountedBefore, false, 'the clicked tick belongs to an unmounted turn');
+    assert(v.relocated.mounted && Math.abs(v.relocated.top - 16) <= 2 && v.relocated.current === v.relocated.text,
+        `jumping to an unmounted turn relocates it by key: ${JSON.stringify(v.relocated)}`);
 
     const g = run('gemini', gemini);
     assert.deepStrictEqual(g.rail, { ticks: 3, visible: true }, 'one tick per outer user-query');
@@ -532,5 +674,12 @@
     assert(g.gutter.railLeft >= g.gutter.columnRight - 0.5, `rail clears the column: ${JSON.stringify(g.gutter)}`);
     assert.deepStrictEqual(g.off, { rail: 0, width: '100vw' }, 'navigation off removes the rail and releases the gutter');
     assert.strictEqual(g.paused.rail, 0);
+    assert(g.widthOffNative.free < 23, `fixture: native Gemini column leaves no room for the rail: ${JSON.stringify(g.widthOffNative)}`);
+    assert(g.widthOff.rail && !g.widthOff.widthClass && g.widthOff.railLeft >= g.widthOff.columnRight - 0.5,
+        `width off keeps a navigation-only gutter in Gemini: ${JSON.stringify(g.widthOff)}`);
+    near(g.widthOff.edges.left, g.widthOffNative.edges.left, 'composer keeps its native left alignment');
+    near(g.widthOff.edges.right, g.widthOffNative.edges.right, 'composer keeps its native right alignment');
+    assert.deepStrictEqual(g.widthOnAgain, { padding: '', input: '' }, 'width on releases the navigation-only gutter');
+    assert.deepStrictEqual(g.pausedGutter, { padding: '', input: '' }, 'pause releases the navigation-only gutter');
     console.log(`Passed navigation and surface regression (${temp}).`);
 })();

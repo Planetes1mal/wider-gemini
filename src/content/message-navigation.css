@@ -7,6 +7,12 @@
     box-sizing: border-box;
 }
 
+/* 挂在站点浮窗内时相对浮窗定位：浮窗拖动或缩放时导航条与预览随之移动，且与浮窗处于同一层叠上下文。 */
+.wg-nav.wg-nav--hosted,
+.wg-nav-preview.wg-nav--hosted {
+    position: absolute;
+}
+
 .wg-nav[hidden],
 .wg-nav-older[hidden],
 .wg-nav-preview[hidden] {

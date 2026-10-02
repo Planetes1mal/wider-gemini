@@ -5,7 +5,7 @@
 用來調整 Gemini 和 ChatGPT 對話寬度與閱讀版面的 Chrome 擴充功能。兩個網站分別記住各自的設定。
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-安裝-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)
-[![內部候選版 3.0.0-rc.1](https://img.shields.io/badge/internal-3.0.0--rc.1-orange)](../../CHANGELOG.md)
+[![內部候選版 3.0.0-rc.2](https://img.shields.io/badge/internal-3.0.0--rc.2-orange)](../../CHANGELOG.md)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 
 同一段完整的 Gemini 對話、相同的視窗大小：使用 Wider Gemini 將對話寬度分別設為 700px 和 1200px。
@@ -14,14 +14,14 @@
 
 ![1200px 寬度的同一完整 Gemini 對話頁面](../images/conversation-after.png)
 
-此分支為內部候選版 **3.0.0-rc.1**，包含 ChatGPT 寬度與閱讀支援、依網站啟用的總開關和帶有網站頁籤的新彈出視窗。需要手動安裝，尚未作為正式版上架 Chrome 線上應用程式商店。
+此分支為內部候選版 **3.0.0-rc.2**，包含 ChatGPT 寬度與閱讀支援、訊息導覽、依網站啟用的總開關和帶有網站頁籤的新彈出視窗。本候選版透過 `chatgpt-width-support` 分支提供，不建立版本 tag 或 GitHub Release。需要手動安裝；最新導覽變更仍待已登入頁面複查。
 
 ## 功能
 
 - **調整寬度**：選擇 Gemini 或 ChatGPT，以像素（`px`）或視窗比例（`%`）設定；兩個網站分別儲存範圍和預設。
 - **依網站啟用或暫停**：網站頁籤下方的「啟用」開關可暫停該網站的所有效果並恢復原頁面，設定仍可編輯並會保留；寬度開關只關閉加寬。遇到尚未辨識的版面時保留原站寬度，並在彈出視窗中提示目前頁面尚未支援。
 - **調整字型大小和間距**：兩個網站都支援 75%–200% 字型大小，標題、程式碼和表格維持原有比例；可用閱讀密度收緊間距，或手動設定行高和段落間距。
-- **訊息導覽**：對話右側的一列短刻度，點選即可跳到自己傳送的每則訊息，支援簡短預覽與鍵盤操作，適用於 Gemini 和 ChatGPT，可在彈出視窗中依網站關閉。
+- **訊息導覽**：對話右側的一列短刻度，點選即可跳到自己傳送的訊息，支援簡短預覽與鍵盤操作，適用於 Gemini 和 ChatGPT。長對話最多顯示目前訊息附近的 20 個刻度；ChatGPT 隨捲動記住帶有穩定識別碼的訊息，不自動掃描歷史。可在彈出視窗中依網站關閉。
 - **任務預設**：一步套用閱讀、寬螢幕或大字設定，並可還原該網站套用前的設定。
 - **Gemini 程式碼自動換行**：較長的程式碼會在對話區內換行顯示。ChatGPT 保留程式碼區塊內建的換行按鈕。
 - **使用者訊息填滿寬度**：讓自己的訊息和回覆一樣，靠左對齊並使用完整的對話寬度。
@@ -31,12 +31,12 @@
 
 ## 安裝
 
-使用 **3.0.0-rc.1** 請依下方步驟手動安裝。[Chrome 線上應用程式商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)和 [GitHub 正式版](https://github.com/Planetes1mal/wider-gemini/releases)是獨立的發佈管道，從那裡安裝不會取得這個內部候選版。
+使用 **3.0.0-rc.2** 請依下方步驟手動安裝。[Chrome 線上應用程式商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)和 [GitHub 正式版](https://github.com/Planetes1mal/wider-gemini/releases)是獨立的發佈管道，從那裡安裝不會取得這個內部候選版。
 
 <details>
 <summary>手動安裝</summary>
 
-1. 使用此分支的本機儲存庫，或解壓縮收到的 `wider-gemini-3.0.0-rc.1.zip` 候選套件。
+1. 簽出 `chatgpt-width-support` 分支，或在 GitHub 的 **Code → Download ZIP** 選單下載該分支的原始碼 ZIP 並解壓縮。
 2. 保留完整資料夾，確認其中包含 `manifest.json`、`src/`、`_locales/` 和 `icons/`。
 3. 開啟 `chrome://extensions/`，開啟右上角的 **開發人員模式**。
 4. 點選 **載入未封裝項目**，選取剛才解壓縮的資料夾。

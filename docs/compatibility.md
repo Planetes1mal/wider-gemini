@@ -2,7 +2,7 @@
 
 ## Bounded navigation across virtualized history — pending live recheck
 
-Uncommitted working tree on `chatgpt-width-support`, version **`3.0.0-rc.1`** unchanged. **Not yet rechecked on signed-in pages.** User decisions (October 1, 2026): ticks accumulate while the user scrolls or jumps (no automatic scanning or page movement), and the rail shows **at most 20 ticks** around the current position.
+Candidate **`3.0.0-rc.2`** on `chatgpt-width-support` includes runtime commit `6177949` and the earlier navigation fixes. Numeric version remains `3.0.0`; this candidate is distributed through the branch without a tag or GitHub Release. **Not yet rechecked on signed-in pages.** User decisions (October 1, 2026): ticks accumulate while the user scrolls or jumps (no automatic scanning or page movement), and the rail shows **at most 20 ticks** around the current position.
 
 The sanitized element packet shows how ordinary ChatGPT virtualizes long conversations: a fixed-height list (170,058px), an offset window, wrappers with inline heights, and one `[data-turn-key]` per turn. The same key hash recurs across scroll positions and equals the user message's `data-chatgpt-search-message-ids`; the earlier probe missed it because it only checked other attribute names.
 
@@ -14,6 +14,8 @@ The sanitized element packet shows how ordinary ChatGPT virtualizes long convers
 | Relocation | Clicking an unmounted tick first jumps instantly to the remembered position. Once the site mounts that key, the message is aligned precisely. Up to four retries; scroll, wheel, touch or key input cancels. | Virtual-time: unmounted turn aligned at 16px. Real-time probe with the actual ChatGPT script and a scroll-driven column-reverse virtualizer: both unmounted targets aligned at 72px; the window slid with the active message. |
 
 Open: live recheck on the long conversation, Dots and Page with this build. Tick labels number messages within the visible window, not within the whole conversation. The earlier-messages marker still scrolls to the top of loaded history. The Page active-attribute observation remains in triage.
+
+October 2 candidate validation: all five unit-test scripts (including 15 packaging checks), `message-width.js`, `chatgpt-reading.js` and `navigation-surfaces.js` passed. A locally packaged and extracted rc.2 loaded successfully in isolated headless Chrome; the popup and help page reported `3.0.0-rc.2`, with numeric manifest version `3.0.0`. These automated checks do not close the signed-in acceptance gaps above.
 
 ## Signed-in recheck of the uncommitted navigation fixes — October 1, 2026
 

@@ -5,7 +5,7 @@ English | [简体中文](./README.zh-CN.md) | [繁體中文](./docs/i18n/README.
 A Chrome extension for adjusting the width and reading layout of Gemini and ChatGPT conversations. Each site remembers its own settings.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
-[![Internal candidate 3.0.0-rc.1](https://img.shields.io/badge/internal-3.0.0--rc.1-orange)](./CHANGELOG.md)
+[![Internal candidate 3.0.0-rc.2](https://img.shields.io/badge/internal-3.0.0--rc.2-orange)](./CHANGELOG.md)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Wider Gemini.
@@ -14,14 +14,14 @@ The same full Gemini conversation at the same window size, with the conversation
 
 ![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)
 
-This branch is the internal **3.0.0-rc.1** candidate, including ChatGPT width and reading support, a per-site Enable switch, and the site-tab popup. It requires manual installation and has not been published as a stable Chrome Web Store release.
+This branch is the internal **3.0.0-rc.2** candidate, including ChatGPT width and reading support, message navigation, a per-site Enable switch, and the site-tab popup. This candidate is distributed from the `chatgpt-width-support` branch without a release tag or GitHub Release. It requires manual installation; signed-in validation of the latest navigation changes remains pending.
 
 ## Features
 
 - **Adjust the width**: Select Gemini or ChatGPT, set pixels (`px`) or a percentage of the window (`%`), and save separate limits and presets for each site.
 - **Enable or pause by site**: The Enable switch below the site tabs pauses every effect on that site and restores the original page, while all settings stay editable and saved. A separate width switch turns off only widening. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
 - **Adjust text size and spacing**: On both sites, scale message text from 75% to 200% while keeping headings, code, and tables in proportion, tighten spacing with reading density, or set line height and paragraph spacing manually.
-- **Message navigation**: A thin column of ticks beside the conversation jumps to each of your messages on Gemini and ChatGPT, with a short preview and keyboard support. Turn it off per site in the popup.
+- **Message navigation**: A thin column of ticks beside the conversation jumps to your messages on Gemini and ChatGPT, with a short preview and keyboard support. Long conversations show at most 20 ticks around the current message. ChatGPT remembers messages with stable keys as you scroll, without scanning history automatically. Turn it off per site in the popup.
 - **Task presets**: Apply a reading, wide, or large-text setup in one step and restore the previous settings for that site.
 - **Wrap Gemini code**: Keep long lines of code within the conversation area. ChatGPT keeps its own per-block wrap button.
 - **Full-width user messages**: Left-align your messages and give them the full conversation width, just like the replies.
@@ -31,12 +31,12 @@ Settings are saved automatically, and changes apply to open pages for the select
 
 ## Installation
 
-For **3.0.0-rc.1**, use the manual steps below. The [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and [stable GitHub releases](https://github.com/Planetes1mal/wider-gemini/releases) are separate distribution channels; installing from them does not install this internal candidate.
+For **3.0.0-rc.2**, use the manual steps below. The [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and [stable GitHub releases](https://github.com/Planetes1mal/wider-gemini/releases) are separate distribution channels; installing from them does not install this internal candidate.
 
 <details>
 <summary>Manual installation</summary>
 
-1. Use a local checkout of this branch, or extract a provided `wider-gemini-3.0.0-rc.1.zip` candidate.
+1. Check out the `chatgpt-width-support` branch, or download its source ZIP from GitHub's **Code → Download ZIP** menu and extract it.
 2. Keep the complete folder containing `manifest.json`, `src/`, `_locales/`, and `icons/`.
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.

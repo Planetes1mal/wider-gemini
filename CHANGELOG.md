@@ -4,6 +4,22 @@ All notable changes to Wider Gemini are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
+## 3.0.0-rc.2 (2026-10-02)
+
+Internal candidate distributed from the `chatgpt-width-support` branch without a release tag or GitHub Release. Numeric version remains `3.0.0`; replace the files and reload the extension to update a manual installation. Signed-in validation of the latest bounded-history navigation and long-conversation performance remains pending; see [the compatibility record](./docs/compatibility.md).
+
+### Features
+
+- Added per-site message navigation with previews, keyboard controls and an earlier-history marker for Gemini, ordinary ChatGPT, Dots and Page quick chat.
+- Limited long-conversation navigation to at most 20 ticks around the current message. ChatGPT remembers keyed messages encountered while scrolling and relocates unmounted targets with bounded retries that user input can cancel, without automatically scanning history.
+
+### Fixes
+
+- Updated ChatGPT reading and width support for its new message structure and scoped layout changes to the active conversation surface.
+- Mounted Page quick-chat navigation and previews inside the floating chat so they follow moves and resizes and remain clickable. Navigation adds missing space to native transcript padding and does not trigger chat dragging.
+- Kept Gemini navigation accessible in narrow windows with widening disabled by adding matching conversation/input gutters, restored when widening is enabled, navigation is disabled or the site is paused.
+- Prevented dense magnified ticks from overlapping and improved preview placement, dark-theme visibility and Dots Reply surface detection.
+
 ## 3.0.0-rc.1 (2026-09-29)
 
 Internal candidate for manual installation. This is not a stable Chrome Web Store release. Chrome uses numeric version `3.0.0`; later candidates and the final `3.0.0` build require manually replacing the files and reloading the extension.

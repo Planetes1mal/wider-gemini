@@ -447,13 +447,19 @@
     }
 
     // 外层 user-query 与内层 user-query-content 只算一条；折叠的长消息定位到外层，不展开。
+    const geminiPromptPreviews = new WeakMap();
+
     function geminiTurns(scroller) {
         return [...scroller.querySelectorAll('user-query')]
             .filter(query => !query.parentElement.closest('user-query'))
             .map(element => {
                 // 只取可见的提问行；.query-text 里还有屏幕阅读器用的“你说”标题及重复全文。
                 const lines = [...element.querySelectorAll('.query-text-line')];
-                const text = lines.length ? lines.map(line => line.textContent).join(' ') : '';
+                // 原生编辑器临时移除正文行：保留已保存的提问，避免误显示为附件。
+                const editor = element.querySelector('textarea');
+                const text = lines.length ? lines.map(line => line.textContent).join(' ')
+                    : editor ? (geminiPromptPreviews.get(element) ?? editor.value) : '';
+                if (lines.length) geminiPromptPreviews.set(element, text);
                 return { element, text: text.replace(/\s+/g, ' ').trim() };
             });
     }

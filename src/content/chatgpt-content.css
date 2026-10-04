@@ -8,6 +8,14 @@
             var(--wg-chatgpt-nav-gutter, 0px) * 2)) !important;
 }
 
+/* 未登录前端（unauth-mweb）的对话 section 与输入区定位层直接写 max-width: 48rem（border-box，
+   含两侧 --mobile-thread-content-margin-inline）。改为设定的正文宽度加两侧原生内边距，二者保持原生对齐。 */
+:where(html.wider-chatgpt-width-active, html.wider-chatgpt-nav-gutter)
+    :is(section[data-web-mobile-conversation], [data-composer-positioner])[data-wgc-width] {
+    max-width: calc(min(var(--wg-chatgpt-width, 1000px), 100% - var(--mobile-thread-content-margin-inline, 0px) * 2 -
+        var(--wg-chatgpt-nav-gutter, 0px) * 2) + var(--mobile-thread-content-margin-inline, 0px) * 2) !important;
+}
+
 /* 阅读排版：内容脚本为消息正文里的文字拥有者记录原生字号、行高与外边距，
    这里只按比例改写。html 上没有 data-wgc-reading 时（默认值或暂停）完全保持原生。 */
 :where(html[data-wgc-reading~="font"]) [data-wgc-font] {

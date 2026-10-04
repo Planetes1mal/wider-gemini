@@ -1,8 +1,35 @@
 # Compatibility record
 
+## Gemini prompt-editor navigation fix — October 4, 2026
+
+HEAD **`2fc3120`**, working tree on `chatgpt-width-support`, **`3.0.0-rc.2`** unchanged.
+Both signed-in sites were exercised in Codex IAB at **2560 × 1440px**, including long chats, QA rich content, live settings, native menus and prompt editing.
+Gemini twice replaced a text prompt's navigation label with **Attachment** during editing, including after refresh. A real hover confirmed the wrong tooltip; navigation off left the native editor unchanged.
+The Gemini site script now retains the saved prompt preview during editing and reads the updated text after saving. ChatGPT already retained the saved preview in this flow.
+One minimal state-transition case in `navigation-surfaces.js` failed before the fix and passed afterward. Unit checks with `--skip-packaging` and all three requested e2e commands passed.
+**Real-site acceptance passed after the user's IAB extension reload.** All six loaded JS files matched the workspace. At the original settings, the 65-character preview remained correct with two reachable ticks.
+Update/Cancel, default settings, width off and pause/resume passed. Gemini first-target alignment was 16px. ChatGPT regression retained 22.4px text, 1000px width and a 72.2px first-target jump.
+Not covered by this fix: an established cause for long-chat delays, Dots/Page, uploads, macOS or PWA.
+Ignored evidence and the short issue: `.scratch/iter-20261004-reading/`.
+
+## Signed-in bounded-history spot check — October 4, 2026
+
+Working tree on **`chatgpt-width-support`**, HEAD **`2fc3120`**, version **`3.0.0-rc.2`**. This check includes the pre-existing uncommitted logged-out ChatGPT changes. **No navigation defect reproduced in the controlled ordinary-chat sample; broader acceptance remains open.** All live evidence came from Codex IAB. The loaded manifest reported `3.0.0` / `3.0.0-rc.2`; shared, navigation and ChatGPT JavaScript matched the working tree in full after line-ending normalization, both before and after page reload. Stylesheets were not compared byte-for-byte.
+
+| Area | Signed-in evidence and boundary |
+| --- | --- |
+| Controlled specimen | Existing long ordinary ChatGPT conversation, reloaded at the user-selected **2560 × 1440px** viewport. Accepted samples remained `visibilityState: visible`. Earlier samples during viewport changes were excluded. |
+| History and bounded memory | Four actual earlier-history-button clicks grew the rail from 5 to 20 ticks while the site loaded and virtualized batches. Settled loaded scroll height was 169,192px. Later jump samples had only 3–6 mounted user messages while retaining 20 ticks. This is not a full-history count or a 40+ mounted-message result. |
+| Pointer access and relocation | Settled 20-tick samples had **20/20** pointer-hit-testable centers. Four actual clicks on targets absent from the DOM remounted the matching target, aligned it at **71.6 / 72 / 72 / 72.2px** below the scroll-root top, and marked that target active. Matching used sanitized preview hashes and turn-key hashes, rather than a window ordinal that can change. |
+| Environment controls and screenshots | A corrected self-built smooth scroller reached 500px and rAF ran in the visible tab. Early screenshot calls coincided with native reflow and scroll resets; their cause was not established and they were excluded from product attribution. Final IAB CDP screenshots preserved the measured viewport, scrollTop, target geometry and rail state before/after capture. |
+
+Following the requested iteration rule, the round stopped after live verification without a reproduced defect. No runtime, version, CHANGELOG or formal-test edits were made; unit/e2e suites were **not run in this round**. This does not certify the pre-existing logged-out changes. Dots, Page, site pause, width-off restoration, another site, home/narrow-window regressions, cancellation, slow/failed loading, streaming, toolbar popup transport, macOS and PWA remain unverified here. The Page active-marker observation remains in triage.
+
+Ignored evidence: `.scratch/rc2-bounded-history-20261004/issues/01-bounded-history-live-check.md`, `source-match.json`, `final-source-match.json`, `measurements.json`, `verified-jumps2560.json`, `foreground-smooth-control-valid.json`, `final-screenshot-metrics.json` and `verified-target2560.png`. No messages, uploads or extension-setting writes were made. Temporary DOM instrumentation was removed by cleanup/reload, and debugger collection was disabled. The selected chat and requested 2560 × 1440px viewport remain open for inspection.
+
 ## Bounded navigation across virtualized history — pending live recheck
 
-Candidate **`3.0.0-rc.2`** on `chatgpt-width-support` includes runtime commit `6177949` and the earlier navigation fixes. Numeric version remains `3.0.0`; this candidate is distributed through the branch without a tag or GitHub Release. **Not yet rechecked on signed-in pages.** User decisions (October 1, 2026): ticks accumulate while the user scrolls or jumps (no automatic scanning or page movement), and the rail shows **at most 20 ticks** around the current position.
+Candidate **`3.0.0-rc.2`** on `chatgpt-width-support` includes runtime commit `6177949` and the earlier navigation fixes. Numeric version remains `3.0.0`; this candidate is distributed through the branch without a tag or GitHub Release. **Broader signed-in acceptance remains pending; the October 4 ordinary-chat sample is recorded above.** User decisions (October 1, 2026): ticks accumulate while the user scrolls or jumps (no automatic scanning or page movement), and the rail shows **at most 20 ticks** around the current position.
 
 The sanitized element packet shows how ordinary ChatGPT virtualizes long conversations: a fixed-height list (170,058px), an offset window, wrappers with inline heights, and one `[data-turn-key]` per turn. The same key hash recurs across scroll positions and equals the user message's `data-chatgpt-search-message-ids`; the earlier probe missed it because it only checked other attribute names.
 
@@ -13,7 +40,7 @@ The sanitized element packet shows how ordinary ChatGPT virtualizes long convers
 | Window | Even when more than 20 messages are mounted, only 20 around the current message are shown. The window moves when the current message gets within three ticks of either edge. | 40 mounted: last 20 at the bottom; scrolling to message 12 moves the window. |
 | Relocation | Clicking an unmounted tick first jumps instantly to the remembered position. Once the site mounts that key, the message is aligned precisely. Up to four retries; scroll, wheel, touch or key input cancels. | Virtual-time: unmounted turn aligned at 16px. Real-time probe with the actual ChatGPT script and a scroll-driven column-reverse virtualizer: both unmounted targets aligned at 72px; the window slid with the active message. |
 
-Open: live recheck on the long conversation, Dots and Page with this build. Tick labels number messages within the visible window, not within the whole conversation. The earlier-messages marker still scrolls to the top of loaded history. The Page active-attribute observation remains in triage.
+Open: broader long-conversation acceptance, Dots and Page with this build; the October 4 ordinary-chat spot check does not close those gaps. Tick labels number messages within the visible window, not within the whole conversation. The earlier-messages marker still scrolls to the top of loaded history. The Page active-attribute observation remains in triage.
 
 October 2 candidate validation: all five unit-test scripts (including 15 packaging checks), `message-width.js`, `chatgpt-reading.js` and `navigation-surfaces.js` passed. A locally packaged and extracted rc.2 loaded successfully in isolated headless Chrome; the popup and help page reported `3.0.0-rc.2`, with numeric manifest version `3.0.0`. These automated checks do not close the signed-in acceptance gaps above.
 

@@ -463,6 +463,17 @@
                 await wait(400);
                 out.jump = { targetTop:q('#c2 user-query').getBoundingClientRect().top - scroller.getBoundingClientRect().top,
                     collapsed:q('#c1 .query-text').classList.contains('collapsed') };
+                // 编辑时正文节点被 textarea 替换：保留已保存的预览，保存后读取新正文。
+                const prompt = q('#c3 .query-text-line');
+                const editor = document.createElement('textarea');
+                editor.value = 'Unsaved draft';
+                prompt.replaceWith(editor);
+                await wait();
+                out.edit = { label:qa('.wg-nav-tick')[2].getAttribute('aria-label') };
+                prompt.textContent = 'Saved Gemini question';
+                editor.replaceWith(prompt);
+                await wait();
+                out.edit.saved = qa('.wg-nav-tick')[2].getAttribute('aria-label');
                 await save('chatWidthSetting', { value:100, unit:'percent' });
                 await wait();
                 const nav = rect('.wg-nav');
@@ -670,6 +681,8 @@
     assert(g.label.endsWith(': Gemini question 2 sassy'), `preview keeps text once without hidden labels: ${g.label}`);
     near(g.jump.targetTop, 16, 'Gemini jump uses the chat-history scroller', 2);
     assert.strictEqual(g.jump.collapsed, true, 'collapsed long message is not expanded');
+    assert(g.edit.label.endsWith(': Gemini question 3 sassy'), 'editing retains the saved prompt preview');
+    assert(g.edit.saved.endsWith(': Saved Gemini question'), 'saving replaces the remembered prompt preview');
     assert(/^min\(100vw, \d+px\)$/.test(g.gutter.width), `Gemini caps width for the rail: ${g.gutter.width}`);
     assert(g.gutter.railLeft >= g.gutter.columnRight - 0.5, `rail clears the column: ${JSON.stringify(g.gutter)}`);
     assert.deepStrictEqual(g.off, { rail: 0, width: '100vw' }, 'navigation off removes the rail and releases the gutter');

@@ -16,13 +16,15 @@
     // 结构变化时重新识别当前可见的对话界面（普通对话、Dots、Page 浮动对话、Space/Page 文档）。
     const SURFACE_MARKERS = '[data-thread-user-message-navigation-content], [data-pip-obstacle], ' +
         'form[data-chatgpt-composer], .messaging-root, .message-list, [data-role="messages-scroll"], ' +
-        '[data-codex-composer-root], [data-page-document-selection], main';
+        '[data-codex-composer-root], [data-page-document-selection], main, ' +
+        '[data-web-mobile-conversation], [data-composer-positioner]';
 
     // 阅读排版只作用于消息正文里的文字拥有者，不给正文根设字号，
     // 以免 font: inherit 的复制/展开按钮、引用标签跟着变大。
     // 新版正文与气泡用 data-* 标识；旧版按角色；Dots 两种角色都用同一渲染器，角色由外层行决定。
+    // 未登录前端（unauth-mweb）的正文是 [data-assistant-markdown]，用户气泡同样是 [data-user-message-bubble]。
     const ASSISTANT_ROOT = ':is([data-markdown-text-style="assistant-message"], ' +
-        '[data-message-author-role="assistant"] .markdown)';
+        '[data-message-author-role="assistant"] .markdown, [data-assistant-markdown])';
     const DOTS_USER_ROW = 'article.message-row.self:has(.message-surface)';
     const USER_BUBBLE = ':is([data-user-message-bubble], [data-message-author-role="user"] .user-message-bubble-color, ' +
         '[data-message-author-role="user"] .whitespace-pre-wrap, article.message-row.self .message-surface > .message-bubble)';
@@ -113,8 +115,12 @@
     const nativeOwner = node => node.matches(NATIVE_WIDTH) && !node.closest(EXCLUDED);
 
     // 排除对话框/菜单/编辑区；唯一的例外是已确认的 Page 浮动对话根本身，其内部的浮层仍被排除。
+    // 未登录前端的用户气泡本身是 button（点击打开复制菜单）：越过它继续检查外层。
     function isExcluded(node) {
         const hit = node.closest(READING_EXCLUDED);
+        if (hit && hit.matches('button[data-user-message-bubble]')) {
+            return Boolean(hit.parentElement) && isExcluded(hit.parentElement);
+        }
         return Boolean(hit) && !(surface.kind === 'quickChat' && hit === surface.host);
     }
 
@@ -166,7 +172,19 @@
                 footer, widthOwners: []
             };
         }
-        const home = findVisible(`main ${HOME_OWNER}`, document, nativeOwner);
+        // 未登录前端：对话 section 与输入区定位层各自以 48rem 为上限，没有 thread 宽度变量。
+        const loggedOut = findVisible('section[data-web-mobile-conversation][data-conversation-id]');
+        if (loggedOut) {
+            const footer = findVisible('[data-swipable-detail-footer]');
+            const composer = footer && findVisible('[data-composer-positioner]', footer);
+            return {
+                kind: 'chat', root: loggedOut, column: loggedOut,
+                scroll: loggedOut.closest('[data-swipable-detail-body]') || loggedOut.parentElement,
+                footer, widthOwners: composer ? [loggedOut, composer] : [loggedOut]
+            };
+        }
+        const home = findVisible(`main ${HOME_OWNER}`, document, nativeOwner) ||
+            findVisible('main[data-default-home] [data-composer-positioner]');
         if (home) return { kind: 'home', root: null, widthOwners: [home] };
         // 普通对话的 main 也带 data-app-shell-main-surface，只能用 Page 文档或 Space 路由正向判断。
         if (findVisible('[data-page-document-selection]') || /^\/space(\/|$)/.test(location.pathname)) {

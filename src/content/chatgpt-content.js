@@ -387,7 +387,8 @@
 
     // 采样前临时撤下本扩展的排版规则，同一任务内恢复；先批量读取再批量写入。
     function measureReading(scopes) {
-        if (!readingScope) return;
+        if (!readingScope || (settings.messageFontSize === 100 && settings.messageCompactness === 0 &&
+            !settings.messageSpacingCustom)) return;
         const { nodes: pending, bubbles } = collectReadingNodes(scopes);
         if (settings.userFullWidth && widthActive) markFullPaths(bubbles);
         if (!pending.length) return;
@@ -490,6 +491,9 @@
             clearReadingMarkers();
             readingScope = scope;
             if (scope) measureReading([scope]);
+        } else if (scope && !root.hasAttribute(READING_ATTR)) {
+            // 默认排版不采样；首次开启阅读设置时补测当前正文。
+            measureReading([scope]);
         }
         const progress = settings.messageCompactness / 100;
         const custom = settings.messageSpacingCustom;

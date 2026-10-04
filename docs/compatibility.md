@@ -1,5 +1,20 @@
 # Compatibility record
 
+## Deferred default reading measurements — October 4, 2026
+
+HEAD **`609065a`**, `chatgpt-width-support`, **`3.0.0-rc.2`** unchanged.
+Both signed-in sites still sampled native text metrics at font size 100% and compactness 0, including after refresh.
+The same QA content had 131 Gemini typography markers (21 paragraphs) and 127 ChatGPT font markers (15 paragraphs).
+Repeated navigation-on, navigation-off and site-pause controls found switch overhead beyond navigation; native loading and cache also affected total time.
+Both site scripts now defer text-metric sampling until reading settings need it. Width and navigation remain independent.
+Minimal checks in the existing reading/navigation fixtures failed before the fix. The unit runner with `--skip-packaging` and all three requested e2e commands passed afterward.
+**Live acceptance passed after the user's extension reload.** All six loaded sources matched; the same QA content now had zero default reading markers on both sites.
+Font 140% activated 23.8px / 22.4px text. Same-content pause/resume retained 131 / 127 markers; native input widths returned to 660px / 768px with the width switch off.
+Pointer/keyboard navigation passed at 16px / 72.2px, with 2/2 hit-testable ticks on both sites. Settings, System themes and 2560x1440 viewports were restored.
+Gemini default-reading sampling disappeared from the CPU sample. Its switch median changed 2309ms -> 2252ms, but navigation-off did not improve; full switch latency remains open.
+Not covered: Dots/Page, Deep Research, Notebook, Canvas, PWA, macOS or toolbar popup UI.
+Ignored issue and evidence: `.scratch/iter-20261004-navigation/`.
+
 ## Gemini prompt-editor navigation fix — October 4, 2026
 
 HEAD **`2fc3120`**, working tree on `chatgpt-width-support`, **`3.0.0-rc.2`** unchanged.

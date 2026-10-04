@@ -413,10 +413,12 @@
         siteEnabled = storedSettings[settingsUtils.SITE_ENABLED_KEYS.gemini] !== false;
         siteActive = Boolean(isExtensionContextValid()) && siteEnabled;
         document.documentElement.classList.toggle(SITE_ROOT_CLASS, siteActive);
-        if (siteActive && !readingPrepared && document.body) {
+        const readingWanted = siteActive && (currentRangeSettings.messageFontSize !== 100 ||
+            currentRangeSettings.messageCompactness > 0 || currentRangeSettings.messageSpacingCustom);
+        if (readingWanted && !readingPrepared && document.body) {
             readingPrepared = true;
             prepareReadingLayout([document.body]);
-        } else if (!siteActive && readingPrepared) {
+        } else if (!readingWanted && readingPrepared) {
             readingPrepared = false;
             clearReadingLayout();
         }
@@ -699,7 +701,7 @@
             });
 
             // 暂停时新插入的内容保持原生，不做排版采样。
-            if (siteActive) prepareReadingLayout(readingScopes);
+            if (readingPrepared) prepareReadingLayout(readingScopes);
             if (readingScopes.length || mutations.some(mutation => mutation.type === 'attributes')) queueNavigation();
             if (settingsLoaded && (shouldUpdate || widthActive !== isWidthEffective())) {
                 applyWidthStyle(currentRangeSettings.chatWidthSetting);

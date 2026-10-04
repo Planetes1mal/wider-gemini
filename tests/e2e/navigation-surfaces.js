@@ -458,6 +458,11 @@
                 const scroller = q('infinite-scroller');
                 if (!q('.wg-nav')) { report({ error:'no Gemini rail; errors=' + JSON.stringify(out.errors) }); return; }
                 out.rail = { ticks:qa('.wg-nav-tick').length, visible:!q('.wg-nav').hidden };
+                out.defaultMarkers = qa('[data-wg-typography]').length;
+                await save('messageFontSize', 125);
+                out.activatedFont = px('#c2 model-response p', 'fontSize');
+                await save('messageFontSize', 100);
+                out.resetMarkers = qa('[data-wg-typography]').length;
                 out.label = qa('.wg-nav-tick')[1].getAttribute('aria-label');
                 qa('.wg-nav-tick')[1].click();
                 await wait(400);
@@ -678,6 +683,9 @@
 
     const g = run('gemini', gemini);
     assert.deepStrictEqual(g.rail, { ticks: 3, visible: true }, 'one tick per outer user-query');
+    assert.strictEqual(g.defaultMarkers, 0, 'default Gemini reading settings do not sample text metrics');
+    near(g.activatedFont, 20, 'activating reading samples the existing Gemini text');
+    assert.strictEqual(g.resetMarkers, 0, 'returning to default reading clears Gemini text metrics');
     assert(g.label.endsWith(': Gemini question 2 sassy'), `preview keeps text once without hidden labels: ${g.label}`);
     near(g.jump.targetTop, 16, 'Gemini jump uses the chat-history scroller', 2);
     assert.strictEqual(g.jump.collapsed, true, 'collapsed long message is not expanded');

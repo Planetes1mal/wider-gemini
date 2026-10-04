@@ -131,6 +131,7 @@
                 const out = {};
                 out.native = snapshot();
                 out.defaultAttrs = document.querySelectorAll('html[data-wgc-reading]').length;
+                out.defaultMarkers = document.querySelectorAll('[data-wgc-font],[data-wgc-line],[data-wgc-space]').length;
                 await reading({ messageFontSize:125 });
                 out.font = snapshot();
                 // 重复投递（storage + 消息）不能二次缩放。
@@ -215,6 +216,7 @@
     const n = r.native;
 
     assert.strictEqual(r.defaultAttrs, 0, 'defaults add no typography override');
+    assert.strictEqual(r.defaultMarkers, 0, 'default reading settings do not sample text metrics');
     for (const key of ['p', 'pLine', 'pBottom', 'h', 'code', 'preLine', 'td', 'user']) {
         near(r.paused[key] ?? 0, key === 'p' ? n.p : n[key], `pause restores ${key}`);
     }

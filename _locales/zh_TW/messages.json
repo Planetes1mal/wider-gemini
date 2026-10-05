@@ -145,7 +145,7 @@
     "message": "字級與間距"
   },
   "helpReadingBody": {
-    "message": "字級可在75%至200%之間調整，不必縮放整個頁面，標題、程式碼和表格維持原有比例。自動密度為0時保留原生段距和行高，提高密度只會逐漸收緊正文。在 ChatGPT 中，程式碼行、表格列和公式維持原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。Gemini 與 ChatGPT 分別儲存閱讀設定。"
+    "message": "字級可在75%至200%之間調整，不必縮放整個頁面，標題、程式碼和表格維持原有比例。自動密度為0時保留原生段距和行高，提高密度只會逐漸收緊正文。兩個網站的程式碼行和表格儲存格保留原生行高比例。ChatGPT 公式也保留原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。Gemini 與 ChatGPT 分別儲存閱讀設定。"
   },
   "helpLiveSettings": {
     "message": "設定會自動儲存並即時套用至所選網站已開啟的分頁。兩個網站的設定互相獨立，彈出視窗語言共用。跨裝置同步取決於瀏覽器的同步設定。"
@@ -329,5 +329,17 @@
   },
   "navigationEarlier": {
     "message": "較早的訊息"
+  },
+  "grantChatgptPermission": {
+    "message": "允許存取 ChatGPT"
+  },
+  "chatgptPermissionHint": {
+    "message": "ChatGPT 存取權限為選用。允許存取後才會套用這些設定。"
+  },
+  "chatgptPermissionFailed": {
+    "message": "無法要求存取權限，請重試。"
+  },
+  "helpSiteAccess": {
+    "message": "Gemini 存取權限為必要。ChatGPT 存取權限為選用：在彈出視窗選擇 ChatGPT 並允許存取。"
   }
 }

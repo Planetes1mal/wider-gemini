@@ -92,7 +92,10 @@
         ':is(user-query, user-query-content, [data-message-author-role="user"], [aria-label="User message"])',
         ':is(.query-text, .query-text-line, .gds-body-l)'
     ].join(' ');
-    const READING_TEXT_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, blockquote, ul, ol, li, td, th, pre, code';
+    const READING_TEXT_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, blockquote, ul, ol, li, td, th, pre, code, ' +
+        '.code-container, .formatted-code-block-internal-container';
+    const READING_FIXED_SELECTOR = 'pre, td, th, code-block, .code-block, .code-container, ' +
+        '.formatted-code-block-internal-container';
     const READING_EXCLUDED_SELECTOR =
         '.cdk-overlay-container, .cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"], dialog';
     const READING_CLASSES = [
@@ -187,6 +190,7 @@
             }
         }
         for (const node of [...candidates]) {
+            if (node.matches('.code-container, .formatted-code-block-internal-container')) continue;
             add(node.parentElement); // 包含嵌套段落的容器，以及 flex/grid 的原生 row-gap。
         }
         const pending = [...candidates].filter(node => !measuredReadingNodes.has(node));
@@ -214,14 +218,18 @@
             if (text && !node.querySelector(READING_EXCLUDED_SELECTOR) && Number.isFinite(font) && font > 0) {
                 node.style.setProperty('--wg-native-font-size', `${font}px`);
                 node.setAttribute('data-wg-typography', '');
+                const fixedLine = !!node.closest(READING_FIXED_SELECTOR);
+                const inlineCode = node.matches('code') && !fixedLine;
+                if (inlineCode) node.setAttribute('data-wg-line', 'inline');
                 if (Number.isFinite(line) && line > 0) {
                     const compactLine = Math.min(line, Math.max(font * 1.15, line * 0.82));
                     node.style.setProperty('--wg-native-line-height', `${line}px`);
                     node.style.setProperty('--wg-line-reduction', `${line - compactLine}px`);
-                    node.setAttribute('data-wg-line', '');
+                    node.setAttribute('data-wg-line', fixedLine ? 'fixed' : inlineCode ? 'inline' : '');
                 }
             }
-            if (!isRoot && !node.matches('li, td, th, code') && display !== 'inline' && display !== 'contents' &&
+            if (!isRoot && !node.matches('li, td, th, code, .code-container, .formatted-code-block-internal-container') &&
+                display !== 'inline' && display !== 'contents' &&
                 Number.isFinite(top) && Number.isFinite(bottom)) {
                 node.style.setProperty('--wg-native-margin-top', `${top}px`);
                 node.style.setProperty('--wg-native-margin-bottom', `${bottom}px`);

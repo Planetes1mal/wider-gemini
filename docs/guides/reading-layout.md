@@ -37,7 +37,7 @@ Use **Font size** in the extension to adjust conversation text without changing 
 3. Keep **Reading density** at **0** as a starting point. If paragraphs then feel too far apart, adjust density; use **Advanced spacing** when you want separate line-height and paragraph-spacing controls.
 4. Use **Reset font size** to return the extension's font setting to **100%**.
 
-This affects supported conversation text, including code and headings; it does not scale Chrome's toolbar or the extension popup. Enlarging text can make tables and code wrap more, so recheck those parts of the answer. Font size is independent of paragraph spacing: at Auto density 0, native paragraph gaps remain unchanged and native line-height proportions scale with the text. Higher density gradually compresses each message's own native spacing. Moving either Advanced spacing slider applies both displayed values manually; Reset spacing returns to Auto at the current density.
+This affects supported conversation text, including code and headings; it does not scale Chrome's toolbar or the extension popup. Enlarging text can make tables and code wrap more, so recheck those parts of the answer. Font size is independent of paragraph spacing: at Auto density 0, native paragraph gaps remain unchanged and native line-height proportions scale with the text. Higher density gradually compresses prose spacing. Code blocks and table cells keep their native line-height proportions at every density and manual line height; inline code follows its paragraph. Moving either Advanced spacing slider applies both displayed values manually; Reset spacing returns to Auto at the current density.
 
 For a simple long-answer starting point, try **1000 px / 110% font / density 0 / code wrap off**. To return to native reading typography after experimenting, set density to 0 and font size to 100%, then expand **Advanced spacing** and click **Reset spacing** to clear custom spacing. Collapsing that panel only hides the controls; it does not reset them. Width and code wrapping remain separate choices.
 
@@ -84,7 +84,7 @@ Maintainer references: [settings defaults and normalization](../../src/shared/se
 
 ## ChatGPT in the current internal source — unreleased
 
-Select the **ChatGPT** tab in the popup. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
+Select the **ChatGPT** tab in the popup, then click **Allow ChatGPT access** if Chrome has not granted the optional permission. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
 
 | Task | Requested width | Font |
 |---|---|---|

@@ -59,7 +59,7 @@ Use **Help & feedback** at the bottom of the popup for troubleshooting or to pre
 
 ## Privacy
 
-The extension requests access to `gemini.google.com` and `chatgpt.com` to adjust page styles, plus `storage` for preferences and `scripting` to restore missing content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
+Gemini access is required. ChatGPT access is optional: select ChatGPT in the popup and click **Allow ChatGPT access**. Chrome asks for permission before the extension applies to ChatGPT. The extension uses `activeTab` to identify the current site when you open the toolbar popup, `storage` for preferences, and `scripting` to register and restore content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
 
 Preferences are saved in Chrome's extension storage. Whether they sync across devices depends on your browser's sync settings. See the [privacy policy](./docs/PRIVACY.md) for details.
 

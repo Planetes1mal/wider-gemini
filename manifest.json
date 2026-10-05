@@ -8,10 +8,13 @@
     "author": "Wider Gemini",
     "permissions": [
         "storage",
-        "scripting"
+        "scripting",
+        "activeTab"
     ],
     "host_permissions": [
-        "https://gemini.google.com/*",
+        "https://gemini.google.com/*"
+    ],
+    "optional_host_permissions": [
         "https://chatgpt.com/*"
     ],
     "background": {
@@ -43,21 +46,6 @@
             "css": [
                 "src/content/message-navigation.css",
                 "src/content/gemini-content.css"
-            ],
-            "run_at": "document_start"
-        },
-        {
-            "matches": [
-                "https://chatgpt.com/*"
-            ],
-            "js": [
-                "src/shared/settings-utils.js",
-                "src/content/message-navigation.js",
-                "src/content/chatgpt-content.js"
-            ],
-            "css": [
-                "src/content/message-navigation.css",
-                "src/content/chatgpt-content.css"
             ],
             "run_at": "document_start"
         }

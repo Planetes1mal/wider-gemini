@@ -145,7 +145,7 @@
     "message": "Tamaño del texto y espaciado"
   },
   "helpReadingBody": {
-    "message": "Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página; títulos, código y tablas mantienen su proporción. Con densidad 0 en Auto se conservan las separaciones y alturas de línea originales; una densidad mayor reduce gradualmente solo el espaciado del texto. En ChatGPT, las líneas de código, las filas de tablas y las fórmulas conservan su espaciado original. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual. Gemini y ChatGPT guardan ajustes de lectura por separado."
+    "message": "Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página; títulos, código y tablas mantienen su proporción. Con densidad 0 en Auto se conservan las separaciones y alturas de línea originales; una densidad mayor reduce gradualmente solo el espaciado del texto. En ambos sitios, las líneas de código y las celdas de tablas conservan sus proporciones de altura de línea. Las fórmulas de ChatGPT también conservan su espaciado original. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual. Gemini y ChatGPT guardan ajustes de lectura por separado."
   },
   "helpLiveSettings": {
     "message": "Los cambios se guardan automáticamente y se aplican al instante a las pestañas abiertas del sitio seleccionado. Los ajustes de cada sitio son independientes; el idioma de la extensión es compartido. La sincronización entre dispositivos depende de los ajustes del navegador."
@@ -329,5 +329,17 @@
   },
   "navigationEarlier": {
     "message": "Mensajes anteriores"
+  },
+  "grantChatgptPermission": {
+    "message": "Permitir acceso a ChatGPT"
+  },
+  "chatgptPermissionHint": {
+    "message": "El acceso a ChatGPT es opcional. Permítelo para aplicar estos ajustes."
+  },
+  "chatgptPermissionFailed": {
+    "message": "No se pudo solicitar acceso. Inténtalo de nuevo."
+  },
+  "helpSiteAccess": {
+    "message": "El acceso a Gemini es obligatorio. El acceso a ChatGPT es opcional: selecciona ChatGPT y permite el acceso en la ventana emergente."
   }
 }

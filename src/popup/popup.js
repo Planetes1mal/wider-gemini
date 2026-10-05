@@ -308,6 +308,9 @@ const sitePower = document.getElementById('sitePower');
 const sitePowerState = document.getElementById('sitePowerState');
 const siteStatus = document.getElementById('siteStatus');
 const siteButtons = [document.getElementById('siteGeminiBtn'), document.getElementById('siteChatgptBtn')];
+const chatgptPermission = document.getElementById('chatgptPermission');
+const grantChatgptPermission = document.getElementById('grantChatgptPermission');
+let chatgptGranted = false;
 
 let taskBusy = false;
 let settingsLoaded = false;
@@ -468,7 +471,12 @@ function notifySiteTabs(site, message) {
         message.action === 'refreshSettings';
     const key = `${site}:${message.action === 'updateWidthSetting' ? 'width' : message.action}`;
     latestSiteMessages.set(key, message);
-    return chrome.tabs.query({ url: settingsUtils.SITE_MATCHES[site] }).then(tabs => {
+    return (site === 'chatgpt'
+        ? chrome.permissions.contains({ origins: [settingsUtils.SITE_MATCHES.chatgpt] })
+        : Promise.resolve(true)).then(granted => {
+        if (!granted) return [];
+        return chrome.tabs.query({ url: settingsUtils.SITE_MATCHES[site] });
+    }).then(tabs => {
         if (latestSiteMessages.get(key) !== message) return;
         return Promise.all(tabs.map(tab => {
             if (tab.discarded) return;
@@ -506,6 +514,10 @@ function getTabSite(tab) {
 async function refreshLayoutStatus() {
     const request = ++layoutStatusRequest;
     const site = selectedSite;
+    if (site === 'chatgpt' && !chatgptGranted) {
+        setStatus('page', '');
+        return;
+    }
     try {
         await writeQueue;
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -667,6 +679,7 @@ function renderSite() {
         button.setAttribute('aria-pressed', String(active));
     });
     codeWrapCard.hidden = selectedSite !== 'gemini';
+    renderPermission();
     renderTaskOptions();
     applyWidthUi(settings);
     applyDensityUi(settings);
@@ -678,6 +691,31 @@ function renderSite() {
     navigationToggle.checked = settings.navigationEnabled;
     renderTaskState();
 }
+
+function renderPermission() {
+    chatgptPermission.hidden = selectedSite !== 'chatgpt' || chatgptGranted;
+    grantChatgptPermission.textContent = t('grantChatgptPermission', 'Allow ChatGPT access');
+    document.getElementById('chatgptPermissionHint').textContent = t('chatgptPermissionHint',
+        'ChatGPT access is optional. Allow access to apply these settings.');
+}
+
+async function refreshPermission() {
+    chatgptGranted = await chrome.permissions.contains({ origins: [settingsUtils.SITE_MATCHES.chatgpt] });
+    renderPermission();
+    refreshLayoutStatus();
+}
+
+grantChatgptPermission.addEventListener('click', function () {
+    // request 必须直接进入点击的同步调用链，不能先等待设置写入。
+    const request = chrome.permissions.request({ origins: [settingsUtils.SITE_MATCHES.chatgpt] });
+    grantChatgptPermission.disabled = true;
+    request.then(refreshPermission).catch(error => {
+        console.error('[Wider Gemini] Could not request ChatGPT permission:', error);
+        setStatus('error', t('chatgptPermissionFailed', 'Could not request access. Please try again.'));
+    }).finally(() => { grantChatgptPermission.disabled = false; });
+});
+chrome.permissions.onAdded.addListener(refreshPermission);
+chrome.permissions.onRemoved.addListener(refreshPermission);
 
 // ---- 任务预设与一步恢复 ----
 
@@ -836,13 +874,15 @@ async function loadTaskUndo(site, localValues) {
 async function initializeSettings() {
     setTaskBusy(false);
     try {
-        const [result, tabs, localValues] = await Promise.all([
+        const [result, tabs, localValues, granted] = await Promise.all([
             chrome.storage.sync.get([...settingsUtils.getSiteStorageKeys('gemini'),
                 ...settingsUtils.getSiteStorageKeys('chatgpt'), 'uiLanguage']),
             chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []),
-            chrome.storage.local.get(Object.values(settingsUtils.TASK_UNDO_KEYS)).catch(() => ({}))
+            chrome.storage.local.get(Object.values(settingsUtils.TASK_UNDO_KEYS)).catch(() => ({})),
+            chrome.permissions.contains({ origins: [settingsUtils.SITE_MATCHES.chatgpt] })
         ]);
         storedSettings = result;
+        chatgptGranted = granted;
         siteSettings.gemini = settingsUtils.normalizeSiteSettings(result, 'gemini');
         siteSettings.chatgpt = settingsUtils.normalizeSiteSettings(result, 'chatgpt');
         await Promise.all(['gemini', 'chatgpt'].map(site => loadTaskUndo(site, localValues)));

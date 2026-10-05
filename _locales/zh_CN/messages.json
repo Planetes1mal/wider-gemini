@@ -145,7 +145,7 @@
     "message": "字号与间距"
   },
   "helpReadingBody": {
-    "message": "字号可在75%至200%之间调整，无需缩放整个页面，标题、代码和表格保持原有比例。自动密度为0时保留原生段距和行高，提高密度只会逐渐收紧正文。在 ChatGPT 中，代码行、表格行和公式保持原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。Gemini 与 ChatGPT 分别保存阅读设置。"
+    "message": "字号可在75%至200%之间调整，无需缩放整个页面，标题、代码和表格保持原有比例。自动密度为0时保留原生段距和行高，提高密度只会逐渐收紧正文。两站的代码行和表格单元格保留原生行高比例。ChatGPT 公式也保留原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。Gemini 与 ChatGPT 分别保存阅读设置。"
   },
   "helpLiveSettings": {
     "message": "设置会自动保存并实时应用到所选网站已打开的标签页。两个网站的设置互相独立，弹窗语言共用。跨设备同步取决于浏览器的同步设置。"
@@ -329,5 +329,17 @@
   },
   "navigationEarlier": {
     "message": "更早的消息"
+  },
+  "grantChatgptPermission": {
+    "message": "允许访问 ChatGPT"
+  },
+  "chatgptPermissionHint": {
+    "message": "ChatGPT 访问权限可选。允许访问后才会应用这些设置。"
+  },
+  "chatgptPermissionFailed": {
+    "message": "无法请求访问权限，请重试。"
+  },
+  "helpSiteAccess": {
+    "message": "Gemini 访问权限为必选。ChatGPT 访问权限可选：在弹窗选择 ChatGPT 并允许访问。"
   }
 }

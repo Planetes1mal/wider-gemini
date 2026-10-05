@@ -1,10 +1,19 @@
 // Service worker：浏览器启动时（如以已安装的 Chrome 应用 / PWA 冷启动）页面
 // 可能先于扩展加载完成，因而错过声明式 content_scripts 注入，只能刷新页面才生效。
-// 启动 / 安装 / 更新时按各站点的 manifest 声明补注入，文件列表保持单一来源。
+// Gemini 按 manifest 补注入；ChatGPT 仅在授权后注册、补注入。
 (function () {
     'use strict';
 
     const contentScripts = chrome.runtime.getManifest().content_scripts;
+    const chatgptScript = {
+        id: 'wider-chatgpt',
+        matches: ['https://chatgpt.com/*'],
+        js: ['src/shared/settings-utils.js', 'src/content/message-navigation.js', 'src/content/chatgpt-content.js'],
+        css: ['src/content/message-navigation.css', 'src/content/chatgpt-content.css'],
+        runAt: 'document_start',
+        persistAcrossSessions: true
+    };
+    let permissionUpdate = Promise.resolve();
     const loadedFlags = {
         'src/content/gemini-content.js': 'widerGeminiContentLoaded',
         'src/content/chatgpt-content.js': 'widerChatgptContentLoaded'
@@ -37,8 +46,8 @@
         console.log('[Wider Gemini] Injected content script into tab', tab.id);
     }
 
-    async function injectIntoOpenTabs() {
-        await Promise.all(contentScripts.map(async contentScript => {
+    async function injectIntoOpenTabs(scripts) {
+        await Promise.all(scripts.map(async contentScript => {
             const loadedFlag = loadedFlags[contentScript.js.find(file => loadedFlags[file])];
             if (!loadedFlag) return;
             try {
@@ -56,6 +65,27 @@
         }));
     }
 
-    chrome.runtime.onStartup.addListener(injectIntoOpenTabs);
-    chrome.runtime.onInstalled.addListener(injectIntoOpenTabs);
+    function updateChatgptPermission() {
+        // 授权与启动事件可能重合：串行注册，避免重复 ID 或撤销后留下注册。
+        permissionUpdate = permissionUpdate.then(async () => {
+            const granted = await chrome.permissions.contains({ origins: chatgptScript.matches });
+            const registered = await chrome.scripting.getRegisteredContentScripts({ ids: [chatgptScript.id] });
+            if (!granted) {
+                if (registered.length) await chrome.scripting.unregisterContentScripts({ ids: [chatgptScript.id] });
+                return;
+            }
+            if (!registered.length) await chrome.scripting.registerContentScripts([chatgptScript]);
+            await injectIntoOpenTabs([chatgptScript]);
+        }).catch(error => console.error('[Wider Gemini] Could not update ChatGPT permission:', error));
+        return permissionUpdate;
+    }
+
+    async function onStart() {
+        await Promise.all([injectIntoOpenTabs(contentScripts), updateChatgptPermission()]);
+    }
+
+    chrome.runtime.onStartup.addListener(onStart);
+    chrome.runtime.onInstalled.addListener(onStart);
+    chrome.permissions.onAdded.addListener(updateChatgptPermission);
+    chrome.permissions.onRemoved.addListener(updateChatgptPermission);
 })();

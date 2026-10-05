@@ -145,7 +145,7 @@
     "message": "Text size & spacing"
   },
   "helpReadingBody": {
-    "message": "Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. In ChatGPT, code lines, table rows, and formulas keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Gemini and ChatGPT keep separate reading settings."
+    "message": "Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. On both sites, code lines and table cells keep their native line-height proportions. ChatGPT formulas also keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Gemini and ChatGPT keep separate reading settings."
   },
   "helpLiveSettings": {
     "message": "Changes are saved automatically and apply live to open tabs of the selected website. The two websites keep separate settings; the popup language is shared. Sync across devices depends on your browser’s sync settings."
@@ -329,5 +329,17 @@
   },
   "navigationEarlier": {
     "message": "Earlier messages"
+  },
+  "grantChatgptPermission": {
+    "message": "Allow ChatGPT access"
+  },
+  "chatgptPermissionHint": {
+    "message": "ChatGPT access is optional. Allow access to apply these settings."
+  },
+  "chatgptPermissionFailed": {
+    "message": "Could not request access. Please try again."
+  },
+  "helpSiteAccess": {
+    "message": "Gemini access is required. ChatGPT access is optional: select ChatGPT and allow access in the popup."
   }
 }

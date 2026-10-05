@@ -394,9 +394,10 @@ body.wider-gemini-font-enabled [data-wg-typography] {
     font-size: calc(var(--wg-native-font-size) * var(--gemini-font-scale)) !important;
 }
 
-body:is(.wider-gemini-font-enabled, .wider-gemini-density-enabled) [data-wg-line] {
-    line-height: calc((var(--wg-native-line-height) -
-        var(--wg-line-reduction) * var(--gemini-density-progress)) * var(--gemini-font-scale)) !important;
+body:is(.wider-gemini-font-enabled, .wider-gemini-density-enabled) [data-wg-line]:not([data-wg-line="inline"]) {
+    --wg-reading-line: calc((var(--wg-native-line-height) -
+        var(--wg-line-reduction) * var(--gemini-density-progress)) * var(--gemini-font-scale));
+    line-height: var(--wg-reading-line) !important;
 }
 
 /* Scale existing margins, including nested paragraphs, without inventing a fixed native gap.
@@ -413,8 +414,18 @@ body.wider-gemini-density-enabled [data-wg-gap] {
 }
 
 /* Manual spacing is an explicit override; 0px stays zero, independent of the density slider. */
-body.wider-gemini-spacing-custom [data-wg-typography] {
+body.wider-gemini-spacing-custom [data-wg-typography]:not([data-wg-line="fixed"], [data-wg-line="inline"]) {
+    --wg-reading-line: calc(var(--wg-native-font-size) * var(--gemini-font-scale) * var(--gemini-message-line-height));
     line-height: var(--gemini-message-line-height) !important;
+}
+
+/* Code blocks and table cells scale their native line height; inline code follows prose. */
+body:is(.wider-gemini-font-enabled, .wider-gemini-density-enabled) [data-wg-line="fixed"] {
+    --wg-reading-line: calc(var(--wg-native-line-height) * var(--gemini-font-scale)) !important;
+}
+
+body:is(.wider-gemini-font-enabled, .wider-gemini-density-enabled) [data-wg-line="inline"] {
+    line-height: var(--wg-reading-line) !important;
 }
 
 body.wider-gemini-spacing-custom [data-wg-spacing] {

@@ -434,7 +434,10 @@
         <div class="query-text${long ? ' collapsed' : ''}"><h5 class="cdk-visually-hidden screen-reader-user-query-label"><span>You said</span> Gemini question ${i} sassy</h5>
         <p class="query-text-line">Gemini question ${i} sassy${long ? ' ' + 'long '.repeat(80) : ''}</p></div>
         </span></div></div></user-query-content></span></user-query>
-        <model-response><div class="markdown"><p>${'Answer text. '.repeat(400)}</p></div></model-response></div>`;
+        <model-response><div class="markdown"><p>${'Answer text. '.repeat(400)}</p>${i === 2 ? `
+            <p id="g-inline-p">Inline <code id="g-inline">sample</code> text</p>
+            <code-block><div class="formatted-code-block-internal-container"><pre id="g-pre"><code id="g-code">a\nb</code></pre></div></code-block>
+            <table><tr><th id="g-th">Title</th><td id="g-td">Cell</td></tr></table>` : ''}</div></model-response></div>`;
     const gemini = `<!doctype html><html><head><meta charset="utf-8"><style>
         body { margin:0; font:16px/26px sans-serif; }
         chat-window, user-query, user-query-content, model-response, infinite-scroller, input-container, input-area-v2 { display:block; }
@@ -443,6 +446,8 @@
         infinite-scroller.chat-history { overflow-y:scroll; flex:1; }
         .conversation-container { max-width:760px; margin:auto; }
         .query-text.collapsed { max-height:96px; overflow:hidden; }
+        code { font-size:14px; line-height:14px; }
+        pre code { display:block; line-height:21px; }
     </style><style>${read('src/content/message-navigation.css')}</style>
     <style>${read('src/content/gemini-content.css')}</style></head><body>
         <chat-window><div class="chat-container"><infinite-scroller class="chat-history">
@@ -463,6 +468,22 @@
                 out.activatedFont = px('#c2 model-response p', 'fontSize');
                 await save('messageFontSize', 100);
                 out.resetMarkers = qa('[data-wg-typography]').length;
+                out.fixedLines = [];
+                for (const font of [100, 140]) {
+                    await save('messageFontSize', font);
+                    for (const manual of [false, true]) {
+                        await save('messageCompactness', 60);
+                        await save('messageLineHeight', 1.2);
+                        await save('messageSpacingCustom', manual);
+                        out.fixedLines.push({ font, manual, container:px('#c2 .formatted-code-block-internal-container','lineHeight'),
+                            pre:px('#g-pre','lineHeight'), code:px('#g-code','lineHeight'),
+                            td:px('#g-td','lineHeight'), th:px('#g-th','lineHeight'),
+                            p:px('#g-inline-p','lineHeight'), inline:px('#g-inline','lineHeight') });
+                    }
+                }
+                await save('messageFontSize', 100);
+                await save('messageCompactness', 0);
+                await save('messageSpacingCustom', false);
                 out.label = qa('.wg-nav-tick')[1].getAttribute('aria-label');
                 qa('.wg-nav-tick')[1].click();
                 await wait(400);
@@ -686,6 +707,13 @@
     assert.strictEqual(g.defaultMarkers, 0, 'default Gemini reading settings do not sample text metrics');
     near(g.activatedFont, 20, 'activating reading samples the existing Gemini text');
     assert.strictEqual(g.resetMarkers, 0, 'returning to default reading clears Gemini text metrics');
+    for (const row of g.fixedLines) {
+        const scale = row.font / 100;
+        near(row.code, 21 * scale, 'Gemini block code ignores compactness and manual line height');
+        for (const key of ['container', 'pre', 'td', 'th']) near(row[key], 26 * scale, `Gemini ${key} preserves its native line height`);
+        near(row.inline, row.p, 'Gemini inline code follows its paragraph line height');
+        near(row.p, row.manual ? 16 * scale * 1.2 : 26 * 0.892 * scale, 'Gemini prose spacing stays unchanged');
+    }
     assert(g.label.endsWith(': Gemini question 2 sassy'), `preview keeps text once without hidden labels: ${g.label}`);
     near(g.jump.targetTop, 16, 'Gemini jump uses the chat-history scroller', 2);
     assert.strictEqual(g.jump.collapsed, true, 'collapsed long message is not expanded');

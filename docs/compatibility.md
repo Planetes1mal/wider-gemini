@@ -1,5 +1,20 @@
 # Compatibility record
 
+## Optional ChatGPT permission and Gemini fixed line heights — October 4, 2026
+
+Baseline HEAD **`e8368de`**, `chatgpt-width-support`; **`3.0.0-rc.2`** unchanged.
+ChatGPT now uses optional host permission and persistent dynamic scripts; Gemini's static declaration is unchanged.
+Chrome's `getPermissionWarningsByManifest` returned identical Gemini-only warnings for main 2.8.0 and the new manifest.
+Complete unit/packaging tests (15 package checks), all three e2e commands, and the extracted ZIP's package-load check passed.
+After the user's IAB reload, Gemini's three loaded sources matched the workspace; ungranted ChatGPT loaded no extension script or stylesheet.
+ChatGPT stayed native after saved width 1600px and font size 140% changes; its new-chat page also had no extension instance.
+The same Gemini QA answer had 981 textContent characters before and after. Code stayed at 21/29.4px line height at font size 100/140%.
+Table/pre line height stayed 26/36.4px at compactness 0/60/100 and manual line height 1.2/1.8; inline code followed prose during reading overrides.
+Same completed 18-paragraph content had 62/0/62 reading markers across site pause/resume. Input widths were 1000/1600px, returning to 660px with width off.
+Real pointer/keyboard navigation passed: 2/2 tick centers hit, and the first prompt stopped 16px below the scroll-area top.
+IAB blocks extension popup URLs. Task 05 still owns real toolbar grant/deny/revoke, authorized ChatGPT persistence/reading comparison, and the store-update enabled-state check.
+Settings were restored to {}; themes were unchanged; Pro and 2560×1440 were restored; temporary tabs were closed. Evidence: `.scratch/release-3.0.0/evidence/`.
+
 ## Deferred default reading measurements — October 4, 2026
 
 HEAD **`609065a`**, `chatgpt-width-support`, **`3.0.0-rc.2`** unchanged.

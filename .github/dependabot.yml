@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Keep the workflow actions current; all updates arrive together in one monthly pull request.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+    commit-message:
+      prefix: ci
+      include: scope

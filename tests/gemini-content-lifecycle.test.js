@@ -10,12 +10,20 @@ function createEventTarget() {
     const listeners = new Map();
 
     return {
-        addEventListener(type, listener) {
+        addEventListener(type, listener, options) {
             if (!listeners.has(type)) listeners.set(type, []);
             listeners.get(type).push(listener);
+            const signal = options && options.signal;
+            if (signal) signal.addEventListener('abort', () => {
+                listeners.set(type, listeners.get(type).filter(item => item !== listener));
+            });
         },
         dispatch(type, event = {}) {
-            (listeners.get(type) || []).forEach(listener => listener(event));
+            (listeners.get(type) || []).slice().forEach(listener => listener(event));
+        },
+        dispatchEvent(event) {
+            this.dispatch(event.type, event);
+            return true;
         }
     };
 }
@@ -41,19 +49,20 @@ function createClassList() {
     };
 }
 
-// 模拟一个 Gemini 页面的扩展隔离世界；readyState 决定内容脚本是等待 DOMContentLoaded 还是立即初始化
-function createPage(readyState, { supported = true, deferStorage = false, stored = {} } = {}) {
+// 模拟一个 Gemini 页面的扩展隔离世界；readyState 决定内容脚本是等待 DOMContentLoaded 还是立即初始化。
+// 传入 sharedPage 时与它共用同一个 document，模拟扩展更新后新旧两个隔离世界作用于同一页面。
+function createPage(readyState, { supported = true, deferStorage = false, stored = {}, sharedPage = null } = {}) {
     const rootStyles = new Map();
     const rootPriorities = new Map();
     const timers = new Map();
-    const counts = { storageGet: 0, observerStart: 0, messageListeners: 0, storageChangeListeners: 0 };
+    const counts = { storageGet: 0, observerStart: 0, observerStop: 0, messageListeners: 0, storageChangeListeners: 0 };
     const pendingStorage = [];
     let deliverMessage;
     let deliverStorage;
     let deliverMutation;
     let nextTimerId = 1;
 
-    const document = {
+    const document = sharedPage ? sharedPage.document : {
         ...createEventTarget(),
         readyState,
         documentElement: {
@@ -133,7 +142,16 @@ function createPage(readyState, { supported = true, deferStorage = false, stored
             observe() {
                 counts.observerStart += 1;
             }
+            disconnect() {
+                counts.observerStop += 1;
+            }
         },
+        Event: class {
+            constructor(type) {
+                this.type = type;
+            }
+        },
+        AbortController,
         getComputedStyle() {
             return {
                 getPropertyValue(property) {
@@ -172,7 +190,7 @@ function createPage(readyState, { supported = true, deferStorage = false, stored
     return {
         sandbox,
         document,
-        rootStyles,
+        rootStyles: sharedPage ? sharedPage.rootStyles : rootStyles,
         counts,
         send(message) {
             let response;
@@ -244,6 +262,37 @@ function createPage(readyState, { supported = true, deferStorage = false, stored
     assert.strictEqual(page.counts.observerStart, 1, 'late injection starts one mutation observer');
     assert.strictEqual(page.rootStyles.get('--gemini-chat-width'), '1200px');
     assert.ok(page.document.body.classList.contains('code-wrap-enabled'));
+}
+
+// 扩展更新：旧实例失去扩展上下文仍留在页面里；新实例在新的隔离世界启动后接管，旧实例不再改写样式。
+{
+    const oldPage = createPage('complete');
+    oldPage.runContentScript();
+    oldPage.runTimers(0);
+    assert.strictEqual(oldPage.rootStyles.get('--gemini-chat-width'), '1200px');
+    oldPage.sandbox.chrome.runtime.id = undefined;
+
+    const newPage = createPage('complete', { sharedPage: oldPage, stored: { chatWidthSetting: { value: 900, unit: 'px' } } });
+    newPage.runContentScript();
+    assert.strictEqual(oldPage.counts.observerStop, 1, 'the new instance retires the old observer');
+    assert.strictEqual(newPage.counts.observerStop, 0, 'the new instance does not retire itself');
+    newPage.runTimers(0);
+    assert.strictEqual(newPage.counts.observerStart, 1);
+    assert.strictEqual(oldPage.rootStyles.get('--gemini-chat-width'), '900px');
+    oldPage.setSupported(true);
+    oldPage.sandbox.dispatch('resize');
+    oldPage.runTimers(0);
+    assert.strictEqual(oldPage.rootStyles.get('--gemini-chat-width'), '900px', 'the old instance no longer writes its stale width');
+}
+
+// 扩展停用或卸载（没有新实例接管）：旧实例在下一次页面变化时自行停止。
+{
+    const page = createPage('complete');
+    page.runContentScript();
+    page.runTimers(0);
+    page.sandbox.chrome.runtime.id = undefined;
+    page.setSupported(true);
+    assert.strictEqual(page.counts.observerStop, 1, 'an orphaned instance stops observing on its own');
 }
 
 // 暂停/恢复与未知布局不需要重新注入，且不会清掉阅读偏好。

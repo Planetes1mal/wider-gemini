@@ -1,5 +1,42 @@
 # Compatibility record
 
+## Signed-in ChatGPT long-conversation navigation — October 15, 2026
+
+Working tree on `chatgpt-width-support`, baseline **`fdf37cc`**, version **`3.0.0`**, with the open-tab update fix below and the jump fix described here. The user's own signed-in Chrome (macOS, viewport 1470 × 715, DPR 2) ran the reloaded unpacked extension; Claude in Chrome drove it with real pointer clicks and key presses. Only layout and position values were read, and no message text was recorded. One automatic screenshot returned by a scroll action showed page content; it was not used, and later scrolling was scripted.
+
+The 48 most recent conversations were measured by turn count only; none exceeded 20 turns. The longest (10–14 turns, about 130,000px once fully loaded) was used, so the 20-tick bound remains covered by the fixture suite rather than this run.
+
+| Check | Result |
+|---|---|
+| Rails while switching conversations | Exactly one visible rail on every conversation with two or more turns |
+| Middle tick, pointer | Target user message 72px below the scroll-root top (the ChatGPT top inset) |
+| Arrow Down then Enter | Focus moved to the next tick; Enter jumped to it at 72px |
+| Hover preview | Shown left of the rail (1159–1439px against a rail at 1447px), fully inside the viewport |
+| Earlier-messages marker | First click scrolled to the loaded start and ChatGPT appended older turns; the second reached the beginning and the marker hid itself |
+| Last tick from the beginning | Target had been unmounted; relocation by key landed it at 72px |
+| Extension console errors | None |
+| **Top tick, before the fix** | Missed twice: ChatGPT loaded earlier turns during the smooth scroll, which ended about 1,800px and then 52px away from the target |
+
+Fix: after a jump, `message-navigation.js` remembers the target for five seconds. When the scroll ends and the scroll root's content height has changed, it realigns the target instantly. Wheel, touch, key or pointer input in the conversation cancels it, and so does the earlier-messages marker. A new Gemini fixture case clicks the first tick and prepends a 2,400px earlier turn 60ms later: without the fix the target ended 2,474px away; with it, at the 16px Gemini inset.
+
+After the user reloaded the extension **without refreshing** the ChatGPT tab, the tab kept exactly one rail, run by the new instance; this confirms the open-tab update fix live. After a page reload, the top tick was clicked three times in a row while ChatGPT grew the conversation from 28,758 to 34,297, 41,693 and 68,372px. Each jump ended with its target at **72px**, and a later 900px scroll was not pulled back. The full unit and packaging suite, `navigation-surfaces`, the 73 message-width scenarios, `chatgpt-reading` and the headless update checks passed after the change.
+
+Not covered: conversations over 20 turns on the live site, Dots/Page quick chat on the live site, Gemini long-history jumps on the live site (the shared fix is covered by the fixture), and Windows scrollbars.
+
+## Open tabs after an extension update — October 15, 2026
+
+Working tree on `chatgpt-width-support`, baseline **`fdf37cc`**, version **`3.0.0`**. This explains the earlier observation of three overlapping Gemini navigation rails after repeated unpacked reloads.
+
+When Chrome updates or reloads an extension, content scripts already running in open tabs stay alive with an invalid extension context, while `background.js` injects the new version into a fresh isolated world. In headless Chrome 155 with a local HTTPS fixture answering for `gemini.google.com` and `chatgpt.com`, reloading the committed 3.0.0 from the same path left **two visible rails** on both sites; both kept updating when a turn was added, until the page was reloaded. Updating from `main` 2.8.0 showed one rail, because 2.8.0 has no navigation, and later width changes and new turns kept the new value.
+
+Fix: each site script now dispatches a site-specific takeover event at start-up and only then listens for it. An earlier instance that receives the event, or that finds its extension context invalid during a page change, stops its observers and listeners, restores the navigation padding it added, and removes its rail; width and reading styles are left for the new instance to reapply.
+
+- After the fix, the same fixture showed **one rail** after the update on both sites, including after a new turn, a window resize, a width change to 900px and a further turn; the width stayed 900px. The 2.8.0 → 3.0.0 run was unchanged.
+- New lifecycle cases simulate two isolated worlds sharing one document: the new instance retires the old observer without retiring itself, the old instance no longer writes its stale width, and an orphan with no successor stops on the next page change. The cases failed against the committed script and pass with the fix.
+- The full unit suite with **15 packaging checks**, `navigation-surfaces`, the **73** message-width scenarios and `chatgpt-reading` passed.
+
+The ChatGPT fixture used a test-only manifest with ChatGPT as a required site, because headless Chrome cannot accept the optional-permission prompt; the shipped manifest is unchanged. Not covered: a signed-in live page, Dots/Page surfaces during an update, and a Chrome Web Store–signed update.
+
 ## Rename to Roomy and stable 3.0.0 packaging — October 15, 2026
 
 Working tree on `chatgpt-width-support`, baseline **`891aa14`**. `version_name` was removed, so the manifest is the stable **`3.0.0`**. The extension is renamed **Roomy**: each locale's `appName` is the localized store title (English: *Roomy: Wide Mode for Gemini & ChatGPT*), and a new `brandName` (“Roomy”) is the manifest `short_name` and the popup/help heading. The popup and help page show the packaged 48px icon instead of the “WG” text tile. Internal identifiers, storage keys, the repository name and the `wider-gemini-*.zip` package name are unchanged.

@@ -505,6 +505,11 @@
 
     function syncNavigation() {
         navigationTimer = null;
+        if (retired) return;
+        if (!isExtensionContextValid()) {
+            retire();
+            return;
+        }
         const wanted = siteActive && storedSettings[settingsUtils.NAVIGATION_KEYS.gemini] !== false &&
             Boolean(window.widerMessageNavigation);
         const scroller = wanted ? findChatScroller() : null;
@@ -554,8 +559,33 @@
     }
 
     function queueNavigation() {
-        if (navigationTimer === null) navigationTimer = setTimeout(syncNavigation, 0);
+        if (!retired && navigationTimer === null) navigationTimer = setTimeout(syncNavigation, 0);
     }
+
+    // ---- 扩展更新后的旧实例 ----
+    // 扩展更新或重新加载后，旧版本脚本仍留在已打开的页面里：chrome.* 已失效，却仍响应页面变化，
+    // 会多出一条导航条，并用旧设置改写样式。新实例启动时先广播接管事件；旧实例收到后（或自己发现
+    // 扩展上下文失效时）停止观察与监听，撤下自己的导航条和留白。宽度与阅读样式由新实例重新应用。
+    const TAKEOVER_EVENT = 'wider-gemini-takeover';
+    const listenerControl = new AbortController();
+    let observer = null;
+    let retired = false;
+
+    function retire() {
+        if (retired) return;
+        retired = true;
+        listenerControl.abort();
+        if (observer) observer.disconnect();
+        clearTimeout(navigationTimer);
+        navigationTimer = null;
+        setNavigationGutter(null, 0);
+        if (navigation) navigation.destroy();
+        navigation = null;
+    }
+
+    // 先通知旧实例再登记自己的监听，不会收到自己发出的事件。
+    document.dispatchEvent(new Event(TAKEOVER_EVENT));
+    document.addEventListener(TAKEOVER_EVENT, retire, { signal: listenerControl.signal });
 
     // 读取期间若收到更新的 storage 事件，旧读取结果作废（事件本身已合并）。
     function applySettings() {
@@ -636,8 +666,8 @@
             }
         };
 
-        window.addEventListener('popstate', urlChangeHandler);
-        window.addEventListener('hashchange', urlChangeHandler);
+        window.addEventListener('popstate', urlChangeHandler, { signal: listenerControl.signal });
+        window.addEventListener('hashchange', urlChangeHandler, { signal: listenerControl.signal });
 
         const originalPushState = history.pushState;
         const originalReplaceState = history.replaceState;
@@ -661,7 +691,11 @@
         applySettings();
         observeUrlChanges();
 
-        const observer = new MutationObserver(function (mutations) {
+        observer = new MutationObserver(function (mutations) {
+            if (!isExtensionContextValid()) {
+                retire();
+                return;
+            }
             let shouldUpdate = false;
             const readingScopes = [];
 
@@ -732,7 +766,7 @@
             isDragging = true;
 
             const checkDragElements = () => {
-                if (!isDragging || !widthActive) {
+                if (retired || !isDragging || !widthActive) {
                     dragCheckFrame = null;
                     return;
                 }
@@ -761,14 +795,14 @@
         document.addEventListener('dragenter', function (e) {
             startDragCheck();
             applyDragDropStyles();
-        }, true);
+        }, { capture: true, signal: listenerControl.signal });
 
         document.addEventListener('dragover', function (e) {
             if (!isDragging) {
                 startDragCheck();
             }
             applyDragDropStyles();
-        }, true);
+        }, { capture: true, signal: listenerControl.signal });
 
         document.addEventListener('dragleave', function (e) {
             setTimeout(() => {
@@ -776,7 +810,7 @@
                     stopDragCheck();
                 }
             }, 100);
-        }, true);
+        }, { capture: true, signal: listenerControl.signal });
 
         document.addEventListener('drop', function (e) {
             setTimeout(() => {
@@ -784,7 +818,7 @@
                 applyDragDropStyles();
                 applySettings();
             }, 200);
-        }, true);
+        }, { capture: true, signal: listenerControl.signal });
 
         // 图片异步加载，load 事件不冒泡，需捕获阶段监听；
         // 窗口尺寸变化会改变图片居中位置，防抖后重新测量
@@ -792,14 +826,14 @@
             if (e.target && e.target.matches && e.target.matches('single-image img')) {
                 alignImageCaptions();
             }
-        }, true);
+        }, { capture: true, signal: listenerControl.signal });
 
         let captionResizeTimer = null;
         window.addEventListener('resize', function () {
             if (captionResizeTimer) clearTimeout(captionResizeTimer);
             captionResizeTimer = setTimeout(alignImageCaptions, 150);
             queueNavigation();
-        });
+        }, { signal: listenerControl.signal });
 
         console.log('[Wider Gemini] MutationObserver and drag listeners started');
     }

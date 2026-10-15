@@ -27,6 +27,8 @@ Wider Gemini is now **Roomy**, and it works on ChatGPT as well as Gemini. The ex
 - Gemini keeps a text prompt's navigation preview while the prompt is being edited.
 - Text measurements for reading settings run only when a font size or spacing setting is in use, so default settings add no per-message work.
 - Gemini navigation stays reachable in narrow windows with widening turned off.
+- After the extension updates or reloads, already-open Gemini and ChatGPT tabs no longer show a second navigation bar or receive stale widths from the previous version's script; the old script stops as soon as the new one starts.
+- Jumping to the earliest loaded message stays on target when Gemini or ChatGPT loads earlier history during the scroll; after the scroll ends, the target is realigned whenever the content height changes within five seconds, unless you scroll yourself.
 - The help page's description of the settings report now lists everything the report contains.
 
 See [the compatibility record](./docs/compatibility.md) for the flows verified for this release.

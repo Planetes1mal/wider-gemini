@@ -489,6 +489,21 @@
                 await wait(400);
                 out.jump = { targetTop:q('#c2 user-query').getBoundingClientRect().top - scroller.getBoundingClientRect().top,
                     collapsed:q('#c1 .query-text').classList.contains('collapsed') };
+                // 跳到最早一条时站点在开头载入更早的消息：滚动停下后仍对准目标，而不是停在旧位置。
+                scroller.scrollTop = scroller.scrollHeight;
+                await wait(300);
+                qa('.wg-nav-tick')[0].click();
+                await wait(60);
+                const earlier = document.createElement('div');
+                earlier.className = 'conversation-container';
+                earlier.id = 'c0';
+                earlier.innerHTML = '<user-query><p class="query-text-line">Earlier question</p></user-query>' +
+                    '<model-response><div class="markdown"><p style="height:2400px">Earlier answer</p></div></model-response>';
+                q('infinite-scroller').prepend(earlier);
+                await wait(1600);
+                out.prependJump = { targetTop:q('#c1 user-query').getBoundingClientRect().top - scroller.getBoundingClientRect().top };
+                earlier.remove();
+                await wait(300);
                 // 编辑时正文节点被 textarea 替换：保留已保存的预览，保存后读取新正文。
                 const prompt = q('#c3 .query-text-line');
                 const editor = document.createElement('textarea');
@@ -716,6 +731,7 @@
     }
     assert(g.label.endsWith(': Gemini question 2 sassy'), `preview keeps text once without hidden labels: ${g.label}`);
     near(g.jump.targetTop, 16, 'Gemini jump uses the chat-history scroller', 2);
+    near(g.prependJump.targetTop, 16, 'a jump stays on target when earlier messages load during the scroll', 2);
     assert.strictEqual(g.jump.collapsed, true, 'collapsed long message is not expanded');
     assert(g.edit.label.endsWith(': Gemini question 3 sassy'), 'editing retains the saved prompt preview');
     assert(g.edit.saved.endsWith(': Saved Gemini question'), 'saving replaces the remembered prompt preview');

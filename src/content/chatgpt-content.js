@@ -195,6 +195,11 @@
 
     function syncLayout() {
         layoutFrame = null;
+        if (retired) return;
+        if (!isExtensionContextValid()) {
+            retire();
+            return;
+        }
         const root = document.documentElement;
         if (!root) return;
         const next = discoverSurface();
@@ -277,7 +282,7 @@
     }
 
     function queueLayout() {
-        if (layoutFrame === null) layoutFrame = requestAnimationFrame(syncLayout);
+        if (!retired && layoutFrame === null) layoutFrame = requestAnimationFrame(syncLayout);
     }
 
     const availableWidthObserver = new ResizeObserver(queueLayout);
@@ -286,7 +291,7 @@
         syncLayout();
         applyReading();
         const hasMarker = node => node.nodeType === 1 && (node.matches(SURFACE_MARKERS) || node.querySelector(SURFACE_MARKERS));
-        new MutationObserver(function (mutations) {
+        layoutObserver = new MutationObserver(function (mutations) {
             const changed = mutations.some(mutation => mutation.type === 'attributes'
                 ? mutation.attributeName !== 'class' || hasMarker(mutation.target)
                 : [...mutation.addedNodes, ...mutation.removedNodes].some(hasMarker));
@@ -297,9 +302,10 @@
                 'data-pip-obstacle', 'data-composer-placement', 'data-app-action-timeline-scroll',
                 'data-chatgpt-composer', 'data-composer-overlay-floating-ui']
         });
-        if (window.navigation) window.navigation.addEventListener('navigatesuccess', queueLayout);
-        window.addEventListener('popstate', queueLayout);
-        window.addEventListener('resize', queueLayout);
+        const options = { signal: listenerControl.signal };
+        if (window.navigation) window.navigation.addEventListener('navigatesuccess', queueLayout, options);
+        window.addEventListener('popstate', queueLayout, options);
+        window.addEventListener('resize', queueLayout, options);
     }
 
     // ---- 阅读排版 ----
@@ -443,6 +449,10 @@
         // 流式输出主要追加文本节点；只处理新增/移除的元素所在范围，不整页重扫。
         // 在观察回调里同步采样，新块在首次绘制前即获得设置（后台标签页也不依赖 rAF）。
         readingObserver = new MutationObserver(function (mutations) {
+            if (!isExtensionContextValid()) {
+                retire();
+                return;
+            }
             if (!siteActive || !readingScope) return;
             const scopes = [];
             let turnsChanged = false;
@@ -567,6 +577,7 @@
 
     function syncNavigation() {
         navigationTimer = null;
+        if (retired) return;
         if (!navigationWanted()) {
             if (navigation) navigation.destroy();
             navigation = null;
@@ -596,8 +607,40 @@
     }
 
     function queueNavigation() {
-        if (navigationTimer === null) navigationTimer = setTimeout(syncNavigation, 0);
+        if (!retired && navigationTimer === null) navigationTimer = setTimeout(syncNavigation, 0);
     }
+
+    // ---- 扩展更新后的旧实例 ----
+    // 扩展更新或重新加载后，旧版本脚本仍留在已打开的页面里：chrome.* 已失效，却仍响应页面变化，
+    // 会多出一条导航条，并用旧设置改写宽度标记。新实例启动时先广播接管事件；旧实例收到后（或自己
+    // 发现扩展上下文失效时）停止观察与监听，撤下自己的导航条和 Page 浮窗内边距；宽度与阅读样式由新实例重新应用。
+    const TAKEOVER_EVENT = 'wider-chatgpt-takeover';
+    const listenerControl = new AbortController();
+    let layoutObserver = null;
+    let retired = false;
+
+    function retire() {
+        if (retired) return;
+        retired = true;
+        listenerControl.abort();
+        if (layoutObserver) layoutObserver.disconnect();
+        if (readingObserver) readingObserver.disconnect();
+        readingObserver = null;
+        availableWidthObserver.disconnect();
+        if (layoutFrame !== null) cancelAnimationFrame(layoutFrame);
+        layoutFrame = null;
+        clearTimeout(navigationTimer);
+        navigationTimer = null;
+        // 内边距是真实的布局属性：不撤回的话，新实例会把它当作原生值再叠加一次。
+        restoreProperty(insetProperty);
+        insetProperty = null;
+        if (navigation) navigation.destroy();
+        navigation = null;
+    }
+
+    // 先通知旧实例再登记自己的监听，不会收到自己发出的事件。
+    document.dispatchEvent(new Event(TAKEOVER_EVENT));
+    document.addEventListener(TAKEOVER_EVENT, retire, { signal: listenerControl.signal });
 
     // ---- 设置与协议 ----
 

@@ -19,6 +19,10 @@
     // 跳到已卸载的消息：滚到记录位置后等待站点挂载，最多重试几次。
     const RELOCATE_MS = 250;
     const RELOCATE_TRIES = 4;
+    // 跳转后网站可能在开头载入更早的消息，使内容整体位移；此时间内内容高度变化后按目标重新对齐。
+    const SETTLE_MS = 5000;
+    // 不支持 scrollend 时，以此时间视为平滑滚动已结束。
+    const SETTLE_FALLBACK_MS = 1000;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     // rAF 在后台标签页与无头环境中可能暂停；以短定时器兜底，二者先到者执行一次。
@@ -81,6 +85,7 @@
         let start = 0;
         let measured = null;
         let pending = null;
+        let settle = null;
         let path = location.pathname;
         let scrollRoot = null;
         let bounds = null;
@@ -216,6 +221,7 @@
             start = 0;
             measured = null;
             pending = null;
+            clearSettle();
         }
 
         // ---- 显示窗口：当前位置附近最多 MAX_VISIBLE 条 ----
@@ -338,6 +344,7 @@
 
         older.addEventListener('click', () => {
             if (!scrollRoot) return;
+            clearPending();
             scrollRoot.scrollTo({ top: scrollRange()[0], behavior: reducedMotion.matches ? 'auto' : 'smooth' });
         });
 
@@ -357,6 +364,7 @@
             clearPending();
             if (turn.element && turn.element.isConnected) {
                 scrollToElement(turn.element, reducedMotion.matches ? 'auto' : 'smooth');
+                settleOn(turn.element);
                 setActive(index);
                 return;
             }
@@ -373,6 +381,39 @@
         function clearPending() {
             if (pending) clearTimeout(pending.timer);
             pending = null;
+            clearSettle();
+        }
+
+        // 跳到最早几条时，站点常在开头插入更早的消息：进行中的平滑滚动仍朝旧位置结束，目标被挤走。
+        // 滚动停下后、内容高度又变化时按目标瞬时重新对齐；只在高度变化时对齐，不干扰用户随后的滚动。
+        function settleOn(element) {
+            clearSettle();
+            settle = { element, height: scrollRoot.scrollHeight, moving: true,
+                deadline: performance.now() + SETTLE_MS, fallback: setTimeout(onScrollEnd, SETTLE_FALLBACK_MS) };
+        }
+
+        function clearSettle() {
+            if (settle) clearTimeout(settle.fallback);
+            settle = null;
+        }
+
+        function onScrollEnd() {
+            if (!settle) return;
+            clearTimeout(settle.fallback);
+            settle.moving = false;
+            realign();
+        }
+
+        function realign() {
+            if (!settle || settle.moving || !scrollRoot) return;
+            if (performance.now() > settle.deadline || !settle.element.isConnected) {
+                clearSettle();
+                return;
+            }
+            if (scrollRoot.scrollHeight === settle.height) return;
+            settle.height = scrollRoot.scrollHeight;
+            const delta = settle.element.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top - topInset();
+            if (Math.abs(delta) > 2) scrollToElement(settle.element, 'auto');
         }
 
         function relocate() {
@@ -395,11 +436,12 @@
             const element = pending.entry.element;
             clearPending();
             scrollToElement(element, 'auto');
+            settleOn(element);
         }
 
         // 用户自己滚动或操作时放弃未完成的重新定位。
         function cancelRelocation(event) {
-            if (pending && !rail.contains(event.target)) clearPending();
+            if ((pending || settle) && !rail.contains(event.target)) clearPending();
         }
 
         // ---- 预览 ----
@@ -539,6 +581,7 @@
             if (next === scrollRoot) return;
             if (scrollRoot) {
                 scrollRoot.removeEventListener('scroll', queueActive);
+                scrollRoot.removeEventListener('scrollend', onScrollEnd);
                 CANCEL_EVENTS.forEach(type => scrollRoot.removeEventListener(type, cancelRelocation, true));
             }
             scrollRoot = next;
@@ -549,6 +592,7 @@
             olderTimer = null;
             if (scrollRoot) {
                 scrollRoot.addEventListener('scroll', queueActive, { passive: true });
+                scrollRoot.addEventListener('scrollend', onScrollEnd, { passive: true });
                 CANCEL_EVENTS.forEach(type => scrollRoot.addEventListener(type, cancelRelocation, { capture: true, passive: true }));
             }
         }
@@ -613,6 +657,7 @@
             layout();
             updateActive();
             resolvePending();
+            realign();
         }
 
         function hide() {

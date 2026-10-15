@@ -1,8 +1,35 @@
 # Changelog
 
-All notable changes to Wider Gemini are documented in this file.
+All notable changes to Roomy (formerly Wider Gemini) are documented in this file.
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
+
+## 3.0.0 (2026-10-15)
+
+Wider Gemini is now **Roomy**, and it works on ChatGPT as well as Gemini. The extension ID, saved Gemini settings and store reviews are unchanged. ChatGPT access is optional: updating from 2.8.0 adds no permission warning, and Chrome asks for ChatGPT access only after you click **Allow ChatGPT access** in the popup.
+
+### Features
+
+- ChatGPT support: conversation and input width, font size, reading density, manual line height and paragraph spacing, full-width user messages, and task presets (Long reading, Wide for tables and code, Large text). Each site keeps its own width, limits, presets, reading settings and one-step Restore.
+- Gemini / ChatGPT tabs in the popup, with an Enable switch for each site that pauses every effect while keeping all settings.
+- Message navigation on Gemini and ChatGPT: a thin column of ticks beside the conversation jumps to your messages, with previews and keyboard controls. Long conversations show at most 20 ticks around the current message.
+- After a new install, the popup opens once from the toolbar to offer ChatGPT access. Updates from 2.x open nothing and show a **NEW** badge on the toolbar icon until the popup is next opened. Until access is granted, the popup's ChatGPT tab shows a dot and keeps the button.
+
+### Changes
+
+- Renamed to Roomy. The store title is “Roomy: Wide Mode for Gemini & ChatGPT”, translated for each interface language. The popup and help page now show the extension icon.
+- The popup reports when an open page still runs an older extension version instead of reloading it.
+
+### Fixes
+
+- ChatGPT width and reading support follows its new message structure, works when signed out, and leaves ChatGPT's code-wrap buttons, formulas, message toolbars and composer unchanged.
+- Gemini keeps code-block and table line heights proportional at every font size and density; inline code follows the surrounding text.
+- Gemini keeps a text prompt's navigation preview while the prompt is being edited.
+- Text measurements for reading settings run only when a font size or spacing setting is in use, so default settings add no per-message work.
+- Gemini navigation stays reachable in narrow windows with widening turned off.
+- The help page's description of the settings report now lists everything the report contains.
+
+See [the compatibility record](./docs/compatibility.md) for the flows verified for this release.
 
 ## 3.0.0-rc.2 (2026-10-02)
 

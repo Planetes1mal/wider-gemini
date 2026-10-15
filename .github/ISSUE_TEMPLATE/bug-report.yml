@@ -25,7 +25,7 @@ body:
     attributes:
       label: Versions / 环境版本
       description: Extension version, browser version, and OS.
-      placeholder: Wider Gemini 2.x.x; Chrome xxx; Windows / macOS / Linux
+      placeholder: Roomy 3.x.x; Chrome xxx; Windows / macOS / Linux
     validations:
       required: true
   - type: dropdown

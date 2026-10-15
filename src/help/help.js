@@ -131,7 +131,7 @@
     async function init() {
         if (!isExtensionContextValid()) {
             generateButton.disabled = true;
-            status.textContent = 'Open this help page from the Wider Gemini extension to generate a settings report.';
+            status.textContent = 'Open this help page from the Roomy extension to generate a settings report.';
             return;
         }
         const manifest = chrome.runtime.getManifest();

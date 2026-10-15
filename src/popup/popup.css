@@ -108,6 +108,19 @@ html:lang(zh-TW) body {
     font-weight: 600;
 }
 
+/* 未授权 ChatGPT 时，站点标签上的小圆点提示。 */
+.site-attention {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.site-attention[hidden] {
+    display: none;
+}
+
 /* 站点总开关：紧贴站点标签的一行，不做卡片；状态点与开关表达启用/暂停。 */
 .site-power {
     display: flex;
@@ -173,7 +186,7 @@ html:lang(zh-TW) body {
 }
 
 .permission-card p {
-    margin: 8px 0 0;
+    margin: 0 0 8px;
     color: var(--muted);
     font-size: 12px;
     line-height: 1.5;
@@ -207,16 +220,9 @@ html:lang(zh-TW) body {
 
 .header-icon {
     grid-area: icon;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    background: var(--accent);
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 800;
 }
 
 h1 {

@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wider Gemini</title>
+    <title>Roomy</title>
     <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
     <div class="container">
         <header class="header">
-            <div class="header-icon" aria-hidden="true">WG</div>
-            <h1 id="i18n-appName">Wider Gemini</h1>
+            <img class="header-icon" src="../../icons/icon48.png" width="36" height="36" alt="">
+            <h1 id="i18n-brandName">Roomy</h1>
             <p class="header-subtitle" id="i18n-headerSubtitle">让对话界面更宽更舒适</p>
         </header>
 
@@ -24,11 +24,13 @@
                 </button>
                 <button type="button" id="siteChatgptBtn" class="site-btn" data-site="chatgpt" aria-pressed="false">
                     ChatGPT <span class="site-current" hidden>Current</span>
+                    <span class="site-attention" id="chatgptAttention" hidden><span class="visually-hidden"
+                            id="chatgptAttentionLabel">Access needed</span></span>
                 </button>
             </div>
             <section id="chatgptPermission" class="card permission-card" hidden>
-                <button type="button" id="grantChatgptPermission" class="secondary-btn">Allow ChatGPT access</button>
                 <p id="chatgptPermissionHint">ChatGPT access is optional. Allow access to apply these settings.</p>
+                <button type="button" id="grantChatgptPermission" class="secondary-btn">Allow ChatGPT access</button>
             </section>
             <div class="site-power" id="sitePower">
                 <span class="site-power-dot" aria-hidden="true"></span>

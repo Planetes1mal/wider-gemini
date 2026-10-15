@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="helpPageTitle">Wider Gemini · Help</title>
+    <title data-i18n="helpPageTitle">Roomy · Help</title>
     <link rel="stylesheet" href="help.css">
     <script src="../shared/settings-utils.js" defer></script>
     <script src="help.js" defer></script>
@@ -13,16 +13,16 @@
 <body>
     <main class="container">
         <header class="header">
-            <span class="header-icon" aria-hidden="true">WG</span>
+            <img class="header-icon" src="../../icons/icon48.png" width="48" height="48" alt="">
             <div>
-                <p class="brand">Wider Gemini <span id="extensionVersion" class="version"></span></p>
+                <p class="brand"><span data-i18n="brandName">Roomy</span> <span id="extensionVersion" class="version"></span></p>
                 <h1 data-i18n="helpTitle">Help & feedback</h1>
             </div>
         </header>
 
         <section class="card" aria-labelledby="gettingStartedTitle">
             <h2 id="gettingStartedTitle" data-i18n="helpGettingStarted">Make Gemini and ChatGPT fit your screen</h2>
-            <p data-i18n="helpOpenPopup">Open Gemini or ChatGPT, then click the Wider Gemini toolbar icon. Choose the site tab to adjust its settings.</p>
+            <p data-i18n="helpOpenPopup">Open Gemini or ChatGPT, then click the Roomy toolbar icon. Choose the site tab to adjust its settings.</p>
             <p data-i18n="helpSiteAccess">Gemini access is required. ChatGPT access is optional: select ChatGPT and allow access in the popup.</p>
             <dl class="instructions">
                 <div>
@@ -51,7 +51,7 @@
         <section class="card" aria-labelledby="troubleshootingTitle">
             <h2 id="troubleshootingTitle" data-i18n="helpTroubleshooting">Something looks wrong?</h2>
             <ol class="troubleshooting">
-                <li data-i18n="helpTroubleshootPage">Check that you are on gemini.google.com or chatgpt.com and Wider Gemini has access to that site. Chrome-installed site app windows use the same webpages. Native desktop apps and Chrome's built-in Gemini panel are not supported.</li>
+                <li data-i18n="helpTroubleshootPage">Check that you are on gemini.google.com or chatgpt.com and Roomy has access to that site. Chrome-installed site app windows use the same webpages. Native desktop apps and Chrome's built-in Gemini panel are not supported.</li>
                 <li data-i18n="helpTroubleshootRefresh">If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the Enable switch below the site tabs to pause everything on a site; saved settings are kept.</li>
                 <li data-i18n="helpTroubleshootReport">If the problem continues, note the site, steps to reproduce it, and your window size. A screenshot with private content removed can help; mention any other extensions that change the page layout.</li>
             </ol>
@@ -61,7 +61,7 @@
 
         <section class="card" aria-labelledby="diagnosticsTitle">
             <h2 id="diagnosticsTitle" data-i18n="helpDiagnosticsTitle">Settings report</h2>
-            <p id="diagnosticPrivacy" data-i18n="helpDiagnosticsPrivacy">Generate a report to preview before sharing it in an issue. It includes only the extension version, browser major version, platform, Gemini layout settings, and ChatGPT width settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically.</p>
+            <p id="diagnosticPrivacy" data-i18n="helpDiagnosticsPrivacy">Generate a report to preview before sharing it in an issue. It includes only the extension version, browser name and major version, platform, interface language, each site's Enable switch, Gemini layout settings, and ChatGPT width and reading settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically.</p>
             <div class="actions">
                 <button type="button" id="generateReport" class="button primary"
                     data-i18n="helpGenerateReport">Generate report</button>
@@ -77,7 +77,7 @@
         </section>
 
         <footer class="footer">
-            <p data-i18n="helpSupportProject">If Wider Gemini helps you, you can star the project or leave an honest review.</p>
+            <p data-i18n="helpSupportProject">If Roomy helps you, you can star the project or leave an honest review.</p>
             <nav class="footer-links">
                 <a href="https://github.com/Planetes1mal/wider-gemini" target="_blank" rel="noopener noreferrer"
                     data-i18n="helpGitHubLink">Source code & Star on GitHub</a>

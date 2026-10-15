@@ -36,7 +36,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
-          name: Wider Gemini ${{ github.ref_name }}
+          name: Roomy ${{ github.ref_name }}
           body_path: release_body.md
           files: wider-gemini-${{ steps.package.outputs.version }}.zip
           fail_on_unmatched_files: true

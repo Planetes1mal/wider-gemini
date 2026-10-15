@@ -1,4 +1,4 @@
-# Contributing to Wider Gemini
+# Contributing to Roomy (formerly Wider Gemini)
 
 Bug reports, translations, and focused fixes are welcome. Start with a reproducible problem or a small improvement to an existing feature. For a larger feature, open an issue describing the user task before implementing it.
 

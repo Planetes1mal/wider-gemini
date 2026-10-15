@@ -1,6 +1,9 @@
 {
   "appName": {
-    "message": "Wider Gemini"
+    "message": "Roomy：Gemini と ChatGPT をワイド表示"
+  },
+  "brandName": {
+    "message": "Roomy"
   },
   "appDesc": {
     "message": "Gemini と ChatGPT の会話エリアを個別に広げ、サイトごとに文字サイズと文章の密度を調整。いつでも一時停止できます。"
@@ -118,7 +121,7 @@
     "message": "GitHub · ソースコード"
   },
   "helpPageTitle": {
-    "message": "Wider Gemini · ヘルプ"
+    "message": "Roomy · ヘルプ"
   },
   "helpTitle": {
     "message": "ヘルプ・フィードバック"
@@ -127,7 +130,7 @@
     "message": "Gemini と ChatGPT を画面に合わせる"
   },
   "helpOpenPopup": {
-    "message": "Gemini または ChatGPT を開き、ツールバーの Wider Gemini アイコンをクリックします。上部のサイトボタンで調整するサイトを選びます。"
+    "message": "Gemini または ChatGPT を開き、ツールバーの Roomy アイコンをクリックします。上部のサイトボタンで調整するサイトを選びます。"
   },
   "helpWidthTitle": {
     "message": "会話の幅"
@@ -157,7 +160,7 @@
     "message": "表示がおかしいときは"
   },
   "helpTroubleshootPage": {
-    "message": "gemini.google.com または chatgpt.com を開いていて、Wider Gemini が有効で、そのサイトへのアクセスが許可されているか確認してください。Chrome からインストールしたウェブアプリ（PWA）は同じウェブページを使用します。ネイティブのデスクトップアプリや Chrome 内蔵の Gemini パネルには対応していません。"
+    "message": "gemini.google.com または chatgpt.com を開いていて、Roomy が有効で、そのサイトへのアクセスが許可されているか確認してください。Chrome からインストールしたウェブアプリ（PWA）は同じウェブページを使用します。ネイティブのデスクトップアプリや Chrome 内蔵の Gemini パネルには対応していません。"
   },
   "helpTroubleshootRefresh": {
     "message": "インストールや更新後に設定が反映されない場合は、対象のページを一度再読み込みしてください。古いバージョンが動作していると表示された場合は、先に chrome://extensions で拡張機能を再読み込みします。レイアウト未対応の通知が表示された場合、現在のページには幅の拡張が適用されません。サイトタブの下にある「有効にする」スイッチで、そのサイトのすべての効果を一時停止できます。保存した設定は残ります。"
@@ -172,7 +175,7 @@
     "message": "設定レポート"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "レポートを生成し、内容を確認してから、問題の報告に添付するかを選べます。含まれるのは、拡張機能のバージョン、ブラウザのメジャーバージョン、プラットフォーム、Gemini のレイアウト設定、ChatGPT の幅の設定のみです。会話、ページの URL、タイトル、独自のプリセット名は含みません。自動送信は行いません。"
+    "message": "レポートを生成し、内容を確認してから、問題の報告に添付するかを選べます。含まれるのは、拡張機能のバージョン、ブラウザの名前とメジャーバージョン、プラットフォーム、表示言語、サイトごとの有効化スイッチ、Gemini のレイアウト設定、ChatGPT の幅と文字の設定のみです。会話、ページの URL、タイトル、独自のプリセット名は含みません。自動送信は行いません。"
   },
   "helpGenerateReport": {
     "message": "レポートを生成"
@@ -184,7 +187,7 @@
     "message": "レポートをコピー"
   },
   "helpSupportProject": {
-    "message": "Wider Gemini が役立ったら、プロジェクトに Star を付けたり、率直なレビューを投稿したりしていただけるとうれしいです。"
+    "message": "Roomy が役立ったら、プロジェクトに Star を付けたり、率直なレビューを投稿したりしていただけるとうれしいです。"
   },
   "helpGitHubLink": {
     "message": "ソースコード・GitHub で Star"
@@ -274,7 +277,7 @@
     "message": "{site}で有効にする"
   },
   "siteEnabledA11y": {
-    "message": "{site}で Wider Gemini を有効にする"
+    "message": "{site}で Roomy を有効にする"
   },
   "widthEnabledSite": {
     "message": "{site}の会話幅を広げる"
@@ -338,6 +341,15 @@
   },
   "chatgptPermissionFailed": {
     "message": "アクセスを要求できませんでした。もう一度お試しください。"
+  },
+  "chatgptIntroHint": {
+    "message": "ChatGPT にも対応しました。アクセスを許可すると、ChatGPT の会話を広げて文字を調整できます。"
+  },
+  "chatgptAccessNeeded": {
+    "message": "アクセス許可が必要"
+  },
+  "badgeNew": {
+    "message": "NEW"
   },
   "helpSiteAccess": {
     "message": "Gemini へのアクセスは必須です。ChatGPT へのアクセスは任意です。ポップアップで ChatGPT を選び、アクセスを許可してください。"

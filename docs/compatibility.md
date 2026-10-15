@@ -1,5 +1,65 @@
 # Compatibility record
 
+## Rename to Roomy and stable 3.0.0 packaging — October 15, 2026
+
+Working tree on `chatgpt-width-support`, baseline **`891aa14`**. `version_name` was removed, so the manifest is the stable **`3.0.0`**. The extension is renamed **Roomy**: each locale's `appName` is the localized store title (English: *Roomy: Wide Mode for Gemini & ChatGPT*), and a new `brandName` (“Roomy”) is the manifest `short_name` and the popup/help heading. The popup and help page show the packaged 48px icon instead of the “WG” text tile. Internal identifiers, storage keys, the repository name and the `wider-gemini-*.zip` package name are unchanged.
+
+- The full `node scripts/test.js` suite passed, including **15 packaging checks**. `scripts/package.ps1 -Tag v3.0.0` built a non-prerelease `wider-gemini-3.0.0.zip` and extracted the new `## 3.0.0` changelog section as release notes.
+- `tests/e2e/package-load.js` loaded the extracted ZIP in headless Chrome 155 (macOS): version `3.0.0`, name *Roomy: Wide Mode for Gemini & ChatGPT*, popup width 400px with styles, and the popup's help link loaded `v3.0.0` with its shared helper and stylesheet.
+- In the local popup/help harness, Simplified Chinese and Japanese showed “Roomy”, the icon, the renamed Enable-switch label and the corrected settings-report description, with no JavaScript errors and no remaining “Wider Gemini” text.
+
+Not covered: localized extension names as shown by Chrome in each browser UI language, and the Chrome Web Store listing itself.
+
+## Optional ChatGPT access with a toolbar prompt — October 15, 2026
+
+Working tree on `chatgpt-width-support`, baseline **`891aa14`**, version **`3.0.0-rc.2`** unchanged. This **supersedes the required-access change below**, which was reverted before any commit: requiring `chatgpt.com` would have disabled the extension for existing 2.8.0 users until they accepted the new warning. ChatGPT is again an optional host permission (the `891aa14` design). A one-time welcome tab was tried next and removed after the user's review because opening a page felt intrusive.
+
+Chrome only accepts `chrome.permissions.request` from a user gesture, so the permission prompt cannot appear by itself. Chrome's toolbar host-access requests (`permissions.addHostAccessRequest`, Chrome 133+) accept optional hosts, but Chromium creates their toolbar button only when `ExtensionsMenuAccessControl` is enabled, which is off by default on desktop. The shipped flow therefore is: a new install sets `chatgptIntroPending`, shows a **NEW** badge and calls `chrome.action.openPopup()`; an update from a version before 3.0 sets only the flag and badge. The popup clears both on opening and, for that opening, shows the grant card on either site tab. Afterwards the card stays on the ChatGPT tab, with a dot on the tab, until access is granted.
+
+Verification completed:
+
+- The full `node scripts/test.js` suite passed, including **15 packaging checks** with the previously verified temporary PowerShell 7.6.7 runtime. Background cases cover the badge-only update from 2.8.0, badge restoration on startup, clearing on grant, no notice when already granted or for 3.x/browser updates, the install popup, and a failed `openPopup` that keeps the badge and still restores scripts. The test also checks that the worker and popup use the same storage key.
+- Headless Chrome 155 (local macOS install) loaded `main` 2.8.0 unpacked, saved width 1350px, font size 120% and code wrap, then had its files replaced with this working tree and was loaded again from the same path. `getPermissionWarningsByManifest` returned the same single warning for both manifests: *Read and change your data on gemini.google.com*. After the update the extension stayed enabled, kept all three values, opened **no** page, showed badge `NEW` and stored the flag. The first popup opening showed the new-ChatGPT card on the Gemini tab and cleared the badge and flag; the second opening showed the card only on the ChatGPT tab, with the ordinary hint, and the tab dot remained. Loading the same version again showed no badge. A separate fresh install opened the extension popup by itself, with the card visible and its button enabled.
+- Real popup files ran in a local harness with stubbed permissions, storage and badge APIs. Simplified Chinese and Spanish layouts fit without horizontal overflow; granting hid both the card and the dot; no JavaScript errors were recorded.
+
+Not covered: Chrome's real permission prompt (headless runs cannot accept it), how the install popup interacts with Chrome's own “extension added” bubble in a visible window, a Chrome Web Store–signed update, and live ChatGPT injection after granting. Headless `chrome.runtime.reload()` unloaded the debug-loaded extension, so updates were simulated with `Extensions.loadUnpacked` on the same path. No release, version bump, tag, commit or push was made.
+
+## Required site access and removal of the popup grant — October 15, 2026
+
+> Superseded by the optional-access entry above; these changes were reverted before commit.
+
+Working tree on `chatgpt-width-support`, baseline **`891aa14`**, version **`3.0.0-rc.2`** unchanged. At the user's request, both Gemini and ChatGPT now use required host permissions and manifest-declared content scripts. The popup grant card, permission API calls and three unused translation keys were removed; `activeTab` is no longer requested. The install/update handler removes the old candidate's persistent `wider-chatgpt` registration before restoring missing scripts. This supersedes the optional-permission design tested earlier below.
+
+Verification completed:
+
+- The updated background test failed against the previous manifest, then passed after the change. It runs without a permissions API and checks direct startup injection for both sites, already-loaded/discarded/unrelated tabs, per-tab failures, and cleanup of the legacy registration without deleting other registrations.
+- The full `node scripts/test.js` suite passed, including **15 packaging checks**, using a temporary official PowerShell 7.6.7 runtime whose download matched the published SHA-256. No system-wide runtime was installed.
+- The generated candidate ZIP contains **25 entries**, all byte-identical to their workspace sources. Its manifest requires both sites, declares both content-script bundles, and contains neither optional hosts nor `activeTab`; the popup contains no grant button.
+- The actual popup files ran in an IAB local harness with an in-memory Chrome API stub and **no permissions API**. ChatGPT 1200px and Gemini 800px were saved independently and sent to the correct site tab; site pause/resume worked. All six locale selections initialized with enabled controls, no grant button and no recorded JavaScript errors. The local harness preserves settings across the popup's normal language-change reload.
+- After the user reloaded the unpacked extension, new live ChatGPT and Gemini conversations automatically rendered at **1000px** without a popup grant. Each response included prose, a table and a code block. ChatGPT transcript/footer owners measured 1040px including their two 20px paddings; Gemini response and input measured 1000px. Both pages had zero horizontal overflow and retained **2560 × 1440** viewports. A temporary ChatGPT account-loading error cleared after reopening its canonical homepage.
+
+Live evidence covers the user's reloaded unpacked extension; the popup interaction checks use mocked Chrome APIs, not a toolbar-popup capture. A fresh Chrome Web Store install/update prompt was not exercised. The permissions change, UI removal, migration and post-reload rendering were verified; no release, version bump, tag, commit or push was made. Saved screenshots exclude account/sidebar content. Ignored evidence, local popup harness and verified candidate ZIP: `.scratch/required-site-access/`.
+
+## ChatGPT permission recovery and Intelligent UI spot check — October 15, 2026
+
+Source baselines: **`891aa14`**, `chatgpt-width-support`, **`3.0.0-rc.2`**, and **`f36b6ce`**, `main`, **`2.8.0`**. The unpacked candidate was loaded from this repository, as shown in the user's extension-details screenshot. No runtime or version change was needed. This run did not compare every loaded script byte-for-byte with the checkout.
+
+The signed-in ChatGPT and Gemini tabs stayed at **2560 × 1440 CSS px**, DPR 1. Saved local evidence omits account details, private sidebar content and conversation identifiers. The ChatGPT component screenshot is cropped to the conversation pane.
+
+| Check | Observed result and scope |
+| --- | --- |
+| ChatGPT before permission | No width activation class or marked width owners; assistant content was 768px. The existing transcript/footer selectors, shared scroll ancestor and native width-variable chain still matched the live page. |
+| User grants ChatGPT access | The user clicked **Allow ChatGPT access** in the extension popup. The existing page immediately acquired the activation class and two width owners: 1040px including 20px padding on each side, giving 1000px content. Reload retained the same result. This establishes recovery from missing permission, not an Intelligent UI selector repair. |
+| Intelligent UI example | The user-selected example rendered its DIL component root at 1000px, with a 932px chart and no page horizontal overflow. Actual radio clicks changed the course, an arrow key changed the slider from 10 to 11, and checking one task changed completion from 0% to 33%. Controls were restored to the initial course, 10 hours and no checked tasks. This covers the supplied example at default reading settings. |
+| Candidate Gemini, live | A synthetic two-turn conversation contained prose, a heading, an eight-column table, long code and a list. Both response bodies and the composer measured 1000px; page horizontal overflow was zero. Wide table/code content retained inner scrolling. Reload retained width and a single two-button navigation rail; both button centers were hit-testable, and clicking the first aligned its message 16px below the scroll-root top. |
+| Both branches, local checks | Each branch passed the four unit scripts selected by `node scripts/test.js --skip-packaging`. Each branch also passed its existing 73 Gemini width scenarios, including protected overlays. The candidate passed the existing ChatGPT reading assertions. |
+
+Browser fixtures used the real branch CSS/JS with mocked Chrome APIs. An ignored adapter generated the existing HTML fixtures, opened them through the supported IAB interface, and replayed their browser measurements through the original assertions; the headless Chrome launcher was not run. The final main Gemini and ChatGPT reading fixtures used 2560 × 1440; the candidate Gemini fixture used its separate test tab's default 1280 × 720. The first ChatGPT fixture run at 1280px failed the overflow assertion because its test scroll container is fixed at 1600px; rerunning at 2560px passed without changing source or assertions.
+
+Limits: **main 2.8.0 was not installed/swapped into the live Gemini tab**, so its live-site acceptance remains unverified. Other Intelligent UI widgets, non-default reading settings on those widgets, Dots/Page/Canvas, uploads, and browser restart persistence were not tested. The initial Gemini document contained three overlapping navigation rails; a page reload removed the extra rails. Their origin was not established, and no runtime fix is claimed for that observation.
+
+The browser tool blocked `chrome://extensions/`; the user performed the permission action in the normal extension popup. The usage instructions now put this prerequisite before the width controls. No commit, release, tag or push was made. Ignored local evidence and fixture adapter: `.scratch/compatibility-20261015/`.
+
 ## Optional ChatGPT permission and Gemini fixed line heights — October 4, 2026
 
 Baseline HEAD **`e8368de`**, `chatgpt-width-support`; **`3.0.0-rc.2`** unchanged.

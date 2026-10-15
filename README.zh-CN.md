@@ -1,20 +1,20 @@
 [English](./README.md) | 简体中文 | [繁體中文](./docs/i18n/README.zh-TW.md)
 
-# Wider Gemini
+# Roomy
+
+原名 **Wider Gemini**。
 
 一个用来调整 Gemini 和 ChatGPT 对话宽度与阅读排版的 Chrome 扩展。两个网站分别记住各自的设置。
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-安装-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)
-[![内部候选版 3.0.0-rc.2](https://img.shields.io/badge/internal-3.0.0--rc.2-orange)](./CHANGELOG.md)
+[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v3.0.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-同一段完整的 Gemini 对话、同样的窗口大小：使用 Wider Gemini 将对话宽度分别设为 700px 和 1200px。
+同一段完整的 Gemini 对话、同样的窗口大小：使用 Roomy 将对话宽度分别设为 700px 和 1200px。
 
 ![700px 宽度的完整 Gemini 对话页面](./docs/images/conversation-before.png)
 
 ![1200px 宽度的同一完整 Gemini 对话页面](./docs/images/conversation-after.png)
-
-此分支为内部候选版 **3.0.0-rc.2**，包含 ChatGPT 宽度与阅读支持、消息导航、按网站启用的总开关和带站点标签的新弹窗。本候选版通过 `chatgpt-width-support` 分支提供，不创建版本 tag 或 GitHub Release。需要手动安装；最新导航改动仍待已登录页面复查。
 
 ## 功能
 
@@ -31,25 +31,29 @@
 
 ## 安装
 
-使用 **3.0.0-rc.2** 请按下方步骤手动安装。[Chrome 应用商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)和 [GitHub 正式版](https://github.com/Planetes1mal/wider-gemini/releases)是独立的分发渠道，从那里安装不会获得这个内部候选版。
+在 [Chrome 应用商店](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)点击 **添加至 Chrome** 即可安装。已经在用 Wider Gemini 的话，Chrome 会自动更新为 Roomy，并保留你的设置。
+
+GitHub 版本与 Chrome 应用商店的更新时间可能不同。若要使用 3.0.0，请按下方方式安装对应的 GitHub 正式版。
 
 <details>
 <summary>手动安装</summary>
 
-1. 检出 `chatgpt-width-support` 分支，或在 GitHub 的 **Code → Download ZIP** 菜单下载该分支的源码 ZIP 并解压。
-2. 保留完整文件夹，确认其中包含 `manifest.json`、`src/`、`_locales/` 和 `icons/`。
+1. 到 [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases) 下载最新正式版的 `wider-gemini-*.zip`。
+2. 解压到一个固定位置，确认文件夹里有 `manifest.json`。
 3. 打开 `chrome://extensions/`，开启右上角的 **开发者模式**。
 4. 点击 **加载已解压的扩展程序**，选择刚才解压的文件夹。
 
-更新手动安装的候选版时，需要替换文件并重新加载扩展。Chrome 比较的是数字版本（`3.0.0`），因此后续候选版和最终 `3.0.0` 正式版也需要手动替换、重新加载。
+若曾手动安装 3.0.0 候选版，请替换文件并重新加载扩展，以使用正式版；候选版不会自动升级为此版本。
 
 </details>
 
 ## 使用
 
-1. 打开 [Gemini](https://gemini.google.com/) 或 [ChatGPT](https://chatgpt.com/)，点击浏览器工具栏里的 Wider Gemini 图标。
+1. 打开 [Gemini](https://gemini.google.com/) 或 [ChatGPT](https://chatgpt.com/)，点击浏览器工具栏里的 Roomy 图标。
 2. 选择站点标签和 `px` 或 `%`，拖动宽度滑块，也可以直接点一个预设。
 3. 在 Gemini 标签中，展开 **阅读与排版** 还可以调整字号、阅读密度，或开启代码自动换行。
+
+新安装后，弹窗会从工具栏图标处自动打开一次。点击其中的 **允许访问 ChatGPT** 并在 Chrome 的提示中确认，即可启用 ChatGPT。从 3.0 之前的版本更新时不会弹出任何内容，只在工具栏图标上显示“新”角标，下次打开弹窗后消失。授权之前，弹窗的 ChatGPT 标签会显示一个小圆点，并保留同一个按钮。
 
 展开 **范围与预设** 可以调整宽度范围和 **管理预设**；每个网站的 `px` 和 `%` 各有一组独立预设。界面语言在弹窗底部切换。
 
@@ -59,7 +63,7 @@
 
 ## 隐私
 
-扩展申请 `gemini.google.com` 和 `chatgpt.com` 的访问权限来调整页面样式，使用 `storage` 保存偏好、`scripting` 补注入未加载的内容脚本。不收集或上传对话内容，也没有统计或追踪服务。
+Gemini 访问权限为必需。ChatGPT 访问权限为可选：只有在弹窗中点击 **允许访问 ChatGPT** 后，Chrome 才会请求授权。扩展使用 `activeTab` 在打开工具栏弹窗时识别当前网站，使用 `storage` 保存偏好、`scripting` 注册并补注入内容脚本。不收集或上传对话内容，也没有统计或追踪服务。
 
 偏好设置通过 Chrome 的扩展存储保存；是否跨设备同步取决于你的浏览器同步设置。详见[隐私说明](./docs/PRIVACY.md)。
 
@@ -81,7 +85,7 @@ git clone https://github.com/Planetes1mal/wider-gemini.git
 
 遇到问题，可在弹窗的 **帮助与反馈** 中复制诊断设置，并附上操作步骤提交 [Issue](https://github.com/Planetes1mal/wider-gemini/issues/new/choose)。分享截图前请移除私人信息。欢迎提交 Pull Request。
 
-如果 Wider Gemini 对你有帮助，可以在 GitHub 点一个 Star，让更多人发现它。
+如果 Roomy 对你有帮助，可以在 GitHub 点一个 Star，让更多人发现它。
 
 Star 完全自愿。想接收版本通知，请使用仓库的 **Watch → Custom → Releases** 设置，参见 [GitHub 通知说明](https://docs.github.com/en/subscriptions-and-notifications/get-started/configuring-notifications)。
 

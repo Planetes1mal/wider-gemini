@@ -32,7 +32,7 @@ function loadLanguageDictionary(language) {
 function localizeHtmlPage() {
     document.documentElement.lang = t('localeCode', 'en');
     const ids = [
-        "appName", "headerSubtitle", "widthLabel", "widthMin", "widthMax",
+        "brandName", "headerSubtitle", "widthLabel", "widthMin", "widthMax",
         "btnNarrow", "btnDefault", "btnWider", "btnUltra", "btnInsane",
         "editPresets", "donePresets", "cancelPresets", "managePresets", "managePresetsSummary", "resetToDefault",
         "codeWrapLabel", "refreshing",
@@ -310,7 +310,10 @@ const siteStatus = document.getElementById('siteStatus');
 const siteButtons = [document.getElementById('siteGeminiBtn'), document.getElementById('siteChatgptBtn')];
 const chatgptPermission = document.getElementById('chatgptPermission');
 const grantChatgptPermission = document.getElementById('grantChatgptPermission');
+const chatgptAttention = document.getElementById('chatgptAttention');
 let chatgptGranted = false;
+// 新装或从 3.0 之前更新后首次打开弹窗：本次在任一站点标签上都显示 ChatGPT 授权提示。
+let chatgptIntro = false;
 
 let taskBusy = false;
 let settingsLoaded = false;
@@ -581,7 +584,7 @@ function applyEnabledUi() {
     siteEnabledToggle.checked = enabled;
     siteEnabledLabel.textContent = t('siteEnabled', 'Enable on {site}').replace('{site}', siteName);
     siteEnabledToggle.setAttribute('aria-label',
-        t('siteEnabledA11y', 'Enable Wider Gemini on {site}').replace('{site}', siteName));
+        t('siteEnabledA11y', 'Enable Roomy on {site}').replace('{site}', siteName));
     sitePower.classList.toggle('is-paused', !enabled);
     sitePowerState.textContent = t('sitePaused', 'Paused');
     sitePowerState.hidden = enabled;
@@ -693,10 +696,24 @@ function renderSite() {
 }
 
 function renderPermission() {
-    chatgptPermission.hidden = selectedSite !== 'chatgpt' || chatgptGranted;
+    const intro = chatgptIntro && !chatgptGranted;
+    chatgptPermission.hidden = chatgptGranted || (selectedSite !== 'chatgpt' && !intro);
+    chatgptAttention.hidden = chatgptGranted;
+    document.getElementById('chatgptAttentionLabel').textContent = t('chatgptAccessNeeded', 'Access needed');
     grantChatgptPermission.textContent = t('grantChatgptPermission', 'Allow ChatGPT access');
-    document.getElementById('chatgptPermissionHint').textContent = t('chatgptPermissionHint',
-        'ChatGPT access is optional. Allow access to apply these settings.');
+    document.getElementById('chatgptPermissionHint').textContent = intro
+        ? t('chatgptIntroHint', 'New: ChatGPT is supported too. Allow access to widen its conversations and adjust their text.')
+        : t('chatgptPermissionHint', 'ChatGPT access is optional. Allow access to apply these settings.');
+}
+
+// 读取后立即清除标记和工具栏角标：提示只在这次打开时出现，之后保留 ChatGPT 标签上的入口。
+async function takeChatgptIntro() {
+    const key = settingsUtils.CHATGPT_INTRO_KEY;
+    const stored = await chrome.storage.local.get(key).catch(() => ({}));
+    if (!stored[key]) return false;
+    await chrome.storage.local.remove(key).catch(() => {});
+    await chrome.action.setBadgeText({ text: '' }).catch(() => {});
+    return true;
 }
 
 async function refreshPermission() {
@@ -874,15 +891,17 @@ async function loadTaskUndo(site, localValues) {
 async function initializeSettings() {
     setTaskBusy(false);
     try {
-        const [result, tabs, localValues, granted] = await Promise.all([
+        const [result, tabs, localValues, granted, intro] = await Promise.all([
             chrome.storage.sync.get([...settingsUtils.getSiteStorageKeys('gemini'),
                 ...settingsUtils.getSiteStorageKeys('chatgpt'), 'uiLanguage']),
             chrome.tabs.query({ active: true, currentWindow: true }).catch(() => []),
             chrome.storage.local.get(Object.values(settingsUtils.TASK_UNDO_KEYS)).catch(() => ({})),
-            chrome.permissions.contains({ origins: [settingsUtils.SITE_MATCHES.chatgpt] })
+            chrome.permissions.contains({ origins: [settingsUtils.SITE_MATCHES.chatgpt] }),
+            takeChatgptIntro()
         ]);
         storedSettings = result;
         chatgptGranted = granted;
+        chatgptIntro = intro;
         siteSettings.gemini = settingsUtils.normalizeSiteSettings(result, 'gemini');
         siteSettings.chatgpt = settingsUtils.normalizeSiteSettings(result, 'chatgpt');
         await Promise.all(['gemini', 'chatgpt'].map(site => loadTaskUndo(site, localValues)));

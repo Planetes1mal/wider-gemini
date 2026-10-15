@@ -1,20 +1,20 @@
 English | [简体中文](./README.zh-CN.md) | [繁體中文](./docs/i18n/README.zh-TW.md)
 
-# Wider Gemini
+# Roomy
+
+Formerly **Wider Gemini**.
 
 A Chrome extension for adjusting the width and reading layout of Gemini and ChatGPT conversations. Each site remembers its own settings.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
-[![Internal candidate 3.0.0-rc.2](https://img.shields.io/badge/internal-3.0.0--rc.2-orange)](./CHANGELOG.md)
+[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v3.0.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Wider Gemini.
+The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Roomy.
 
 ![Full Gemini conversation at 700px width](./docs/images/conversation-before.png)
 
 ![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)
-
-This branch is the internal **3.0.0-rc.2** candidate, including ChatGPT width and reading support, message navigation, a per-site Enable switch, and the site-tab popup. This candidate is distributed from the `chatgpt-width-support` branch without a release tag or GitHub Release. It requires manual installation; signed-in validation of the latest navigation changes remains pending.
 
 ## Features
 
@@ -31,35 +31,39 @@ Settings are saved automatically, and changes apply to open pages for the select
 
 ## Installation
 
-For **3.0.0-rc.2**, use the manual steps below. The [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and [stable GitHub releases](https://github.com/Planetes1mal/wider-gemini/releases) are separate distribution channels; installing from them does not install this internal candidate.
+Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and click **Add to Chrome**. If you already use Wider Gemini, Chrome updates it to Roomy automatically and keeps your settings.
+
+GitHub releases and Chrome Web Store updates can follow different schedules. For version 3.0.0, use the matching GitHub release below.
 
 <details>
 <summary>Manual installation</summary>
 
-1. Check out the `chatgpt-width-support` branch, or download its source ZIP from GitHub's **Code → Download ZIP** menu and extract it.
-2. Keep the complete folder containing `manifest.json`, `src/`, `_locales/`, and `icons/`.
+1. Download `wider-gemini-*.zip` from the latest stable release on [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases).
+2. Extract it to a folder you intend to keep. Make sure the folder contains `manifest.json`.
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.
 
-To update a manually installed candidate, replace its files and reload the extension. Chrome compares the numeric version (`3.0.0`), so later candidates and the final `3.0.0` build also require manual replacement and reload.
+If you manually installed a 3.0.0 release candidate, replace its files and reload the extension to use the stable build; it will not automatically upgrade from the candidate.
 
 </details>
 
 ## Usage
 
-1. Open [Gemini](https://gemini.google.com/) or [ChatGPT](https://chatgpt.com/) and click the Wider Gemini icon in your browser toolbar.
+1. Open [Gemini](https://gemini.google.com/) or [ChatGPT](https://chatgpt.com/) and click the Roomy icon in your browser toolbar.
 2. Select the site tab, choose `px` or `%`, then move the width slider or click a preset.
 3. On Gemini, expand **Reading & typography** to adjust the font size and reading density, or turn on code wrapping as needed.
+
+After a new install, the popup opens once from the toolbar icon. Click **Allow ChatGPT access** there and confirm Chrome's prompt to turn on ChatGPT. After updating from a version before 3.0, nothing opens: a **NEW** badge appears on the toolbar icon until you next open the popup. Until access is granted, the popup's ChatGPT tab shows a dot and keeps the same button.
 
 Expand **Range & presets** for width limits and **Manage presets**. Each site and unit has its own presets. The language selector is at the bottom of the popup.
 
 On Gemini, use **Task presets** for long reading, tables, code, and large text. Preview the settings, then apply them; **Restore previous settings** restores the previous Gemini layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
 
-Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Wider Gemini targets Gemini and ChatGPT webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. See the [compatibility record](./docs/compatibility.md) for the flows actually verified.
+Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Roomy targets Gemini and ChatGPT webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. See the [compatibility record](./docs/compatibility.md) for the flows actually verified.
 
 ## Privacy
 
-Gemini access is required. ChatGPT access is optional: select ChatGPT in the popup and click **Allow ChatGPT access**. Chrome asks for permission before the extension applies to ChatGPT. The extension uses `activeTab` to identify the current site when you open the toolbar popup, `storage` for preferences, and `scripting` to register and restore content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
+Gemini access is required. ChatGPT access is optional: Chrome asks for it only after you click **Allow ChatGPT access** in the popup. The extension uses `activeTab` to identify the current site when you open the toolbar popup, `storage` for preferences, and `scripting` to register and restore content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
 
 Preferences are saved in Chrome's extension storage. Whether they sync across devices depends on your browser's sync settings. See the [privacy policy](./docs/PRIVACY.md) for details.
 
@@ -81,7 +85,7 @@ The [dated compatibility record](./docs/compatibility.md) separates verified sou
 
 If something looks wrong, open **Help & feedback** in the popup, copy the diagnostic settings, and include the steps in an [issue](https://github.com/Planetes1mal/wider-gemini/issues/new/choose). Remove private information from screenshots before sharing. Pull requests are welcome.
 
-If you find Wider Gemini useful, a GitHub star helps other people discover it.
+If you find Roomy useful, a GitHub star helps other people discover it.
 
 Stars are optional. To receive version notifications, use the repository's **Watch → Custom → Releases** setting; see [GitHub's notification guide](https://docs.github.com/en/subscriptions-and-notifications/get-started/configuring-notifications).
 

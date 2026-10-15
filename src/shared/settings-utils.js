@@ -8,6 +8,8 @@
     const CHATGPT_READING_KEY = 'chatgptReadingSettings';
     const SITE_ENABLED_KEYS = { gemini: 'geminiEnabled', chatgpt: 'chatgptEnabled' };
     const TASK_UNDO_KEYS = { gemini: 'taskPresetUndo', chatgpt: 'chatgptTaskPresetUndo' };
+    // 新装或从 3.0 之前更新后、尚未打开弹窗时为 true（chrome.storage.local），工具栏图标显示角标。
+    const CHATGPT_INTRO_KEY = 'chatgptIntroPending';
     // 消息导航按网站独立开关，不属于任务预设管理的字段。
     const NAVIGATION_KEYS = { gemini: 'geminiMessageNavigationEnabled', chatgpt: 'chatgptMessageNavigationEnabled' };
     // 内容脚本协议版本：2 起支持总开关、阅读设置刷新与细分状态。
@@ -484,6 +486,7 @@
         SITE_ENABLED_KEYS,
         NAVIGATION_KEYS,
         TASK_UNDO_KEYS,
+        CHATGPT_INTRO_KEY,
         TASK_PRESETS,
         PROTOCOL_VERSION,
         SITE_MATCHES,

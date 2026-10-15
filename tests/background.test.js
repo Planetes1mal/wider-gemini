@@ -38,6 +38,10 @@ const queries = [];
 let granted = false;
 let registered = [];
 let registrations = 0;
+const localStore = {};
+let badgeText = '';
+let popupOpens = 0;
+let popupFails = false;
 
 const sandbox = {
     console: { log() {}, error() {} },
@@ -63,6 +67,22 @@ const sandbox = {
                 addListener(listener) {
                     listeners.onInstalled = listener;
                 }
+            }
+        },
+        i18n: { getMessage: key => (key === 'badgeNew' ? 'NEW' : '') },
+        storage: {
+            local: {
+                async get(key) { return key in localStore ? { [key]: localStore[key] } : {}; },
+                async set(values) { Object.assign(localStore, values); },
+                async remove(key) { delete localStore[key]; }
+            }
+        },
+        action: {
+            async setBadgeBackgroundColor() {},
+            async setBadgeText(details) { badgeText = details.text; },
+            async openPopup() {
+                if (popupFails) throw new Error('Browser window is not active.');
+                popupOpens++;
             }
         },
         tabs: {
@@ -181,6 +201,62 @@ function typesFor(tabId) {
     assert.strictEqual(calls.length, 0);
     await listeners.onInstalled();
     assert.deepStrictEqual(typesFor(5), [], 'revoked ChatGPT access must remain native');
+    assert.strictEqual(popupOpens, 0, 'restoring scripts alone must not open the popup');
+    assert.strictEqual(badgeText, '');
+
+    // 键名与弹窗共用的常量一致。
+    const settingsSandbox = {};
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src/shared/settings-utils.js'), 'utf8'),
+        { globalThis: settingsSandbox });
+    const introKey = settingsSandbox.widerGeminiSettings.CHATGPT_INTRO_KEY;
+    assert.ok(backgroundSource.includes(`'${introKey}'`), 'background must use the shared intro key');
+
+    // 从 2.x 更新：只加角标并记下提示，不弹出任何窗口。
+    await listeners.onInstalled({ reason: 'update', previousVersion: '2.8.0' });
+    assert.strictEqual(localStore[introKey], true);
+    assert.strictEqual(badgeText, 'NEW');
+    assert.strictEqual(popupOpens, 0, 'updates must not open the popup');
+
+    // 浏览器重启后角标重新显示；授权 ChatGPT 后清除提示和角标。
+    badgeText = '';
+    await listeners.onStartup();
+    assert.strictEqual(badgeText, 'NEW');
+    granted = true;
+    await listeners.onAdded();
+    assert.ok(!(introKey in localStore));
+    assert.strictEqual(badgeText, '');
+
+    // 已授权时，新装或更新都不再提示。
+    await listeners.onInstalled({ reason: 'install' });
+    assert.strictEqual(popupOpens, 0);
+    assert.strictEqual(badgeText, '');
+    granted = false;
+    await listeners.onRemoved();
+
+    // 3.x 之间的更新、缺少旧版本号的更新和浏览器更新都不提示。
+    for (const details of [{ reason: 'update', previousVersion: '3.0.0' }, { reason: 'update', previousVersion: '3.1.2' },
+        { reason: 'update' }, { reason: 'chrome_update' }]) {
+        await listeners.onInstalled(details);
+    }
+    assert.ok(!(introKey in localStore));
+    assert.strictEqual(badgeText, '');
+
+    // 新装：从工具栏弹出扩展弹窗，同时保留角标。
+    await listeners.onInstalled({ reason: 'install' });
+    assert.strictEqual(popupOpens, 1);
+    assert.strictEqual(localStore[introKey], true);
+    assert.strictEqual(badgeText, 'NEW');
+
+    // 无法弹出（例如窗口未激活）时仍保留角标，并完成补注入。
+    delete localStore[introKey];
+    badgeText = '';
+    popupFails = true;
+    calls.length = 0;
+    await listeners.onInstalled({ reason: 'install' });
+    assert.strictEqual(popupOpens, 1);
+    assert.strictEqual(localStore[introKey], true);
+    assert.strictEqual(badgeText, 'NEW');
+    assert.deepStrictEqual(typesFor(1), ['check']);
 
     console.log('background tests passed');
 })().catch(error => {

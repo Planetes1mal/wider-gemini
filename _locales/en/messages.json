@@ -1,6 +1,9 @@
 {
   "appName": {
-    "message": "Wider Gemini"
+    "message": "Roomy: Wide Mode for Gemini & ChatGPT"
+  },
+  "brandName": {
+    "message": "Roomy"
   },
   "appDesc": {
     "message": "Widen Gemini and ChatGPT, adjust font size and reading density per site, and pause either site at any time."
@@ -118,7 +121,7 @@
     "message": "GitHub · Source"
   },
   "helpPageTitle": {
-    "message": "Wider Gemini · Help"
+    "message": "Roomy · Help"
   },
   "helpTitle": {
     "message": "Help & feedback"
@@ -127,7 +130,7 @@
     "message": "Make Gemini and ChatGPT fit your screen"
   },
   "helpOpenPopup": {
-    "message": "Open Gemini or ChatGPT, then click the Wider Gemini toolbar icon. Use the site buttons to choose which website to adjust."
+    "message": "Open Gemini or ChatGPT, then click the Roomy toolbar icon. Use the site buttons to choose which website to adjust."
   },
   "helpWidthTitle": {
     "message": "Conversation width"
@@ -157,7 +160,7 @@
     "message": "Something looks wrong?"
   },
   "helpTroubleshootPage": {
-    "message": "Check that you are on gemini.google.com or chatgpt.com and Wider Gemini is enabled with access to that site. Chrome-installed web apps (PWAs) use the same webpages. Native desktop apps and Chrome’s built-in Gemini panel are not supported."
+    "message": "Check that you are on gemini.google.com or chatgpt.com and Roomy is enabled with access to that site. Chrome-installed web apps (PWAs) use the same webpages. Native desktop apps and Chrome’s built-in Gemini panel are not supported."
   },
   "helpTroubleshootRefresh": {
     "message": "If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the Enable switch below the site tabs to pause everything on a site; saved settings are kept."
@@ -172,7 +175,7 @@
     "message": "Settings report"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser major version, platform, Gemini layout settings, and ChatGPT width settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
+    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser name and major version, platform, interface language, each site's Enable switch, Gemini layout settings, and ChatGPT width and reading settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
   },
   "helpGenerateReport": {
     "message": "Generate report"
@@ -184,7 +187,7 @@
     "message": "Copy report"
   },
   "helpSupportProject": {
-    "message": "If Wider Gemini helps you, you can star the project or leave an honest review."
+    "message": "If Roomy helps you, you can star the project or leave an honest review."
   },
   "helpGitHubLink": {
     "message": "Source code & Star on GitHub"
@@ -274,7 +277,7 @@
     "message": "Enable on {site}"
   },
   "siteEnabledA11y": {
-    "message": "Enable Wider Gemini on {site}"
+    "message": "Enable Roomy on {site}"
   },
   "widthEnabledSite": {
     "message": "Widen {site} conversations"
@@ -338,6 +341,15 @@
   },
   "chatgptPermissionFailed": {
     "message": "Could not request access. Please try again."
+  },
+  "chatgptIntroHint": {
+    "message": "New: ChatGPT is supported too. Allow access to widen its conversations and adjust their text."
+  },
+  "chatgptAccessNeeded": {
+    "message": "Access needed"
+  },
+  "badgeNew": {
+    "message": "NEW"
   },
   "helpSiteAccess": {
     "message": "Gemini access is required. ChatGPT access is optional: select ChatGPT and allow access in the popup."

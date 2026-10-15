@@ -1,6 +1,9 @@
 {
   "appName": {
-    "message": "Wider Gemini"
+    "message": "Roomy：Gemini 與 ChatGPT 寬版閱讀"
+  },
+  "brandName": {
+    "message": "Roomy"
   },
   "appDesc": {
     "message": "分別加寬 Gemini 和 ChatGPT 的對話區域，依網站調整字型大小與閱讀密度，並可隨時暫停任一網站。"
@@ -118,7 +121,7 @@
     "message": "GitHub · 原始碼"
   },
   "helpPageTitle": {
-    "message": "Wider Gemini · 說明"
+    "message": "Roomy · 說明"
   },
   "helpTitle": {
     "message": "使用說明與意見回饋"
@@ -127,7 +130,7 @@
     "message": "讓 Gemini 與 ChatGPT 適合你的螢幕"
   },
   "helpOpenPopup": {
-    "message": "開啟 Gemini 或 ChatGPT，點選工具列上的 Wider Gemini 圖示，再透過頂端的網站按鈕選擇要調整的網站。"
+    "message": "開啟 Gemini 或 ChatGPT，點選工具列上的 Roomy 圖示，再透過頂端的網站按鈕選擇要調整的網站。"
   },
   "helpWidthTitle": {
     "message": "訊息區域寬度"
@@ -157,7 +160,7 @@
     "message": "顯示不如預期？"
   },
   "helpTroubleshootPage": {
-    "message": "確認目前網站是 gemini.google.com 或 chatgpt.com，且 Wider Gemini 已啟用並獲准存取該網站。透過 Chrome 安裝的網頁應用程式（PWA）使用同一網頁。不支援原生桌面應用程式或 Chrome 內建的 Gemini 面板。"
+    "message": "確認目前網站是 gemini.google.com 或 chatgpt.com，且 Roomy 已啟用並獲准存取該網站。透過 Chrome 安裝的網頁應用程式（PWA）使用同一網頁。不支援原生桌面應用程式或 Chrome 內建的 Gemini 面板。"
   },
   "helpTroubleshootRefresh": {
     "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理對應頁面一次。若彈出視窗提示頁面仍在執行舊版，請先在 chrome://extensions 重新載入擴充功能。出現版面尚未支援的提示時，目前頁面不會套用加寬。站點分頁下方的「啟用」開關可暫停該網站的所有效果，已儲存的設定會保留。"
@@ -172,7 +175,7 @@
     "message": "設定診斷報告"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器主版本、平台、Gemini 版面設定與 ChatGPT 寬度設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
+    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器名稱與主版本、平台、介面語言、各網站的啟用開關、Gemini 版面設定，以及 ChatGPT 寬度與閱讀設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
   },
   "helpGenerateReport": {
     "message": "產生報告"
@@ -184,7 +187,7 @@
     "message": "複製報告"
   },
   "helpSupportProject": {
-    "message": "如果 Wider Gemini 對你有幫助，歡迎為專案點 Star，或留下真實的使用評價。"
+    "message": "如果 Roomy 對你有幫助，歡迎為專案點 Star，或留下真實的使用評價。"
   },
   "helpGitHubLink": {
     "message": "檢視原始碼 / 在 GitHub 點 Star"
@@ -274,7 +277,7 @@
     "message": "在 {site} 上啟用"
   },
   "siteEnabledA11y": {
-    "message": "在 {site} 上啟用 Wider Gemini"
+    "message": "在 {site} 上啟用 Roomy"
   },
   "widthEnabledSite": {
     "message": "啟用 {site} 對話加寬"
@@ -338,6 +341,15 @@
   },
   "chatgptPermissionFailed": {
     "message": "無法要求存取權限，請重試。"
+  },
+  "chatgptIntroHint": {
+    "message": "新增 ChatGPT 支援。允許存取後，即可加寬 ChatGPT 對話並調整文字。"
+  },
+  "chatgptAccessNeeded": {
+    "message": "需要授權"
+  },
+  "badgeNew": {
+    "message": "新"
   },
   "helpSiteAccess": {
     "message": "Gemini 存取權限為必要。ChatGPT 存取權限為選用：在彈出視窗選擇 ChatGPT 並允許存取。"

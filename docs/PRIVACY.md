@@ -1,8 +1,8 @@
 # Privacy Policy
 
-**Effective date:** October 4, 2026
+**Effective date:** October 15, 2026
 
-This policy describes how the **Wider Gemini** browser extension (“Extension”, “we”, “us”) handles information when you use it. It is provided in English and Chinese; both sections have the same meaning.
+This policy describes how the **Roomy** browser extension, formerly named Wider Gemini (“Extension”, “we”, “us”), handles information when you use it. It is provided in English and Chinese; both sections have the same meaning.
 
 ---
 
@@ -10,19 +10,19 @@ This policy describes how the **Wider Gemini** browser extension (“Extension�
 
 ### 1. Who we are
 
-Wider Gemini is an open-source Chrome extension that adjusts layout and styling on [Google Gemini](https://gemini.google.com/) and [ChatGPT](https://chatgpt.com/). It is distributed through the Chrome Web Store and other channels chosen by the publisher.
+Roomy (formerly Wider Gemini) is an open-source Chrome extension that adjusts layout and styling on [Google Gemini](https://gemini.google.com/) and [ChatGPT](https://chatgpt.com/). It is distributed through the Chrome Web Store and other channels chosen by the publisher.
 
 ### 2. Information the Extension processes
 
 The Extension **does not** collect, sell, or transmit your personal data, chat content, or browsing history to us or to analytics services for the Extension’s own purposes.
 
-**Local settings.** The Extension uses the browser’s extension storage API (`chrome.storage`, including sync where your browser profile supports it) only to save **your preferences**, such as each site's width, limits, and preset buttons, plus Gemini's reading and code-wrap options. That data is managed by your browser and remains under your control.
+**Local settings.** The Extension uses the browser’s extension storage API (`chrome.storage`, including sync where your browser profile supports it) only to save **your preferences**, such as each site's width, limits, preset buttons, reading settings, Enable switch and message navigation, plus Gemini's code-wrap option and your interface language. That data is managed by your browser and remains under your control.
 
-Applying a Gemini task preset also saves one previous Gemini layout in device-local extension storage (`chrome.storage.local`) so you can restore it after reopening the popup. This snapshot contains layout preferences only, is replaced by the next task-preset application, and is removed when restored. It does not contain conversation content or sync as part of this undo feature.
+Applying a task preset on Gemini or ChatGPT also saves that site's previous layout in device-local extension storage (`chrome.storage.local`) so you can restore it after reopening the popup. Each site keeps one snapshot, which contains layout preferences only, is replaced by the next task-preset application on that site, and is removed when restored. It does not contain conversation content or sync as part of this undo feature. After installing or updating, the Extension also stores a single on/off flag in `chrome.storage.local` so that the ChatGPT notice and toolbar badge appear once; the flag is removed when you open the popup or allow ChatGPT access.
 
-**Site access.** Gemini access (`https://gemini.google.com/*`) is required. ChatGPT access (`https://chatgpt.com/*`) is optional and requested only when you click the permission button in the popup. The Extension inspects page structure and applies CSS only on permitted sites. `activeTab` identifies the current site when you open the toolbar popup. The `scripting` permission restores missing content scripts when the extension starts, installs, or updates; `storage` saves preferences. No browsing-history `tabs` permission is requested. The Extension does **not** collect or transmit your prompts, replies, uploaded files, or other page content.
+**Site access.** Gemini access (`https://gemini.google.com/*`) is required. ChatGPT access (`https://chatgpt.com/*`) is optional and requested only when you click **Allow ChatGPT access** in the popup. The Extension inspects page structure and applies CSS only on permitted sites. `activeTab` identifies the current site when you open the toolbar popup. The `scripting` permission restores missing content scripts when the extension starts, installs, or updates; `storage` saves preferences. No browsing-history `tabs` permission is requested. The Extension does **not** collect or transmit your prompts, replies, uploaded files, or other page content.
 
-**Optional diagnostic copy.** The help page can display the extension version, browser version, platform, each site's Enable switch, Gemini layout settings, and ChatGPT width, range, and reading settings on your device. It excludes conversations, page URLs, titles, browsing history, and custom preset names. Nothing is sent automatically: copying only puts the displayed text on your clipboard. You choose whether to share it in a public GitHub issue.
+**Optional diagnostic copy.** The help page can display the extension version, browser name and version, platform, interface language, each site's Enable switch, Gemini layout settings, and ChatGPT width, range, and reading settings on your device. It excludes conversations, page URLs, titles, browsing history, and custom preset names. Nothing is sent automatically: copying only puts the displayed text on your clipboard. You choose whether to share it in a public GitHub issue.
 
 ### 3. Third parties
 
@@ -46,19 +46,19 @@ Questions about this policy or the Extension may be reported via the GitHub repo
 
 ### 1. 主体说明
 
-**Wider Gemini** 是一款开源 Chrome 扩展，用于调整 [Google Gemini](https://gemini.google.com/) 和 [ChatGPT](https://chatgpt.com/) 网页上的版式与样式。扩展通过 Chrome 应用商店及发布者选择的其他渠道分发。
+**Roomy**（原名 Wider Gemini）是一款开源 Chrome 扩展，用于调整 [Google Gemini](https://gemini.google.com/) 和 [ChatGPT](https://chatgpt.com/) 网页上的版式与样式。扩展通过 Chrome 应用商店及发布者选择的其他渠道分发。
 
 ### 2. 扩展处理的信息
 
 本扩展**不会**出于自身功能目的，向开发者或第三方分析服务收集、出售或传输您的个人数据、对话内容或浏览记录。
 
-**本地设置。** 扩展仅通过浏览器提供的扩展存储接口（`chrome.storage`，在您的浏览器配置支持时含同步）保存**您的偏好设置**，例如各网站的宽度、范围和预设按钮，以及 Gemini 的阅读和代码换行选项。数据由浏览器管理，并由您本人控制。
+**本地设置。** 扩展仅通过浏览器提供的扩展存储接口（`chrome.storage`，在您的浏览器配置支持时含同步）保存**您的偏好设置**，例如各网站的宽度、范围、预设按钮、阅读设置、启用开关和消息导航，以及 Gemini 的代码换行选项和界面语言。数据由浏览器管理，并由您本人控制。
 
-应用 Gemini 任务预设时，还会在本机扩展存储（`chrome.storage.local`）保留一份应用前的 Gemini 版式，方便重新打开弹窗后恢复。这份快照仅包含版式偏好，下一次应用任务预设时会被替换，恢复后会被删除；不包含对话内容，这项撤销功能也不会同步该快照。
+在 Gemini 或 ChatGPT 上应用任务预设时，还会在本机扩展存储（`chrome.storage.local`）保留该网站应用前的版式，方便重新打开弹窗后恢复。每个网站只保留一份快照，仅包含版式偏好，在该网站下一次应用任务预设时会被替换，恢复后会被删除；不包含对话内容，这项撤销功能也不会同步该快照。安装或更新后，扩展还会在 `chrome.storage.local` 中保存一个开关标记，让 ChatGPT 提示和工具栏角标只出现一次；打开弹窗或允许访问 ChatGPT 后，该标记即被删除。
 
-**网站访问范围。** Gemini 访问权限（`https://gemini.google.com/*`）为必选。ChatGPT 访问权限（`https://chatgpt.com/*`）为可选，仅在点击弹窗的授权按钮时请求。扩展只在已获授权的网站检查页面结构并注入 CSS 等调整。`activeTab` 用于在打开工具栏弹窗时识别当前网站。`scripting` 权限用于在扩展启动、安装或更新时补注入未加载的内容脚本；`storage` 用于保存偏好。不申请读取浏览记录的 `tabs` 权限。扩展**不会**收集或传输您的提问、回答、上传文件或其他页面内容。
+**网站访问范围。** Gemini 访问权限（`https://gemini.google.com/*`）为必选。ChatGPT 访问权限（`https://chatgpt.com/*`）为可选，仅在您点击弹窗中的 **允许访问 ChatGPT** 时请求。扩展只在已获授权的网站检查页面结构并注入 CSS 等调整。`activeTab` 用于在打开工具栏弹窗时识别当前网站。`scripting` 权限用于在扩展启动、安装或更新时补注入未加载的内容脚本；`storage` 用于保存偏好。不申请读取浏览记录的 `tabs` 权限。扩展**不会**收集或传输您的提问、回答、上传文件或其他页面内容。
 
-**可选的诊断复制。** 帮助页可以在本机显示扩展版本、浏览器版本、平台、各网站的启用开关、Gemini 版式设置及 ChatGPT 宽度、范围和阅读设置，不包含对话、页面网址、标题、浏览记录或自定义预设名称。不会自动发送任何内容；复制操作仅将已显示的文本放入剪贴板。是否将其分享至公开的 GitHub Issue，由您自行决定。
+**可选的诊断复制。** 帮助页可以在本机显示扩展版本、浏览器名称和版本、平台、界面语言、各网站的启用开关、Gemini 版式设置及 ChatGPT 宽度、范围和阅读设置，不包含对话、页面网址、标题、浏览记录或自定义预设名称。不会自动发送任何内容；复制操作仅将已显示的文本放入剪贴板。是否将其分享至公开的 GitHub Issue，由您自行决定。
 
 ### 3. 第三方
 

@@ -42,14 +42,9 @@ html:lang(zh-TW) body {
 }
 
 .header-icon {
-    display: grid;
-    place-items: center;
     flex: 0 0 48px;
     height: 48px;
     border-radius: 10px;
-    background: var(--accent);
-    color: var(--surface);
-    font-weight: 800;
 }
 
 .brand {

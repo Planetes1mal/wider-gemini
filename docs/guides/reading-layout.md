@@ -2,7 +2,7 @@
 
 [繁體中文](./reading-layout.zh-TW.md)
 
-Open a conversation on **gemini.google.com**, then open Wider Gemini from Chrome's extensions menu or its pinned toolbar icon. Keep an existing answer visible while changing a setting: you do not need to ask Gemini to generate it again. Changes are saved and applied to open Gemini tabs; cross-device synchronization depends on your browser's sync settings.
+Open a conversation on **gemini.google.com**, then open Roomy from Chrome's extensions menu or its pinned toolbar icon. Keep an existing answer visible while changing a setting: you do not need to ask Gemini to generate it again. Changes are saved and applied to open Gemini tabs; cross-device synchronization depends on your browser's sync settings.
 
 The steps below use individual controls. They also work when your installed version does not have newer task presets or help features. Suggested values are starting points, not a claim that one layout suits every screen.
 
@@ -46,7 +46,7 @@ For a simple long-answer starting point, try **1000 px / 110% font / density 0 /
 Work through the following checks on the same answer:
 
 1. **Check the page.** The supported site is `gemini.google.com`. A Chrome-installed app for that site is also supported. This does not establish support for a separate native Gemini desktop app, AI Studio, or Chrome's built-in Gemini side panel.
-2. **Check the extension.** Confirm Wider Gemini is enabled in Chrome. If it was just installed or updated, refresh the Gemini page once and try again. Routine setting changes should apply without a reload.
+2. **Check the extension.** Confirm Roomy is enabled in Chrome. If it was just installed or updated, refresh the Gemini page once and try again. Routine setting changes should apply without a reload.
 3. **Make the difference visible.** Compare 800 px and 1200 px in a sufficiently wide window. If your custom width range excludes a value, choose two values inside that range. On a narrow window, both settings can be limited by the same available space.
 4. **Identify the view.** Ordinary conversations, Notebook pages, and Deep Research can have different layouts. The current implementation applies a separate 1600 px width when it detects the Deep Research response view, so a slider change there may not match an ordinary conversation.
 5. **Check overlapping layout tools.** If you use another Gemini theme, width extension, or user style, temporarily turn off that specific layout customization and compare again. Report whether the problem only occurs with both enabled.
@@ -63,11 +63,11 @@ If your version includes **Help & feedback**, open it and choose **Generate repo
 | Long prose | 1000 px, font 110%, density 0 | Comfortable line length and paragraph separation |
 | Resizable window | 90%, font 100% | Fit after changing window size and sidebar state |
 
-Fresh settings in the current source start at **1000 px**, **100% font**, **density 0**, **custom spacing off**, and **code wrapping off**. Existing installations retain their saved settings. These suggestions do not change the defaults or claim verified behavior on every operating system.
+Fresh installs start at **1000 px**, **100% font**, **density 0**, **custom spacing off**, and **code wrapping off**. Existing installations retain their saved settings. These suggestions do not change the defaults or claim verified behavior on every operating system.
 
-## Optional shortcut in the current internal source — unreleased
+## Task presets
 
-If you are testing the current source checkout, **Task presets** combines the same individual controls. Select a task to see its summary; nothing changes until you click **Apply**.
+**Task presets** combines the same individual controls. Select a task to see its summary; nothing changes until you click **Apply**.
 
 | Task | Requested width | Font | Code wrapping |
 |---|---|---|---|
@@ -78,13 +78,13 @@ If you are testing the current source checkout, **Task presets** combines the sa
 
 Every task sets density to 0 and clears custom spacing. Actual width respects your saved minimum and maximum limits. Your named width presets, range limits, interface language, and user-message full-width choice are preserved.
 
-**Restore previous settings** restores the width, font, spacing, and code-wrapping settings saved immediately before the latest task application on this device. The single saved snapshot survives closing the popup. Restoring also replaces any later manual changes to those four setting groups; it is not a multi-step history. These task shortcuts are internal, unreleased work, so a store-installed version may not show them.
+**Restore previous settings** restores the width, font, spacing, and code-wrapping settings saved immediately before the latest task application on this device. The single saved snapshot survives closing the popup. Restoring also replaces any later manual changes to those four setting groups; it is not a multi-step history.
 
 Maintainer references: [settings defaults and normalization](../../src/shared/settings-utils.js), [layout rules](../../src/content/gemini-content.css), [content behavior](../../src/content/gemini-content.js), and [diagnostic report fields](../../src/help/help.js).
 
-## ChatGPT in the current internal source — unreleased
+## ChatGPT
 
-Select the **ChatGPT** tab in the popup, then click **Allow ChatGPT access** if Chrome has not granted the optional permission. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
+Select the **ChatGPT** tab in the popup, then click **Allow ChatGPT access** and confirm Chrome's prompt if access has not been granted yet. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
 
 | Task | Requested width | Font |
 |---|---|---|

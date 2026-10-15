@@ -3,13 +3,15 @@ name: Release
 # Push v<version_name> for an RC (e.g. v2.6.0-rc.1), or v<version> for a stable release.
 # The shared packager validates the tag, manifest, and exact CHANGELOG heading before packaging.
 # RC assets are for manual testing; upload only stable release assets to Chrome Web Store.
+# Run it manually from the Actions tab to rehearse packaging and the Chrome load check without publishing.
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   tests:
@@ -17,20 +19,84 @@ jobs:
     permissions:
       contents: read
 
-  release:
+  package:
     needs: tests
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.package.outputs.version }}
+      prerelease: ${{ steps.package.outputs.prerelease }}
     steps:
-      - name: Checkout tag
+      - name: Checkout
         uses: actions/checkout@v6
 
       - name: Validate release and build extension ZIP
         id: package
         shell: pwsh
         run: |
-          $package = & ./scripts/package.ps1 -Tag $env:GITHUB_REF_NAME -ReleaseNotesPath release_body.md
+          # A manual run is not on a tag, so it skips only the tag check.
+          $tag = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { '' }
+          $package = & ./scripts/package.ps1 -Tag $tag -ReleaseNotesPath release_body.md
           "version=$($package.Version)" >> $env:GITHUB_OUTPUT
           "prerelease=$($package.Prerelease.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      - name: Write SHA-256 checksum
+        run: sha256sum "wider-gemini-${{ steps.package.outputs.version }}.zip" > "wider-gemini-${{ steps.package.outputs.version }}.zip.sha256"
+
+      - name: Keep the package for verification and release
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-package
+          path: |
+            wider-gemini-${{ steps.package.outputs.version }}.zip
+            wider-gemini-${{ steps.package.outputs.version }}.zip.sha256
+            release_body.md
+          if-no-files-found: error
+
+  verify:
+    # Load the exact ZIP that will be published, in the same Windows Chrome setup as the Tests workflow.
+    needs: package
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Download the package
+        uses: actions/download-artifact@v4
+        with:
+          name: release-package
+          path: release-package
+
+      - name: Check the checksum and load the package in Chrome
+        shell: pwsh
+        run: |
+          $zip = "release-package/wider-gemini-${{ needs.package.outputs.version }}.zip"
+          $expected = (Get-Content -LiteralPath "$zip.sha256" -Raw).Split(' ')[0].Trim()
+          $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) { throw "Checksum mismatch: $actual (file) vs $expected (recorded)" }
+          Write-Host "SHA-256 $actual"
+          Expand-Archive -LiteralPath $zip -DestinationPath package-check
+          $chromePath = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(default)'
+          Write-Host "Google Chrome $((Get-Item -LiteralPath $chromePath).VersionInfo.ProductVersion) ($chromePath)"
+          $env:WG_CHROME = $chromePath
+          node tests/e2e/package-load.js package-check
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+  release:
+    needs: [package, verify]
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download the package
+        uses: actions/download-artifact@v4
+        with:
+          name: release-package
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
@@ -38,7 +104,9 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Roomy ${{ github.ref_name }}
           body_path: release_body.md
-          files: wider-gemini-${{ steps.package.outputs.version }}.zip
+          files: |
+            wider-gemini-${{ needs.package.outputs.version }}.zip
+            wider-gemini-${{ needs.package.outputs.version }}.zip.sha256
           fail_on_unmatched_files: true
-          prerelease: ${{ steps.package.outputs.prerelease == 'true' }}
-          make_latest: ${{ steps.package.outputs.prerelease == 'true' && 'false' || 'legacy' }}
+          prerelease: ${{ needs.package.outputs.prerelease == 'true' }}
+          make_latest: ${{ needs.package.outputs.prerelease == 'true' && 'false' || 'legacy' }}

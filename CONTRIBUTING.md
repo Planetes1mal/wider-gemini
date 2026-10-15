@@ -69,4 +69,4 @@ The existing language check confirmed parity for all 86 message keys across six 
 
 ## Releases
 
-Maintainers update the manifest and dated changelog, run the checks, and tag a release. CI runs the same tests before building the release ZIP. The shared `scripts/package.ps1` validates versions and release notes and packages an explicit runtime-file list. Ordinary contributions should leave version bumps and release tags to the maintainer.
+Maintainers update the manifest and dated changelog, run the checks, and tag a release. CI runs the same tests before building the release ZIP. The shared `scripts/package.ps1` validates versions and release notes and packages an explicit runtime-file list. The Release workflow then checks the exact ZIP's SHA-256, loads it in Chrome on Windows, and attaches the ZIP and its `.sha256` file to the GitHub Release. To rehearse a release without publishing, run the Release workflow manually from the Actions tab; it stops after the Chrome check. Dependabot opens one pull request a month when the workflow actions have updates. Ordinary contributions should leave version bumps and release tags to the maintainer.

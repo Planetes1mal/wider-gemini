@@ -195,10 +195,16 @@
         `)}</body></html>`;
     const file = path.join(temp, 'fixture.html');
     fs.writeFileSync(file, html);
-    const result = spawnSync(chrome, ['--headless=new', '--no-first-run', '--no-default-browser-check',
-        '--disable-extensions', '--window-size=2000,1200', `--user-data-dir=${path.join(temp, 'profile')}`,
+    // 这是 CI 里第一次启动 Chrome，全新 Windows 环境的冷启动偶尔很慢：放宽超时，超时后用新的配置目录重试一次。
+    const runChrome = profile => spawnSync(chrome, ['--headless=new', '--no-first-run', '--no-default-browser-check',
+        '--disable-extensions', '--window-size=2000,1200', `--user-data-dir=${path.join(temp, profile)}`,
         '--dump-dom', '--virtual-time-budget=1000', pathToFileURL(file).href],
-    { encoding:'utf8', windowsHide:true, timeout:30000, maxBuffer:4 * 1024 * 1024 });
+    { encoding:'utf8', windowsHide:true, timeout:90000, maxBuffer:4 * 1024 * 1024 });
+    let result = runChrome('profile');
+    if (result.error && result.error.code === 'ETIMEDOUT') {
+        console.error('Chrome timed out; retrying once with a fresh profile.');
+        result = runChrome('profile-retry');
+    }
     const match = result.stdout?.match(/<pre id="results">([^<]+)<\/pre>/);
     if (result.error || !match) {
         console.error(`Chrome report failure: status=${result.status}, signal=${result.signal}`);

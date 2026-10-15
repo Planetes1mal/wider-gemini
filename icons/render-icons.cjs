@@ -30,7 +30,7 @@ async function renderIcons() {
       <rect width="1200" height="720" fill="#F1F3F8"/>
       <rect x="600" width="600" height="720" fill="#151923"/>
       <g font-family="Arial, sans-serif">
-        <text x="44" y="54" fill="#101828" font-size="24" font-weight="700">Wider Gemini</text>
+        <text x="44" y="54" fill="#101828" font-size="24" font-weight="700">Roomy</text>
         <text x="644" y="54" fill="#F8FAFC" font-size="24" font-weight="700">Open reading frame</text>
         <text x="44" y="84" fill="#667085" font-size="14">A wider space for words.</text>
         <text x="644" y="84" fill="#AAB3C3" font-size="14">New artwork · cobalt / white · vector source</text>

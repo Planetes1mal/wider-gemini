@@ -7,7 +7,7 @@ Formerly **Wider Gemini**.
 A Chrome extension for adjusting the width and reading layout of Gemini and ChatGPT conversations. Each site remembers its own settings.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
-[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v3.0.0)
+[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/roomy/releases/tag/v3.0.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Roomy.
@@ -38,7 +38,7 @@ GitHub releases and Chrome Web Store updates can follow different schedules. For
 <details>
 <summary>Manual installation</summary>
 
-1. Download `wider-gemini-*.zip` from the latest stable release on [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases).
+1. Download `wider-gemini-*.zip` from the latest stable release on [GitHub Releases](https://github.com/Planetes1mal/roomy/releases).
 2. Extract it to a folder you intend to keep. Make sure the folder contains `manifest.json`.
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.
@@ -72,7 +72,7 @@ Preferences are saved in Chrome's extension storage. Whether they sync across de
 The project uses vanilla JavaScript, HTML, and CSS. No dependencies or build step are needed.
 
 ```bash
-git clone https://github.com/Planetes1mal/wider-gemini.git
+git clone https://github.com/Planetes1mal/roomy.git
 ```
 
 Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the repository folder. After changing the code, reload the extension and refresh the affected Gemini or ChatGPT page.
@@ -83,7 +83,7 @@ The [dated compatibility record](./docs/compatibility.md) separates verified sou
 
 ## Feedback and contributions
 
-If something looks wrong, open **Help & feedback** in the popup, copy the diagnostic settings, and include the steps in an [issue](https://github.com/Planetes1mal/wider-gemini/issues/new/choose). Remove private information from screenshots before sharing. Pull requests are welcome.
+If something looks wrong, open **Help & feedback** in the popup, copy the diagnostic settings, and include the steps in an [issue](https://github.com/Planetes1mal/roomy/issues/new/choose). Remove private information from screenshots before sharing. Pull requests are welcome.
 
 If you find Roomy useful, a GitHub star helps other people discover it.
 

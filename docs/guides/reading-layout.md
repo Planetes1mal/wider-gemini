@@ -52,7 +52,7 @@ Work through the following checks on the same answer:
 5. **Check overlapping layout tools.** If you use another Gemini theme, width extension, or user style, temporarily turn off that specific layout customization and compare again. Report whether the problem only occurs with both enabled.
 6. **Provide a small reproduction.** Include the page type, approximate window size, width value/unit, font size, wrap state, and steps. If sharing an image, remove private conversations and account details first.
 
-If your version includes **Help & feedback**, open it and choose **Generate report**. Review the preview before selecting **Copy report** and pasting it into a [GitHub issue](https://github.com/Planetes1mal/wider-gemini/issues). The report includes extension version, browser major version, platform, and layout settings; it excludes conversation content, page URLs, titles, and custom preset names. It is not sent automatically. Older versions can use the same issue link with the settings written manually.
+If your version includes **Help & feedback**, open it and choose **Generate report**. Review the preview before selecting **Copy report** and pasting it into a [GitHub issue](https://github.com/Planetes1mal/roomy/issues). The report includes extension version, browser major version, platform, and layout settings; it excludes conversation content, page URLs, titles, and custom preset names. It is not sent automatically. Older versions can use the same issue link with the settings written manually.
 
 ## Reference settings
 

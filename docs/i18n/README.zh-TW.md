@@ -7,7 +7,7 @@
 用來調整 Gemini 和 ChatGPT 對話寬度與閱讀版面的 Chrome 擴充功能。兩個網站分別記住各自的設定。
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-安裝-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-tw)
-[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v3.0.0)
+[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/roomy/releases/tag/v3.0.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 
 同一段完整的 Gemini 對話、相同的視窗大小：使用 Roomy 將對話寬度分別設為 700px 和 1200px。
@@ -38,7 +38,7 @@ GitHub 版本與 Chrome 線上應用程式商店的更新時間可能不同。�
 <details>
 <summary>手動安裝</summary>
 
-1. 到 [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases) 下載最新正式版的 `wider-gemini-*.zip`。
+1. 到 [GitHub Releases](https://github.com/Planetes1mal/roomy/releases) 下載最新正式版的 `wider-gemini-*.zip`。
 2. 解壓縮至固定位置，確認資料夾內有 `manifest.json`。
 3. 開啟 `chrome://extensions/`，開啟右上角的 **開發人員模式**。
 4. 點選 **載入未封裝項目**，選取剛才解壓縮的資料夾。
@@ -72,7 +72,7 @@ Gemini 存取權限為必要。ChatGPT 存取權限為選用：只有在彈出�
 本專案使用原生 JavaScript、HTML 和 CSS，無須安裝相依套件或建置。
 
 ```bash
-git clone https://github.com/Planetes1mal/wider-gemini.git
+git clone https://github.com/Planetes1mal/roomy.git
 ```
 
 在 `chrome://extensions/` 開啟 **開發人員模式**，點選 **載入未封裝項目**，選取儲存庫資料夾。修改程式碼後，重新載入擴充功能並重新整理受影響的 Gemini 或 ChatGPT 頁面。
@@ -83,7 +83,7 @@ git clone https://github.com/Planetes1mal/wider-gemini.git
 
 ## 回報問題與貢獻
 
-遇到問題，可在彈出視窗的 **說明與回報** 中複製診斷設定，並附上操作步驟提交 [Issue](https://github.com/Planetes1mal/wider-gemini/issues/new/choose)。分享螢幕截圖前請移除私人資訊。歡迎提交 Pull Request。
+遇到問題，可在彈出視窗的 **說明與回報** 中複製診斷設定，並附上操作步驟提交 [Issue](https://github.com/Planetes1mal/roomy/issues/new/choose)。分享螢幕截圖前請移除私人資訊。歡迎提交 Pull Request。
 
 如果 Roomy 對你有幫助，可以在 GitHub 點一個 Star，讓更多人發現它。
 

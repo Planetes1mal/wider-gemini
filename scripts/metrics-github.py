@@ -67,7 +67,7 @@ def traffic_get(gh, endpoint):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--repo', default='Planetes1mal/wider-gemini')
+    parser.add_argument('--repo', default='Planetes1mal/roomy')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if not args.output.resolve().is_relative_to((ROOT / 'archive').resolve()):

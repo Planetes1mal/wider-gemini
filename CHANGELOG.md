@@ -100,7 +100,7 @@ Internal candidate for manual installation. This is not a stable Chrome Web Stor
 - Added the existing regression checks to the source tree, CI before release packaging, and contribution and compatibility documentation.
 - Preserved PR #10's conversation-width, input, upload, and overlay boundaries while changing the reading-density/font-size mechanism.
 
-The [dated compatibility record](https://github.com/Planetes1mal/wider-gemini/blob/v2.8.0/docs/compatibility.md) distinguishes current-source unit and isolated Windows Chrome synthetic-layout checks from outstanding live Gemini, system PWA cold-start, and macOS verification. This release does not claim new acceptance of those live/device flows.
+The [dated compatibility record](https://github.com/Planetes1mal/roomy/blob/v2.8.0/docs/compatibility.md) distinguishes current-source unit and isolated Windows Chrome synthetic-layout checks from outstanding live Gemini, system PWA cold-start, and macOS verification. This release does not claim new acceptance of those live/device flows.
 
 If you manually installed a 2.8.0 release candidate, replace/reload it with the stable files; Chrome compares the numeric version and does not automatically upgrade that candidate to this build.
 
@@ -126,7 +126,7 @@ If you manually installed a 2.8.0 release candidate, replace/reload it with the 
 
 ### Other
 
-- Thanks to @PANPEIWEN for the Gemini layout compatibility improvements in [#10](https://github.com/Planetes1mal/wider-gemini/pull/10).
+- Thanks to @PANPEIWEN for the Gemini layout compatibility improvements in [#10](https://github.com/Planetes1mal/roomy/pull/10).
 
 ## 2.6.0-rc.1 (2026-09-08)
 

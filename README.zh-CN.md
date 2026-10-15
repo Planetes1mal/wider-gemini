@@ -7,7 +7,7 @@
 一个用来调整 Gemini 和 ChatGPT 对话宽度与阅读排版的 Chrome 扩展。两个网站分别记住各自的设置。
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-安装-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=zh-cn)
-[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/wider-gemini/releases/tag/v3.0.0)
+[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/roomy/releases/tag/v3.0.0)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 同一段完整的 Gemini 对话、同样的窗口大小：使用 Roomy 将对话宽度分别设为 700px 和 1200px。
@@ -38,7 +38,7 @@ GitHub 版本与 Chrome 应用商店的更新时间可能不同。若要使用 3
 <details>
 <summary>手动安装</summary>
 
-1. 到 [GitHub Releases](https://github.com/Planetes1mal/wider-gemini/releases) 下载最新正式版的 `wider-gemini-*.zip`。
+1. 到 [GitHub Releases](https://github.com/Planetes1mal/roomy/releases) 下载最新正式版的 `wider-gemini-*.zip`。
 2. 解压到一个固定位置，确认文件夹里有 `manifest.json`。
 3. 打开 `chrome://extensions/`，开启右上角的 **开发者模式**。
 4. 点击 **加载已解压的扩展程序**，选择刚才解压的文件夹。
@@ -72,7 +72,7 @@ Gemini 访问权限为必需。ChatGPT 访问权限为可选：只有在弹窗�
 项目使用原生 JavaScript、HTML 和 CSS，无需安装依赖或构建。
 
 ```bash
-git clone https://github.com/Planetes1mal/wider-gemini.git
+git clone https://github.com/Planetes1mal/roomy.git
 ```
 
 在 `chrome://extensions/` 开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择仓库文件夹。修改代码后，重新加载扩展并刷新受影响的 Gemini 或 ChatGPT 页面。
@@ -83,7 +83,7 @@ git clone https://github.com/Planetes1mal/wider-gemini.git
 
 ## 反馈与贡献
 
-遇到问题，可在弹窗的 **帮助与反馈** 中复制诊断设置，并附上操作步骤提交 [Issue](https://github.com/Planetes1mal/wider-gemini/issues/new/choose)。分享截图前请移除私人信息。欢迎提交 Pull Request。
+遇到问题，可在弹窗的 **帮助与反馈** 中复制诊断设置，并附上操作步骤提交 [Issue](https://github.com/Planetes1mal/roomy/issues/new/choose)。分享截图前请移除私人信息。欢迎提交 Pull Request。
 
 如果 Roomy 对你有帮助，可以在 GitHub 点一个 Star，让更多人发现它。
 

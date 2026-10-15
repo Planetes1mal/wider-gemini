@@ -33,13 +33,13 @@
             }
         }
     });
-    function send(method, params = {}, sessionId) {
+    function send(method, params = {}, sessionId, timeout = 10000) {
         return new Promise((resolve, reject) => {
             const id = ++serial;
             const timer = setTimeout(() => {
                 pending.delete(id);
                 reject(new Error(`Timeout: ${method}`));
-            }, 10000);
+            }, timeout);
             pending.set(id, { resolve, reject, timer });
             child.stdio[3].write(JSON.stringify({ id, method, params, sessionId }) + '\0');
         });
@@ -47,7 +47,8 @@
 
     async function waitForPage(sessionId, expression, message) {
         // createTarget returns before navigation finishes; the initial document may be about:blank.
-        for (let attempt = 0; attempt < 50; attempt++) {
+        // Pages in a freshly started Chrome on a CI runner can take several seconds to load.
+        for (let attempt = 0; attempt < 300; attempt++) {
             const result = await send('Runtime.evaluate', { expression, returnByValue: true }, sessionId);
             assert(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
             if (result.result.value) return result.result.value;
@@ -58,7 +59,8 @@
 
     (async () => {
         try {
-            const { id } = await send('Extensions.loadUnpacked', { path: extension });
+            // The first command also waits for Chrome itself to start, which is slow on a fresh Windows runner.
+            const { id } = await send('Extensions.loadUnpacked', { path: extension }, undefined, 90000);
             assert(id, 'Chrome should accept the release manifest and files');
             const { targetId } = await send('Target.createTarget', {
                 url: `chrome-extension://${id}/${expected.action.default_popup}`

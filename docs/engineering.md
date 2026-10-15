@@ -2,18 +2,6 @@
 
 Roomy (formerly Wider Gemini) adjusts the conversation width and reading layout of `gemini.google.com` and `chatgpt.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
 
-## Implementation case studies
-
-- [Recovering a missed content-script injection at browser startup](./engineering/pwa-cold-start.md): the worker's recovery path, two initialization guards, and the limits of mocked lifecycle checks.
-- [Keeping Drive overlays outside conversation width rules](./engineering/drive-overlay-width.md): the historical selector failure, current input boundaries, and the existing browser fixture's protected-overlay assertions.
-- [Performance checks](./performance.md): the measurement method, recorded local baseline, and limits of synthetic performance evidence.
-- [Measuring layout regressions in a real browser](./engineering/browser-regressions.md): geometry assertions, one focused caption reproduction, and the boundaries between fixture and live-site evidence.
-- [From a compatibility report to a traceable release](./engineering/report-to-release.md): minimal reproductions, candidate versions, exact release notes, and the existing publication gate.
-
-These articles explain code and reproducible checks. They do not claim new live-site or cross-platform verification.
-
-The dated [compatibility record](./compatibility.md) lists what was actually checked, what failed before measurement, and which real-device checks remain open. The separate [reading lab](./lab/README.md) explores mixed prose/table widths without changing production selectors.
-
 ## Settings and injection
 
 ```mermaid
@@ -39,9 +27,21 @@ The popup asks `getLayoutStatus` on opening, site selection, and pause/resume. I
 
 Normally Chrome injects the manifest's content scripts on navigation. During browser or installed-site app startup, a page can be ready before the extension. `background.js` processes each site's manifest entry and checks its isolated-world loaded flag (`widerGeminiContentLoaded` or `widerChatgptContentLoaded`). It injects only that entry's CSS and JS when missing. Discarded tabs are skipped. Content-script guards keep repeated injection from installing duplicate listeners or observers.
 
+When Chrome updates or reloads the extension, content scripts already running in open tabs stay alive with an invalid extension context, while the worker injects the new version into a fresh isolated world. Each site script therefore dispatches a site-specific takeover event when it starts and only then listens for it. An earlier instance that receives the event, or that finds its extension context invalid during a page change, stops its observers and listeners, removes its navigation rail and restores the padding it added; width and reading styles are left for the new instance. Without this, open tabs showed one extra navigation rail per update until they were reloaded.
+
 ChatGPT access is an optional host permission, so Chrome's permission warnings stay identical to Gemini-only 2.8.0 and the 3.0 update does not disable the extension. After access is granted, `background.js` registers a persistent ChatGPT content script and injects open ChatGPT tabs without reloading; revoking access unregisters it. Chrome only accepts `chrome.permissions.request` from a user gesture, so the extension cannot show the permission prompt by itself. On a new install the worker sets `chatgptIntroPending` in local storage, shows a **NEW** badge and calls `chrome.action.openPopup()`; an update from a version before 3.0 only sets the flag and badge. The popup reads and clears the flag and badge on opening, shows the grant card on either site tab for that opening, and afterwards keeps it, with a dot on the site tab, only on the ChatGPT tab while access is missing. The badge is restored on browser startup while the flag remains, and granting access clears both. Chrome's toolbar host-access requests (`permissions.addHostAccessRequest`) would be a closer fit, but their toolbar button only exists when the Extensions Menu Access Control feature is enabled, which is off by default on desktop.
 
 The extension requests `storage`, `scripting`, `activeTab`, required access to `gemini.google.com`, and optional access to `chatgpt.com`; startup injection does not require the browsing-history `tabs` permission. See [manifest.json](../manifest.json), [background.js](../src/background.js), [gemini-content.js](../src/content/gemini-content.js), and [chatgpt-content.js](../src/content/chatgpt-content.js).
+
+## Reading density and font size (Gemini)
+
+Auto density is relative to the native styles of each supported message rather than a fixed layout. The content script records font size, numeric line height, margins and row gap when it first sees a message node, with the extension's reading classes temporarily disabled so a new reply is not measured inside an already compressed ancestor. Newly inserted content is measured by the existing observer; ordinary setting changes only update root variables.
+
+- **Auto 0:** native paragraph margins and gaps are kept. At 100% font no reading override is active; another font size scales each text node's native font size and numeric line height proportionally.
+- **Auto 1–100:** positive margins and row gaps scale from 100% to 12.5% of their native size. Numeric line height moves toward an 18% reduction but never below 1.15 times the font size, and an already tighter native line is left unchanged. Font scaling is applied independently.
+- **Manual:** `messageSpacingCustom: true` uses the stored unitless line height and exact paragraph gap, including 0px. Reset spacing returns to Auto at the current density.
+
+Measurement is skipped entirely while font size is 100% and density is Auto 0, so default settings add no per-message work. Native `line-height: normal` has no numeric baseline and is left to the browser in Auto. Code blocks and table cells keep their native line-height proportions and scale only with font size; inline code follows the surrounding prose. If another extension or a later theme change alters the native typography of content that was already measured, reload the page.
 
 ## Layout boundaries
 
@@ -65,7 +65,7 @@ ChatGPT reading controls record the native font size, line height, and margins o
 
 ChatGPT first discovers the **visible** chat surface: ordinary chat (transcript + footer), Dots (`.message-list` + composer width owner inside `.thread-pane`), Page quick chat, the home composer, or a native-only Space/Page surface. Cached routes stay connected with zero size after SPA navigation, so every owner must be visible, and width markers (`data-wgc-width`) are written only on the current owners; the CSS keys off that marker instead of global selectors. Reading measurement and observation are limited to the active chat and resampled after a surface change. Dots renders both roles with the same Markdown renderer, so roles come from the outer `.message-row` (`.self` with message content; call rows have none). Status reports `surface.kind` and per-capability results, and native-only surfaces are `notApplicable` rather than unsupported.
 
-[message-navigation.js](../src/content/message-navigation.js) is a site-neutral rail: sites pass recognized user turns, the actual scroll container and pane bounds. It rebuilds buttons only when the set of turns changes, computes jumps from element rects and clamps to the container's real range (ordinary ChatGPT scrolls `column-reverse` with negative `scrollTop`), and removes itself on pause, when navigation is off, or when fewer than two turns remain. When the column would leave less than 24px beside the pane edge, the site narrows the column symmetrically by only the missing amount and releases it when the rail goes away.
+[message-navigation.js](../src/content/message-navigation.js) is a site-neutral rail: sites pass recognized user turns, the actual scroll container and pane bounds. It rebuilds buttons only when the set of turns changes, computes jumps from element rects and clamps to the container's real range (ordinary ChatGPT scrolls `column-reverse` with negative `scrollTop`), and removes itself on pause, when navigation is off, or when fewer than two turns remain. Long conversations show at most 20 ticks around the current message. Sites can load earlier history while a smooth jump is still scrolling, which pushes the target away; for five seconds after a jump the rail realigns the target once scrolling stops whenever the content height has changed, and any wheel, touch, key or pointer input in the conversation cancels this. When the column would leave less than 24px beside the pane edge, the site narrows the column symmetrically by only the missing amount and releases it when the rail goes away.
 
 Keep native attachment, menu, preview, Canvas, and floating-composer layouts outside those overrides. Do not add global native-variable changes or generic `form`, `section`, table, dialog, or overlay width rules. A new live DOM variant needs observed evidence before adding another selector.
 
@@ -81,7 +81,7 @@ node tests/e2e/chatgpt-reading.js
 
 `WG_CHROME` selects the browser executable; the local default is Chrome's standard Windows installation path. The layout script prints the temporary fixture directory and retains the synthetic HTML and measurements for inspection.
 
-For full release validation, `node scripts/test.js` also runs packaging tests and therefore needs PowerShell 7 or Windows PowerShell 5.1. `WG_POWERSHELL` selects PowerShell; the default is `powershell.exe` on Windows and `pwsh` elsewhere. CI retains this full suite, using Node 24, Windows PowerShell on the Windows runner, and its preinstalled Google Chrome. The layout step resolves Chrome's registered application path and prints its actual version. Release ZIP creation remains a separate Ubuntu job using PowerShell 7.
+For full release validation, `node scripts/test.js` also runs packaging tests and therefore needs PowerShell 7 or Windows PowerShell 5.1. `WG_POWERSHELL` selects PowerShell; the default is `powershell.exe` on Windows and `pwsh` elsewhere. CI retains this full suite, using Node 24, Windows PowerShell on the Windows runner, and its preinstalled Google Chrome. The layout step resolves Chrome's registered application path and prints its actual version.
 
 | Check | What it establishes |
 |---|---|
@@ -89,11 +89,14 @@ For full release validation, `node scripts/test.js` also runs packaging tests an
 | `gemini-content-css.test.js` | Required scoped selectors and declarations |
 | `gemini-content-lifecycle.test.js` | Single initialization, repeated injection, and late injection |
 | `background.test.js` | Check-before-inject, manifest permissions, discarded tabs, and per-tab failures |
+| `locales.test.js` | Identical keys in all six locales, preserved placeholders, store/manifest length limits, and no missing or unused keys |
+| `repository-files.test.js` | Only the listed public files are tracked; internal notes stay in the ignored `internal/` folder |
 | `release-package.test.js` (full suite only) | RC/stable tags, exact release notes, ZIP allowlist, and failed-build behavior |
 | `e2e/message-width.js` | Real-browser measurements on synthetic message trees: px/%, nested width limits, late messages, tables, code wrapping, images, input, and protected overlay content |
 | `e2e/chatgpt-reading.js` | Real-browser measurements on stripped ChatGPT markup: font/density/manual spacing boundaries, protected code/table/controls, user full width gated by width, native wrap, streamed content, pause restoration, and fresh resampling on resume |
+| `e2e/navigation-surfaces.js` | Navigation rails on Gemini, ordinary ChatGPT, Dots and Page quick chat: tick placement, jumps, previews, virtualized history, gutters, pause, and a jump while earlier history loads |
 
-The Tests workflow runs these checks on PRs and pushes to `main`. The Release workflow calls the same workflow and publishes only after it passes. These checks exercise local fixtures and mocked extension APIs, not a signed-in Gemini account.
+The Tests workflow runs these checks on PRs and pushes to `main`. The Release workflow calls the same workflow, then builds the ZIP and a `.sha256` file, checks the checksum and loads that exact ZIP in Chrome on Windows with `e2e/package-load.js`, and only then creates the GitHub Release. Running the Release workflow manually rehearses everything except publishing. These checks exercise local fixtures and mocked extension APIs, not a signed-in Gemini or ChatGPT account.
 
 The public layout fixture retains the overlay/menu and message-width checks. It excludes two earlier experimental assumptions about fixed-width wrapper shells around nested dialog markup: those structures were not confirmed in a real Gemini failure, so preserving their arbitrary widths is not a release requirement. A reproduced live-page regression would be evaluated on its own evidence.
 
@@ -104,7 +107,7 @@ node tests/e2e/package-load.js .
 node tests/e2e/popup-language.js . archive/popup-language-check
 ```
 
-These commands do not build a ZIP. Package-load checks extension loading, the manifest, and popup localization; popup-language checks the localized popup and captures diagnostic screenshots in the ignored archive. They use isolated browser profiles and require a Chrome version supporting the extension debugging APIs they invoke. They are optional local checks, separate from the CI layout test. When validating an actual release package, substitute its extracted directory for `.`.
+These commands do not build a ZIP. Package-load checks extension loading, the manifest, and popup localization; popup-language checks the localized popup and captures diagnostic screenshots in the ignored archive. They use isolated browser profiles and require a Chrome version supporting the extension debugging APIs they invoke. The Release workflow runs package-load on the extracted release ZIP; locally, substitute an extracted package directory for `.`. `node tests/e2e/performance.js` is an optional local benchmark of the Gemini content script on generated conversations; it has no pass/fail threshold.
 
 ## Manual compatibility checklist
 

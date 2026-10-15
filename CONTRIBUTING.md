@@ -46,8 +46,6 @@ These use isolated browser profiles. Despite its name, `package-load.js` accepts
 
 For layout changes, also try the affected flow on the real Gemini or ChatGPT website. Record the site, browser, OS, extension version, and steps in the PR. The existing Gemini fixtures do not establish ChatGPT compatibility, compatibility with every live site rollout, or macOS acceptance. See [engineering and compatibility notes](docs/engineering.md) for the supported boundaries and manual scenarios.
 
-For focused examples, read the [startup injection case study](docs/engineering/pwa-cold-start.md) and the [Drive overlay layout case study](docs/engineering/drive-overlay-width.md). Each links the existing source and tests, explains what the checks establish, and separates fixture evidence from manual verification.
-
 ## Keep a change focused
 
 - Follow the existing four-space JavaScript indentation and semicolon style.
@@ -59,13 +57,15 @@ For focused examples, read the [startup injection case study](docs/engineering/p
 
 Do not include private conversations, account details, tokens, or local diagnostic archives in an issue or commit. `tests/diagnostics/` and experimental browser scripts remain local.
 
+The repository holds only the extension, its tests and build scripts, and the public documentation. Keep research, metrics, verification logs, experiments and other working notes in the ignored `internal/` folder. `tests/repository-files.test.js` lists every public path and fails when anything else is committed; extend that list in the same PR when a new public file is genuinely needed.
+
 ## Translations
 
 Locale dictionaries live in `_locales/<locale>/messages.json`; use the English keys as the source. Keep message keys and placeholders consistent, translate the meaning rather than the code identifiers, and check the popup at its actual size. New UI languages also need the language selector and language normalization updated. Include a native-speaker review when available, and identify machine-assisted translations that still need review.
 
 The [Korean](./_locales/ko/messages.json), [Japanese](./_locales/ja/messages.json), and [Spanish](./_locales/es/messages.json) dictionaries are machine-assisted internal drafts awaiting native-speaker review. Review natural phrasing, technical terms, help text, and fit at the popup's actual size before treating them as release-ready. They do not include localized store materials or additional READMEs in this iteration.
 
-The existing language check confirmed parity for all 86 message keys across six dictionaries, manual switching among all six interface languages, automatic Korean/Japanese/Spanish selection, and English fallback for a French browser locale. Popup text fit was checked locally. These checks establish loading and layout, not translation quality; native-speaker review is still pending. See the dated [compatibility record](docs/compatibility.md) for the exact help-page and browser coverage.
+`tests/locales.test.js` checks that all six dictionaries have the same keys and placeholders, that store and manifest strings fit their length limits, and that every key is used. `node tests/e2e/popup-language.js` checks manual language switching and browser-language matching in a real popup. These checks establish loading and layout, not translation quality; native-speaker review is still pending.
 
 ## Releases
 

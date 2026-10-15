@@ -59,7 +59,7 @@ GitHub 版本与 Chrome 应用商店的更新时间可能不同。若要使用 3
 
 使用**任务预设**可以一步切换版式：Gemini 有长文阅读、表格、代码和大字四种，ChatGPT 有长文阅读、宽屏（表格与代码）和大字三种。先查看设置摘要，再点击应用；**恢复之前的设置**可以在本机恢复该网站应用前的版式，关闭弹窗后仍可使用。具体数值及恢复范围见[阅读指南](./docs/guides/reading-layout.md)。
 
-弹窗底部的 **帮助与反馈** 提供排查说明，也可以预览并复制诊断设置。扩展作用于 Gemini、ChatGPT 网页及通过 Chrome 安装的网站应用窗口，不会修改原生桌面应用或 Chrome 内置的 Gemini 面板。已实际验证的操作见[兼容性记录](./docs/compatibility.md)。
+弹窗底部的 **帮助与反馈** 提供排查说明，也可以预览并复制诊断设置。扩展作用于 Gemini、ChatGPT 网页及通过 Chrome 安装的网站应用窗口，不会修改原生桌面应用或 Chrome 内置的 Gemini 面板。
 
 ## 隐私
 
@@ -78,8 +78,6 @@ git clone https://github.com/Planetes1mal/roomy.git
 在 `chrome://extensions/` 开启 **开发者模式**，点击 **加载已解压的扩展程序**，选择仓库文件夹。修改代码后，重新加载扩展并刷新受影响的 Gemini 或 ChatGPT 页面。
 
 内部迭代可运行 `node scripts/test.js --skip-packaging`，执行已有单元检查而不生成 ZIP。浏览器与发布检查见[贡献指南](./CONTRIBUTING.md)，版式规则见[工程与兼容性说明](./docs/engineering.md)。
-
-[带日期的兼容性记录](./docs/compatibility.md)区分源码实测和待验证设备。运行 `node scripts/reading-lab.js` 可打开[本地阅读实验](./docs/lab/README.md)，比较正文与表格的两种宽度安排；它独立于扩展。
 
 ## 反馈与贡献
 

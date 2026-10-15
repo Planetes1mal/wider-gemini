@@ -33,3 +33,8 @@ tests/e2e/*
 .scratch/
 .scratch/**
 docs/action-plan-status.md
+
+# Internal notes, research, metrics and experiments stay local; only the public docs listed in
+# tests/repository-files.test.js belong in the repository.
+internal/
+internal/**

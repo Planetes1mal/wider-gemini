@@ -31,11 +31,9 @@ Wider Gemini is now **Roomy**, and it works on ChatGPT as well as Gemini. The ex
 - Jumping to the earliest loaded message stays on target when Gemini or ChatGPT loads earlier history during the scroll; after the scroll ends, the target is realigned whenever the content height changes within five seconds, unless you scroll yourself.
 - The help page's description of the settings report now lists everything the report contains.
 
-See [the compatibility record](./docs/compatibility.md) for the flows verified for this release.
-
 ## 3.0.0-rc.2 (2026-10-02)
 
-Internal candidate distributed from the `chatgpt-width-support` branch without a release tag or GitHub Release. Numeric version remains `3.0.0`; replace the files and reload the extension to update a manual installation. Signed-in validation of the latest bounded-history navigation and long-conversation performance remains pending; see [the compatibility record](./docs/compatibility.md).
+Internal candidate distributed from the `chatgpt-width-support` branch without a release tag or GitHub Release. Numeric version remains `3.0.0`; replace the files and reload the extension to update a manual installation.
 
 ### Features
 
@@ -93,14 +91,10 @@ Internal candidate for manual installation. This is not a stable Chrome Web Stor
 
 ### Other
 
-- Added reproducible long-conversation performance measurements, a dated compatibility record, and engineering case studies for startup injection, Drive overlay boundaries, browser regressions, and release traceability.
-- Added local CSV/GitHub measurement tools, an initial traffic baseline, and English/Traditional Chinese reading guides. No extension telemetry is added.
-- Added a separate local reading-layout experiment with two synthetic samples and a blank participant worksheet; mixed prose/table widths are not part of the extension.
+- Added English and Traditional Chinese reading guides. No extension telemetry is added.
 - Added `--skip-packaging` to the test runner for internal iterations; the default CI and release suite is unchanged.
-- Added the existing regression checks to the source tree, CI before release packaging, and contribution and compatibility documentation.
+- Added the existing regression checks to the source tree, CI before release packaging, and contribution documentation.
 - Preserved PR #10's conversation-width, input, upload, and overlay boundaries while changing the reading-density/font-size mechanism.
-
-The [dated compatibility record](https://github.com/Planetes1mal/roomy/blob/v2.8.0/docs/compatibility.md) distinguishes current-source unit and isolated Windows Chrome synthetic-layout checks from outstanding live Gemini, system PWA cold-start, and macOS verification. This release does not claim new acceptance of those live/device flows.
 
 If you manually installed a 2.8.0 release candidate, replace/reload it with the stable files; Chrome compares the numeric version and does not automatically upgrade that candidate to this build.
 

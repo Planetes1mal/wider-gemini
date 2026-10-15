@@ -59,7 +59,7 @@ Expand **Range & presets** for width limits and **Manage presets**. Each site an
 
 Use **Task presets** to change the layout in one step: long reading, tables, code, or large text on Gemini; long reading, wide (tables and code), or large text on ChatGPT. Preview the settings, then apply them; **Restore previous settings** restores that site's previous layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
 
-Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Roomy targets Gemini and ChatGPT webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. See the [compatibility record](./docs/compatibility.md) for the flows actually verified.
+Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Roomy targets Gemini and ChatGPT webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel.
 
 ## Privacy
 
@@ -78,8 +78,6 @@ git clone https://github.com/Planetes1mal/roomy.git
 Open `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select the repository folder. After changing the code, reload the extension and refresh the affected Gemini or ChatGPT page.
 
 For internal iterations, run `node scripts/test.js --skip-packaging` for the existing unit checks without creating a ZIP. See [Contributing](./CONTRIBUTING.md) for browser and release checks and [Engineering and compatibility](./docs/engineering.md) for layout boundaries.
-
-The [dated compatibility record](./docs/compatibility.md) separates verified source behavior from untested devices. For the experimental comparison of prose and table widths, run `node scripts/reading-lab.js`; this [local reading lab](./docs/lab/README.md) is separate from the extension.
 
 ## Feedback and contributions
 

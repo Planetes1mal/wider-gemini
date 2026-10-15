@@ -51,13 +51,13 @@ If you manually installed a 3.0.0 release candidate, replace its files and reloa
 
 1. Open [Gemini](https://gemini.google.com/) or [ChatGPT](https://chatgpt.com/) and click the Roomy icon in your browser toolbar.
 2. Select the site tab, choose `px` or `%`, then move the width slider or click a preset.
-3. On Gemini, expand **Reading & typography** to adjust the font size and reading density, or turn on code wrapping as needed.
+3. Expand **Reading & typography** to adjust the font size and reading density. On Gemini you can also turn on code wrapping; ChatGPT keeps its own wrap button on each code block.
 
 After a new install, the popup opens once from the toolbar icon. Click **Allow ChatGPT access** there and confirm Chrome's prompt to turn on ChatGPT. After updating from a version before 3.0, nothing opens: a **NEW** badge appears on the toolbar icon until you next open the popup. Until access is granted, the popup's ChatGPT tab shows a dot and keeps the same button.
 
 Expand **Range & presets** for width limits and **Manage presets**. Each site and unit has its own presets. The language selector is at the bottom of the popup.
 
-On Gemini, use **Task presets** for long reading, tables, code, and large text. Preview the settings, then apply them; **Restore previous settings** restores the previous Gemini layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
+Use **Task presets** to change the layout in one step: long reading, tables, code, or large text on Gemini; long reading, wide (tables and code), or large text on ChatGPT. Preview the settings, then apply them; **Restore previous settings** restores that site's previous layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
 
 Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Roomy targets Gemini and ChatGPT webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. See the [compatibility record](./docs/compatibility.md) for the flows actually verified.
 

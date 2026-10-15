@@ -1,6 +1,6 @@
 # Engineering and compatibility
 
-Wider Gemini adjusts the conversation width and reading layout of `gemini.google.com` and `chatgpt.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
+Roomy (formerly Wider Gemini) adjusts the conversation width and reading layout of `gemini.google.com` and `chatgpt.com`. It is a Manifest V3 extension with no runtime dependencies, server, or build step. Its source, tests, and release packager are kept together so layout fixes can be reproduced.
 
 ## Implementation case studies
 

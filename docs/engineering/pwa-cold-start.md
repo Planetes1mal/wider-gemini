@@ -1,6 +1,6 @@
 # Recovering a missed content-script injection at browser startup
 
-A Gemini tab can already be open when Wider Gemini becomes available. The same timing matters for a Chrome-installed Gemini site app: the page and extension do not necessarily become ready in the order a navigation-only setup expects. The recovery path lives in [background.js](../../src/background.js), while [gemini-content.js](../../src/content/gemini-content.js) makes re-execution safe.
+A Gemini tab can already be open when Roomy becomes available. The same timing matters for a Chrome-installed Gemini site app: the page and extension do not necessarily become ready in the order a navigation-only setup expects. The recovery path lives in [background.js](../../src/background.js), while [gemini-content.js](../../src/content/gemini-content.js) makes re-execution safe.
 
 This article explains the current repository implementation and how to exercise its existing checks. It does not report a new macOS or live-Gemini cold-start verification.
 

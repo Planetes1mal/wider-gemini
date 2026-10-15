@@ -1,15 +1,15 @@
 # Discovery and measurement
 
-The extension remains focused on Gemini reading layout: conversation width, code wrapping, text size, and spacing. Demonstrations should show those controls solving a visible problem, with the installation link nearby.
+Roomy (formerly Wider Gemini) focuses on the reading layout of Gemini and ChatGPT: conversation width, text size and spacing, code wrapping on Gemini, and message navigation. Demonstrations should show those controls solving a visible problem, with the installation link nearby.
 
 ## Assets and entry points
 
 - The three READMEs show the same real Gemini conversation at 700px and 1200px, using full-page screenshots. They retain contributor documentation and separate `utm_campaign` values for English, Simplified Chinese, and Traditional Chinese installation links.
 - The popup links to local help and the source repository. Help offers troubleshooting, an optional diagnostic copy, GitHub, and an honest store review. No automatic review prompt or reward is involved.
 - [Engineering notes](./engineering.md) explain the existing implementation and link reproducible checks. They offer a concrete basis for technical discussion and contributions.
-- The repository About description, installation URL, and seven relevant topics were saved on GitHub on September 19, 2026.
+- The repository About description, installation URL, and seven relevant topics were saved on GitHub on September 19, 2026. On October 15, 2026 the repository was renamed from `wider-gemini` to `roomy`; the description now names both sites and the former name, and the topics add `chatgpt` and `ai-chat`. Old repository URLs redirect to the new name.
 
-Updated store assets are maintained locally: four screenshots per language across six languages, with the conversation-width comparison first and the table screenshot retained, plus two English promotional images. English assets also serve the global listing. These updated materials have not been uploaded or published. Video production remains paused, and the original recordings and recording scripts remain preserved in an ignored local archive.
+The 3.0.0 store assets were uploaded with the 3.0.0 submission on October 15, 2026: five screenshots per language across six languages (ChatGPT and Gemini width comparisons, tables, reading layout, and code wrapping), a 440×280 and a 1400×560 tile, plus a 1280×640 GitHub social preview. English screenshots also serve the global listing. Their sources and render scripts are kept in an ignored local archive. Each store description starts with “formerly Wider Gemini” for about three months after the rename. Video production remains paused, and the original recordings and recording scripts remain preserved in an ignored local archive.
 
 ## Internal follow-up ready for review
 
@@ -32,8 +32,8 @@ UTM parameters are in the links. Attribution still depends on the store's availa
 
 Use English and Traditional Chinese materials first, then Simplified Chinese. Further localization should follow user demand and a native-language copy review. Avoid changing screenshots, description, and a large feature set simultaneously if the purpose is to understand which change helps.
 
-## Internal iteration and future release boundary
+## Releases
 
-The current work is an internal iteration. It does not require a release ZIP, tag, or publication. Version and release preparation should be decided separately after the changes are reviewed.
+3.0.0 was released on October 15, 2026: GitHub release `v3.0.0`, and a Chrome Web Store submission intended for a staged rollout (10%, then 50%, then 100%). Do not publish another store version while a staged rollout is running, because that stops the earlier version from reaching more users.
 
-If a stable release is requested later, use the existing gated Release workflow and shared packager; only a stable extension ZIP belongs in a Chrome Web Store upload. Keep the contributor's PR #10 layout changes intact unless a real regression has been reproduced. Cross-platform claims still require the relevant device, especially macOS and actual Chrome-installed-app cold starts.
+Later releases use the existing gated Release workflow and shared packager; only a stable extension ZIP belongs in a Chrome Web Store upload. Keep the contributor's PR #10 layout changes intact unless a real regression has been reproduced. Cross-platform claims still require the relevant device, especially macOS and actual Chrome-installed-app cold starts.

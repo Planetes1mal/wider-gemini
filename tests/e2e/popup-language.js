@@ -24,10 +24,16 @@
 
     async function checkBrowser(browserLanguage, check) {
         const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'wg-popup-language-'));
+        // Chrome on macOS ignores --lang and takes its UI language from AppleLanguages, which a Cocoa
+        // user-defaults argument overrides for this process only. Chrome also reads that "(locale)" value
+        // as a page to open, so it starts without a window instead of opening about:blank.
+        const languageArgs = process.platform === 'darwin'
+            ? ['--no-startup-window', '-AppleLanguages', `(${browserLanguage})`]
+            : [`--lang=${browserLanguage}`, 'about:blank'];
         const child = spawn(process.env.WG_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe', [
             '--headless=new', '--remote-debugging-pipe', '--enable-unsafe-extension-debugging',
-            `--user-data-dir=${profile}`, `--lang=${browserLanguage}`, '--no-first-run',
-            '--no-default-browser-check', '--disable-sync', '--disable-background-networking', 'about:blank'
+            `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check', '--disable-sync',
+            '--disable-background-networking', ...languageArgs
         ], { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'], windowsHide: true });
         const pending = new Map();
         const closed = new Promise(resolve => child.once('close', resolve));

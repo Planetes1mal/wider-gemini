@@ -7,7 +7,7 @@ const path = require('path');
 
 const sourceRoot = path.resolve(__dirname, '..');
 const powershell = process.env.WG_POWERSHELL || (process.platform === 'win32' ? 'powershell.exe' : 'pwsh');
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'wider-gemini release '));
+const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'roomy release '));
 const fixtureRoot = path.join(tempRoot, 'extension source');
 const outputRoot = path.join(tempRoot, 'release output');
 const externalCwd = path.join(tempRoot, 'external working directory');
@@ -68,13 +68,13 @@ function expectSuccess(version, prerelease) {
     assert.strictEqual(report.Package.Version, version);
     assert.strictEqual(report.Package.ManifestVersion, '2.6.0');
     assert.strictEqual(report.Package.Prerelease, prerelease);
-    assert.strictEqual(report.Package.ArchivePath, path.join(outputRoot, `wider-gemini-${version}.zip`));
+    assert.strictEqual(report.Package.ArchivePath, path.join(outputRoot, `roomy-${version}.zip`));
     assert.strictEqual(fs.readFileSync(notesPath, 'utf8'), noteBodies[version]);
     assert.deepStrictEqual(report.Entries.map(entry => entry.Name).sort(), [...files].sort());
     for (const entry of report.Entries) {
         assert.strictEqual(entry.Hash, hashFile(path.join(fixtureRoot, entry.Name)), entry.Name);
     }
-    assert.ok(!fs.readdirSync(outputRoot).some(name => name.startsWith('.wider-gemini-')));
+    assert.ok(!fs.readdirSync(outputRoot).some(name => name.startsWith('.roomy-')));
     checks++;
 }
 
@@ -164,6 +164,6 @@ Write-Output ('RESULT:' + ($report | ConvertTo-Json -Depth 5 -Compress))
     // Resolve and verify the one temporary fixture root before deleting it recursively.
     const cleanupPath = path.resolve(tempRoot);
     assert.strictEqual(path.dirname(cleanupPath), path.resolve(os.tmpdir()));
-    assert.ok(path.basename(cleanupPath).startsWith('wider-gemini release '));
+    assert.ok(path.basename(cleanupPath).startsWith('roomy release '));
     fs.rmSync(cleanupPath, { recursive: true, force: true });
 }

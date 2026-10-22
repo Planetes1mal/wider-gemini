@@ -38,7 +38,7 @@ GitHub 版本与 Chrome 应用商店的更新时间可能不同。若要使用 3
 <details>
 <summary>手动安装</summary>
 
-1. 到 [GitHub Releases](https://github.com/Planetes1mal/roomy/releases) 下载最新正式版的 `wider-gemini-*.zip`。
+1. 到 [GitHub Releases](https://github.com/Planetes1mal/roomy/releases) 下载最新正式版的 `roomy-*.zip`。
 2. 解压到一个固定位置，确认文件夹里有 `manifest.json`。
 3. 打开 `chrome://extensions/`，开启右上角的 **开发者模式**。
 4. 点击 **加载已解压的扩展程序**，选择刚才解压的文件夹。

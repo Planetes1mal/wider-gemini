@@ -38,7 +38,7 @@ GitHub 版本與 Chrome 線上應用程式商店的更新時間可能不同。�
 <details>
 <summary>手動安裝</summary>
 
-1. 到 [GitHub Releases](https://github.com/Planetes1mal/roomy/releases) 下載最新正式版的 `wider-gemini-*.zip`。
+1. 到 [GitHub Releases](https://github.com/Planetes1mal/roomy/releases) 下載最新正式版的 `roomy-*.zip`。
 2. 解壓縮至固定位置，確認資料夾內有 `manifest.json`。
 3. 開啟 `chrome://extensions/`，開啟右上角的 **開發人員模式**。
 4. 點選 **載入未封裝項目**，選取剛才解壓縮的資料夾。

@@ -40,15 +40,15 @@ jobs:
           "prerelease=$($package.Prerelease.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
 
       - name: Write SHA-256 checksum
-        run: sha256sum "wider-gemini-${{ steps.package.outputs.version }}.zip" > "wider-gemini-${{ steps.package.outputs.version }}.zip.sha256"
+        run: sha256sum "roomy-${{ steps.package.outputs.version }}.zip" > "roomy-${{ steps.package.outputs.version }}.zip.sha256"
 
       - name: Keep the package for verification and release
         uses: actions/upload-artifact@v7
         with:
           name: release-package
           path: |
-            wider-gemini-${{ steps.package.outputs.version }}.zip
-            wider-gemini-${{ steps.package.outputs.version }}.zip.sha256
+            roomy-${{ steps.package.outputs.version }}.zip
+            roomy-${{ steps.package.outputs.version }}.zip.sha256
             release_body.md
           if-no-files-found: error
 
@@ -74,7 +74,7 @@ jobs:
       - name: Check the checksum and load the package in Chrome
         shell: pwsh
         run: |
-          $zip = "release-package/wider-gemini-${{ needs.package.outputs.version }}.zip"
+          $zip = "release-package/roomy-${{ needs.package.outputs.version }}.zip"
           $expected = (Get-Content -LiteralPath "$zip.sha256" -Raw).Split(' ')[0].Trim()
           $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($actual -ne $expected) { throw "Checksum mismatch: $actual (file) vs $expected (recorded)" }
@@ -105,8 +105,8 @@ jobs:
           name: Roomy ${{ github.ref_name }}
           body_path: release_body.md
           files: |
-            wider-gemini-${{ needs.package.outputs.version }}.zip
-            wider-gemini-${{ needs.package.outputs.version }}.zip.sha256
+            roomy-${{ needs.package.outputs.version }}.zip
+            roomy-${{ needs.package.outputs.version }}.zip.sha256
           fail_on_unmatched_files: true
           prerelease: ${{ needs.package.outputs.prerelease == 'true' }}
           make_latest: ${{ needs.package.outputs.prerelease == 'true' && 'false' || 'legacy' }}

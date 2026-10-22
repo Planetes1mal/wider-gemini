@@ -38,7 +38,7 @@ GitHub releases and Chrome Web Store updates can follow different schedules. For
 <details>
 <summary>Manual installation</summary>
 
-1. Download `wider-gemini-*.zip` from the latest stable release on [GitHub Releases](https://github.com/Planetes1mal/roomy/releases).
+1. Download `roomy-*.zip` from the latest stable release on [GitHub Releases](https://github.com/Planetes1mal/roomy/releases).
 2. Extract it to a folder you intend to keep. Make sure the folder contains `manifest.json`.
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.

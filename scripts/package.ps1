@@ -63,8 +63,8 @@ foreach ($file in $files) {
 if (-not $OutputDirectory) { $OutputDirectory = $repoRoot }
 $outputRoot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDirectory)
 [void][System.IO.Directory]::CreateDirectory($outputRoot)
-$archivePath = Join-Path $outputRoot "wider-gemini-$releaseVersion.zip"
-$temporaryZip = Join-Path $outputRoot ('.wider-gemini-' + [guid]::NewGuid().ToString('N') + '.zip')
+$archivePath = Join-Path $outputRoot "roomy-$releaseVersion.zip"
+$temporaryZip = Join-Path $outputRoot ('.roomy-' + [guid]::NewGuid().ToString('N') + '.zip')
 
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 try {

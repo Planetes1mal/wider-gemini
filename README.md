@@ -7,7 +7,7 @@ Formerly **Wider Gemini**.
 A Chrome extension for adjusting the width and reading layout of Gemini and ChatGPT conversations. Each site remembers its own settings.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-4285F4)](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en)
-[![GitHub Release 3.0.0](https://img.shields.io/badge/release-v3.0.0-blue)](https://github.com/Planetes1mal/roomy/releases/tag/v3.0.0)
+[![GitHub Release 3.0.1](https://img.shields.io/badge/release-v3.0.1-blue)](https://github.com/Planetes1mal/roomy/releases/tag/v3.0.1)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Roomy.
@@ -33,7 +33,7 @@ Settings are saved automatically, and changes apply to open pages for the select
 
 Open the [Chrome Web Store listing](https://chromewebstore.google.com/detail/apadogadaahdjhhmbdhkmdecbobijoed?utm_source=github&utm_medium=readme&utm_campaign=en) and click **Add to Chrome**. If you already use Wider Gemini, Chrome updates it to Roomy automatically and keeps your settings.
 
-GitHub releases and Chrome Web Store updates can follow different schedules. For version 3.0.0, use the matching GitHub release below.
+GitHub releases and Chrome Web Store updates can follow different schedules. For version 3.0.1, use the matching GitHub release below.
 
 <details>
 <summary>Manual installation</summary>
@@ -43,7 +43,7 @@ GitHub releases and Chrome Web Store updates can follow different schedules. For
 3. Open `chrome://extensions/` and enable **Developer mode** in the top right.
 4. Click **Load unpacked** and select the extracted folder.
 
-If you manually installed a 3.0.0 release candidate, replace its files and reload the extension to use the stable build; it will not automatically upgrade from the candidate.
+If you manually installed a release candidate, replace its files with the stable release and reload the extension; candidates do not upgrade automatically.
 
 </details>
 

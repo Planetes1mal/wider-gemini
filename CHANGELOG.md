@@ -4,6 +4,18 @@ All notable changes to Roomy (formerly Wider Gemini) are documented in this file
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
+## 3.0.1 (2026-10-22)
+
+### Fixes
+
+- The help page's ChatGPT link is now translated, like the Gemini link next to it.
+
+### Other
+
+- The help page's review link uses the extension ID, so it keeps working if the store name changes.
+- Console messages from the extension now start with `[Roomy]`.
+- Release packages on GitHub are named `roomy-<version>.zip`; earlier releases keep their `wider-gemini-*.zip` names.
+
 ## 3.0.0 (2026-10-15)
 
 Wider Gemini is now **Roomy**, and it works on ChatGPT as well as Gemini. The extension ID, saved Gemini settings and store reviews are unchanged. ChatGPT access is optional: updating from 2.8.0 adds no permission warning, and Chrome asks for ChatGPT access only after you click **Allow ChatGPT access** in the popup.

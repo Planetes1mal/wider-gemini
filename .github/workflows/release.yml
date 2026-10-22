@@ -39,16 +39,12 @@ jobs:
           "version=$($package.Version)" >> $env:GITHUB_OUTPUT
           "prerelease=$($package.Prerelease.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
 
-      - name: Write SHA-256 checksum
-        run: sha256sum "roomy-${{ steps.package.outputs.version }}.zip" > "roomy-${{ steps.package.outputs.version }}.zip.sha256"
-
       - name: Keep the package for verification and release
         uses: actions/upload-artifact@v7
         with:
           name: release-package
           path: |
             roomy-${{ steps.package.outputs.version }}.zip
-            roomy-${{ steps.package.outputs.version }}.zip.sha256
             release_body.md
           if-no-files-found: error
 
@@ -71,14 +67,10 @@ jobs:
           name: release-package
           path: release-package
 
-      - name: Check the checksum and load the package in Chrome
+      - name: Load the package in Chrome
         shell: pwsh
         run: |
           $zip = "release-package/roomy-${{ needs.package.outputs.version }}.zip"
-          $expected = (Get-Content -LiteralPath "$zip.sha256" -Raw).Split(' ')[0].Trim()
-          $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($actual -ne $expected) { throw "Checksum mismatch: $actual (file) vs $expected (recorded)" }
-          Write-Host "SHA-256 $actual"
           Expand-Archive -LiteralPath $zip -DestinationPath package-check
           $chromePath = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe').'(default)'
           Write-Host "Google Chrome $((Get-Item -LiteralPath $chromePath).VersionInfo.ProductVersion) ($chromePath)"
@@ -104,9 +96,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Roomy ${{ github.ref_name }}
           body_path: release_body.md
-          files: |
-            roomy-${{ needs.package.outputs.version }}.zip
-            roomy-${{ needs.package.outputs.version }}.zip.sha256
+          files: roomy-${{ needs.package.outputs.version }}.zip
           fail_on_unmatched_files: true
           prerelease: ${{ needs.package.outputs.prerelease == 'true' }}
           make_latest: ${{ needs.package.outputs.prerelease == 'true' && 'false' || 'legacy' }}

@@ -12,9 +12,9 @@ A Chrome extension for adjusting the width and reading layout of Gemini and Chat
 
 The same full Gemini conversation at the same window size, with the conversation width set to 700px and then 1200px using Roomy.
 
-![Full Gemini conversation at 700px width](./docs/images/conversation-before.png)
-
-![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)
+| 700px | 1200px |
+| :---: | :---: |
+| [![Full Gemini conversation at 700px width](./docs/images/conversation-before.png)](./docs/images/conversation-before.png) | [![The same full Gemini conversation at 1200px width](./docs/images/conversation-after.png)](./docs/images/conversation-after.png) |
 
 ## Features
 

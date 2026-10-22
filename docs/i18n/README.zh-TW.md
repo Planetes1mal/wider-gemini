@@ -12,9 +12,9 @@
 
 同一段完整的 Gemini 對話、相同的視窗大小：使用 Roomy 將對話寬度分別設為 700px 和 1200px。
 
-![700px 寬度的完整 Gemini 對話頁面](../images/conversation-before.png)
-
-![1200px 寬度的同一完整 Gemini 對話頁面](../images/conversation-after.png)
+| 700px | 1200px |
+| :---: | :---: |
+| [![700px 寬度的完整 Gemini 對話頁面](../images/conversation-before.png)](../images/conversation-before.png) | [![1200px 寬度的同一完整 Gemini 對話頁面](../images/conversation-after.png)](../images/conversation-after.png) |
 
 ## 功能
 

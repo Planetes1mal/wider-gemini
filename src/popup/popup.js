@@ -24,7 +24,7 @@ function loadLanguageDictionary(language) {
             });
         })
         .catch(err => {
-            console.error('[Wider Gemini] Failed to load language dictionary:', language, err);
+            console.error('[Roomy] Failed to load language dictionary:', language, err);
             i18nDictionary = null;
         });
 }
@@ -397,7 +397,7 @@ async function onSaved(site) {
 
 // 写入失败时显示错误，并按存储中最后一次确认的值重新渲染控件。
 async function onSaveFailed(site, error) {
-    console.error('[Wider Gemini] Settings could not be saved:', error);
+    console.error('[Roomy] Settings could not be saved:', error);
     failedSinceFlush = true;
     try {
         Object.assign(storedSettings, await chrome.storage.sync.get(settingsUtils.getSiteStorageKeys(site)));
@@ -498,7 +498,7 @@ function notifySiteTabs(site, message) {
         }));
     }).then(() => {
         if (site === selectedSite) refreshLayoutStatus();
-    }).catch(error => console.error('[Wider Gemini] Could not query site tabs:', error));
+    }).catch(error => console.error('[Roomy] Could not query site tabs:', error));
 }
 
 function hasReadingEffect(settings) {
@@ -727,7 +727,7 @@ grantChatgptPermission.addEventListener('click', function () {
     const request = chrome.permissions.request({ origins: [settingsUtils.SITE_MATCHES.chatgpt] });
     grantChatgptPermission.disabled = true;
     request.then(refreshPermission).catch(error => {
-        console.error('[Wider Gemini] Could not request ChatGPT permission:', error);
+        console.error('[Roomy] Could not request ChatGPT permission:', error);
         setStatus('error', t('chatgptPermissionFailed', 'Could not request access. Please try again.'));
     }).finally(() => { grantChatgptPermission.disabled = false; });
 });
@@ -857,7 +857,7 @@ async function runTaskPreset(restore) {
         await flushPendingChanges();
         message = await enqueue(() => restore ? restoreTask(site) : applyTask(site, task));
     } catch (error) {
-        console.error('[Wider Gemini] Task preset could not be saved:', error);
+        console.error('[Roomy] Task preset could not be saved:', error);
         message = t('taskSaveError');
         await readSite(site).catch(() => {});
         siteSettings[site] = settingsUtils.normalizeSiteSettings(storedSettings, site);
@@ -929,7 +929,7 @@ async function initializeSettings() {
         setTaskBusy(false);
         refreshLayoutStatus();
     } catch (error) {
-        console.error('[Wider Gemini] Settings could not be loaded:', error);
+        console.error('[Roomy] Settings could not be loaded:', error);
         setStatus('error', t('saveFailed', 'Could not save. Please try again.'));
     }
 }

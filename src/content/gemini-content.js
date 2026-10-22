@@ -154,7 +154,7 @@
                     });
                 }
             } catch (e) {
-                console.error(`[Wider Gemini] CSS query error: ${css.key}`, e);
+                console.error(`[Roomy] CSS query error: ${css.key}`, e);
             }
         }
     }
@@ -306,7 +306,7 @@
 
         const isDeepResearch = document.querySelector('#extended-response-message-content') !== null;
         if (isDeepResearch) {
-            console.log('[Wider Gemini] Deep Research page detected, using 1600px width');
+            console.log('[Roomy] Deep Research page detected, using 1600px width');
             widthCssValue = '1600px';
         }
         // 显示消息导航且对话几乎占满窗格时，两侧各留出导航条宽度；保存的宽度值不变。
@@ -316,7 +316,7 @@
         setWidthProperty(root, '--gemini-chat-width', widthCssValue, '');
         modifyElementStyles(widthCssValue);
         applyDragDropStyles();
-        console.log(`[Wider Gemini] Applied width ${widthCssValue}`);
+        console.log(`[Roomy] Applied width ${widthCssValue}`);
     }
 
     function applyDragDropStyles() {
@@ -405,7 +405,7 @@
                 }
             });
         } catch (e) {
-            console.log('[Wider Gemini] alignImageCaptions failed:', e.message);
+            console.log('[Roomy] alignImageCaptions failed:', e.message);
         }
     }
 
@@ -600,7 +600,7 @@
                 applyAllSettings();
             });
         } catch (e) {
-            console.log('[Wider Gemini] Failed to get storage:', e.message);
+            console.log('[Roomy] Failed to get storage:', e.message);
         }
     }
 
@@ -835,7 +835,7 @@
             queueNavigation();
         }, { signal: listenerControl.signal });
 
-        console.log('[Wider Gemini] MutationObserver and drag listeners started');
+        console.log('[Roomy] MutationObserver and drag listeners started');
     }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -918,6 +918,6 @@
             }
         };
 
-        console.log('[Wider Gemini] Debug tools loaded, use window.widerGeminiDebug to access');
+        console.log('[Roomy] Debug tools loaded, use window.widerGeminiDebug to access');
     }
 })();

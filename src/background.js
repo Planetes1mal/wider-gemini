@@ -43,7 +43,7 @@
             injectImmediately: true,
             files: contentScript.js
         });
-        console.log('[Wider Gemini] Injected content script into tab', tab.id);
+        console.log('[Roomy] Injected content script into tab', tab.id);
     }
 
     async function injectIntoOpenTabs(scripts) {
@@ -56,11 +56,11 @@
                     try {
                         await injectContentScript(tab, contentScript, loadedFlag);
                     } catch (e) {
-                        console.log('[Wider Gemini] Skipped tab', tab.id, e.message);
+                        console.log('[Roomy] Skipped tab', tab.id, e.message);
                     }
                 }));
             } catch (e) {
-                console.log('[Wider Gemini] Could not query site tabs', e.message);
+                console.log('[Roomy] Could not query site tabs', e.message);
             }
         }));
     }
@@ -76,7 +76,7 @@
             }
             if (!registered.length) await chrome.scripting.registerContentScripts([chatgptScript]);
             await injectIntoOpenTabs([chatgptScript]);
-        }).catch(error => console.error('[Wider Gemini] Could not update ChatGPT permission:', error));
+        }).catch(error => console.error('[Roomy] Could not update ChatGPT permission:', error));
         return permissionUpdate;
     }
 
@@ -113,7 +113,7 @@
                 await showIntroBadge();
             }
         } catch (e) {
-            console.log('[Wider Gemini] Could not update the ChatGPT notice', e.message);
+            console.log('[Roomy] Could not update the ChatGPT notice', e.message);
         }
     }
 
@@ -126,7 +126,7 @@
             // 浏览器窗口未激活等情况下无法弹出，角标仍会提示用户。
             if (details.reason === 'install') await chrome.action.openPopup();
         } catch (e) {
-            console.log('[Wider Gemini] Could not show the ChatGPT notice', e.message);
+            console.log('[Roomy] Could not show the ChatGPT notice', e.message);
         }
     }
 

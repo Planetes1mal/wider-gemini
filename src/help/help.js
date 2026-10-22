@@ -33,7 +33,7 @@
                 const response = await fetch(chrome.runtime.getURL(`_locales/${selected}/messages.json`));
                 dictionary = await response.json();
             } catch (e) {
-                console.error('[Wider Gemini] Failed to load help language:', e.message);
+                console.error('[Roomy] Failed to load help language:', e.message);
             }
         }
         document.documentElement.lang = t('localeCode', 'en');

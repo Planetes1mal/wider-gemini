@@ -13,7 +13,6 @@ const PUBLIC = [
     /^(CHANGELOG|CONTRIBUTING|README|README\.zh-CN)\.md$/,
     /^LICENSE$/,
     /^manifest\.json$/,
-    /^package\.bat$/,
     /^_locales\/[A-Za-z_]+\/messages\.json$/,
     /^src\//,
     /^tests\//,

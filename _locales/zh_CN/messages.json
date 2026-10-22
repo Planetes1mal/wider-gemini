@@ -156,6 +156,9 @@
   "helpOpenGemini": {
     "message": "打开 Gemini"
   },
+  "helpOpenChatgpt": {
+    "message": "打开 ChatGPT"
+  },
   "helpTroubleshooting": {
     "message": "显示不符合预期？"
   },

@@ -156,6 +156,9 @@
   "helpOpenGemini": {
     "message": "Abrir Gemini"
   },
+  "helpOpenChatgpt": {
+    "message": "Abrir ChatGPT"
+  },
   "helpTroubleshooting": {
     "message": "¿Algo no se ve bien?"
   },

@@ -156,6 +156,9 @@
   "helpOpenGemini": {
     "message": "Gemini を開く"
   },
+  "helpOpenChatgpt": {
+    "message": "ChatGPT を開く"
+  },
   "helpTroubleshooting": {
     "message": "表示がおかしいときは"
   },

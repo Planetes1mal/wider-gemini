@@ -156,6 +156,9 @@
   "helpOpenGemini": {
     "message": "Gemini 열기"
   },
+  "helpOpenChatgpt": {
+    "message": "ChatGPT 열기"
+  },
   "helpTroubleshooting": {
     "message": "화면이 제대로 표시되지 않나요?"
   },

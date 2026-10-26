@@ -46,10 +46,14 @@
             }
             const editor = ctx.findVisible(selectors.editor);
             if (editor) {
-                // 首页（/new）：只有输入区，限宽层是卡片槽（display: contents）的第一个子元素
+                // 首页（/new）：只有输入区。限宽层（41rem）是卡片槽（display: contents）下包含输入框的那个直接子元素；
+                // 槽里还有一个高度为 0 的装饰层，不能按“第一个子元素”取。
                 const slot = editor.closest(selectors.homeSlot);
-                const owner = slot && slot.firstElementChild;
-                if (owner && ctx.isVisible(owner) && slot.parentElement) {
+                let owner = null;
+                for (let el = editor; slot && el && el !== slot; el = el.parentElement) {
+                    if (el.parentElement === slot) owner = el;
+                }
+                if (owner && slot.parentElement) {
                     return { kind: 'home', root: null, pane: slot.parentElement, widthOwners: [{ element: owner, strategy: 'maxWidth' }] };
                 }
             }

@@ -37,6 +37,8 @@ body:
         - Gemini installed as a Chrome app (PWA) / Chrome 安装的 Gemini 网站应用
         - ChatGPT website in a browser tab / 浏览器中的 ChatGPT 网页
         - ChatGPT installed as a Chrome app / Chrome 安装的 ChatGPT 网站应用
+        - Claude website in a browser tab / 浏览器中的 Claude 网页
+        - Claude installed as a Chrome app / Chrome 安装的 Claude 网站应用
         - Native Gemini app or Chrome's built-in panel / 原生 Gemini 应用或 Chrome 内置面板
         - Other / 其他
   - type: textarea

@@ -93,3 +93,15 @@ Open ChatGPT's page in the popup (from the site list, or directly when ChatGPT i
 | Large text | 1000 px | 140% |
 
 Use the switch beside the site name at the top of its page to compare with the original page: turning it off pauses everything on that site while keeping your settings.
+
+## Claude
+
+Open Claude's page in the popup (from the site list, or directly when claude.ai is the current tab), then click **Allow Claude access** and confirm Chrome's prompt if access has not been granted yet. Width, font size, reading density, Advanced spacing, full-width user messages and message navigation work as described above, with separate saved values for Claude. Density and manual spacing change prose only: code lines, table rows and formulas keep Claude's own spacing. Claude has no code-wrap control at all, so long code lines scroll inside the block.
+
+| Task | Requested width | Font |
+|---|---|---|
+| Long reading | 1000 px | 110% |
+| Wide (tables & code) | 90% | 100% |
+| Large text | 1000 px | 140% |
+
+Roomy adjusts Claude's conversation pages and the new-chat page. When the Artifacts panel is open, the conversation is capped at the space left beside the panel; the panel itself and its content are not changed. Projects, settings, Claude Code and shared pages keep their native layout, and the popup says so.

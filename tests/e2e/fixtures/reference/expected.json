@@ -1,0 +1,36 @@
+{
+    "viewport": [
+        1600,
+        1000
+    ],
+    "turns": 3,
+    "scrollInset": 72,
+    "unknown": {
+        "selector": "[data-probe=\"column\"]",
+        "attribute": "data-conversation"
+    },
+    "narrowPane": {
+        "selector": "main",
+        "style": "width:700px"
+    },
+    "home": {
+        "hide": "[data-probe=\"column\"]",
+        "attributes": [
+            {
+                "selector": "[data-probe=\"composer\"]",
+                "attribute": "data-placement",
+                "value": "home"
+            }
+        ]
+    },
+    "notApplicable": {
+        "hide": "[data-probe=\"column\"], [data-probe=\"composer\"]",
+        "attributes": [
+            {
+                "selector": "body",
+                "attribute": "data-page",
+                "value": "settings"
+            }
+        ]
+    }
+}

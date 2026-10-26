@@ -30,6 +30,9 @@ tests/e2e/*
 !tests/e2e/performance.js
 !tests/e2e/package-load.js
 !tests/e2e/popup-language.js
+!tests/e2e/sites.js
+!tests/e2e/popup-sites.js
+!tests/e2e/fixtures/
 .scratch/
 .scratch/**
 docs/action-plan-status.md

@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- 参考站点：合成的通用对话页面（固定 max-width 的消息列与输入区，普通方向的滚动容器）。
+     它不对应任何真实网站，只用来验证公共内核本身；真实网站的页面从线上采集还原。 -->
+<style>
+    *, ::before, ::after { box-sizing: border-box; }
+    body { margin: 0; font: 16px/26px sans-serif; }
+    main { display: flex; flex-direction: column; height: 100vh; }
+    .topbar { height: 56px; flex: 0 0 auto; }
+    .scroll { flex: 1; min-height: 0; overflow-y: auto; }
+    .column { max-width: 768px; width: 100%; margin: 0 auto; padding: 0 16px; }
+    .composer-wrap { flex: 0 0 auto; padding: 8px 0 16px; }
+    .composer { max-width: 768px; width: 100%; margin: 0 auto; padding: 0 16px; }
+    .composer [contenteditable] { min-height: 40px; border: 1px solid #ccc; font-size: 16px; }
+    [data-role="user"] { display: flex; justify-content: flex-end; margin: 16px 0; }
+    [data-role="user"] .bubble { max-width: 70%; padding: 10px 16px; background: #eee; line-height: 24px; }
+    .markdown p { margin: 0 0 16px; }
+    .markdown h3 { font-size: 20px; line-height: 28px; margin: 16px 0 8px; }
+    .markdown li { margin: 4px 0; }
+    .markdown ul { margin: 0 0 16px; padding-left: 24px; }
+    .markdown code { font-size: .875em; }
+    .markdown pre { margin: 0; font-size: 12px; line-height: 20px; white-space: pre; overflow-x: auto; }
+    .markdown pre code { font-size: inherit; }
+    .markdown td { font-size: 14px; }
+    .markdown table { min-width: 2400px; }
+    .table-scroll { overflow-x: auto; }
+    button { font: inherit; font-size: 13px; }
+    .answer-filler { min-height: 420px; }
+</style>
+</head>
+<body>
+<main>
+    <div class="topbar"></div>
+    <div class="scroll" data-probe="scroll">
+        <div class="column" data-probe="column" data-conversation>
+            <div data-role="user"><div class="bubble" data-probe="bubble"><span data-probe="user">Short user question</span></div></div>
+            <div data-role="assistant"><div class="markdown" data-probe="markdown">
+                <h3 data-probe="h">Heading</h3>
+                <p data-probe="p1">First paragraph <code data-probe="inline">inline</code>
+                    <span class="katex" data-probe="katex" style="font-size:1.21em;line-height:1.2">x</span></p>
+                <p data-probe="p2">Second paragraph</p>
+                <ul data-probe="ul"><li data-probe="li">Item</li></ul>
+                <div><div><button data-probe="copy">Copy</button></div>
+                    <pre data-probe="pre"><code data-probe="code">long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_</code></pre></div>
+                <div class="table-scroll" data-probe="table-scroll"><table><tbody>
+                    <tr><td data-probe="td">wide cell wide cell wide cell wide cell wide cell wide cell</td></tr></tbody></table></div>
+                <div class="answer-filler"></div>
+            </div></div>
+            <div data-role="user"><div class="bubble"><span>Second question</span></div></div>
+            <div data-role="assistant"><div class="markdown"><p>Second answer</p><div class="answer-filler"></div></div></div>
+            <div data-role="user"><div class="bubble"><span>Third question</span></div></div>
+            <div data-role="assistant"><div class="markdown"><p>Third answer</p><div class="answer-filler"></div></div></div>
+        </div>
+    </div>
+    <div class="composer-wrap" data-probe="footer">
+        <div class="composer" data-probe="composer" data-placement="chat"><div contenteditable="true" data-probe="composer-input"></div></div>
+    </div>
+</main>
+</body>
+</html>

@@ -51,7 +51,7 @@
                 storage:{sync:{get(keys,callback){window.__counts.storageReads++;queueMicrotask(()=>callback(window.__settings));}},
                 onChanged:{addListener(){}}}};
             window.__frames=async count=>{for(let i=0;i<count;i++)await new Promise(requestAnimationFrame);};
-        `)}${enabled ? script(read('src/shared/settings-utils.js')) + script(read('src/content/gemini-content.js')) : ''}
+        `)}${enabled ? script(read('src/shared/sites.js')) + script(read('src/shared/settings-utils.js')) + script(read('src/content/gemini-content.js')) : ''}
         ${script(`
             addEventListener('load',async()=>{await window.__frames(2);window.__firstSettledMs=performance.now();window.__ready=true;});
             window.__append=async()=>{

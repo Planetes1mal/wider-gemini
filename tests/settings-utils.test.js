@@ -3,10 +3,13 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
+const sitesPath = path.join(__dirname, '..', 'src/shared/sites.js');
 const utilsPath = path.join(__dirname, '..', 'src/shared/settings-utils.js');
 const source = fs.readFileSync(utilsPath, 'utf8');
 const sandbox = { console, Object, Array, Number, Math, parseInt, parseFloat, isFinite: Number.isFinite };
 sandbox.globalThis = sandbox;
+// 设置层由站点注册表驱动：先加载注册表，再加载设置层。
+vm.runInNewContext(fs.readFileSync(sitesPath, 'utf8'), sandbox, { filename: 'sites.js' });
 vm.runInNewContext(source, sandbox, { filename: 'settings-utils.js' });
 
 const utils = sandbox.widerGeminiSettings;

@@ -161,7 +161,7 @@
         </div>
         ${script(`window.initialStore = { chatgptWidthSettings:{ widthEnabled:true, chatWidthSetting:{ value:1000, unit:'px' } },
             chatgptReadingSettings:{ messageFontSize:125 } };` + harness)}
-        ${script(read('src/shared/settings-utils.js'))}${script(read('src/content/message-navigation.js'))}
+        ${script(read('src/shared/sites.js'))}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/message-navigation.js'))}
         ${script(read('src/content/chatgpt-content.js'))}
         ${script(`
             const show = id => { qa('.route').forEach(el => el.setAttribute('hidden-route', '')); q('#' + id).removeAttribute('hidden-route'); };
@@ -454,7 +454,7 @@
             ${geminiTurn(1, true)}${geminiTurn(2)}${geminiTurn(3)}
         </infinite-scroller><input-container><div class="input-area-container"><input-area-v2>Composer</input-area-v2></div></input-container></div></chat-window>
         ${script(`window.initialStore = { chatWidthSetting:{ value:1000, unit:'px' } };` + harness)}
-        ${script(read('src/shared/settings-utils.js'))}${script(read('src/content/message-navigation.js'))}
+        ${script(read('src/shared/sites.js'))}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/message-navigation.js'))}
         ${script(read('src/content/gemini-content.js'))}
         ${script(`
             window.addEventListener('load', async () => {

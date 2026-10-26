@@ -94,7 +94,7 @@
                 storage:{ sync:{ get(keys, cb){ cb(JSON.parse(JSON.stringify(window.store))); } },
                     onChanged:{ addListener(fn){ window.deliverStorage = fn; } } }
             };
-        `)}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/chatgpt-content.js'))}
+        `)}${script(read('src/shared/sites.js'))}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/chatgpt-content.js'))}
         ${script(`
             const frames = () => new Promise(resolve => setTimeout(resolve, 50));
             const q = selector => document.querySelector(selector);

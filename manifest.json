@@ -39,6 +39,7 @@
                 "https://gemini.google.com/*"
             ],
             "js": [
+                "src/shared/sites.js",
                 "src/shared/settings-utils.js",
                 "src/content/message-navigation.js",
                 "src/content/gemini-content.js"

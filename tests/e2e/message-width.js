@@ -84,7 +84,7 @@
                 runtime:{id:'width-regression',onMessage:{addListener(fn){window.deliver=fn;}}},
                 storage:{sync:{get(keys,cb){cb(window.settings);}},onChanged:{addListener(fn){window.deliverStorage=fn;}}}
             };
-        `)}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/gemini-content.js'))}
+        `)}${script(read('src/shared/sites.js'))}${script(read('src/shared/settings-utils.js'))}${script(read('src/content/gemini-content.js'))}
         ${script(`
             window.addEventListener('load', async () => {
                 const width = node => node.getBoundingClientRect().width;

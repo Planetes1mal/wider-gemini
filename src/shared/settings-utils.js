@@ -1,41 +1,53 @@
 (function (global) {
     'use strict';
 
+    // 站点注册表（sites.js）必须先加载：存储键、任务预设和能力都由它推导。
+    const sites = global.widerRoomySites;
+    const SITE_IDS = sites.sites.map(site => site.id);
+    const keysById = Object.fromEntries(SITE_IDS.map(id => [id, sites.getStorageKeys(id)]));
+    const keyMap = name => Object.fromEntries(SITE_IDS.map(id => [id, keysById[id][name]]));
+
     const UNIT_PX = 'px';
     const UNIT_PERCENT = 'percent';
     const PRESET_COUNT = 5;
-    const CHATGPT_WIDTH_KEY = 'chatgptWidthSettings';
-    const CHATGPT_READING_KEY = 'chatgptReadingSettings';
-    const SITE_ENABLED_KEYS = { gemini: 'geminiEnabled', chatgpt: 'chatgptEnabled' };
-    const TASK_UNDO_KEYS = { gemini: 'taskPresetUndo', chatgpt: 'chatgptTaskPresetUndo' };
-    // 新装或从 3.0 之前更新后、尚未打开弹窗时为 true（chrome.storage.local），工具栏图标显示角标。
-    const CHATGPT_INTRO_KEY = 'chatgptIntroPending';
+    const SITE_ENABLED_KEYS = keyMap('enabled');
+    const TASK_UNDO_KEYS = keyMap('taskUndo');
     // 消息导航按网站独立开关，不属于任务预设管理的字段。
-    const NAVIGATION_KEYS = { gemini: 'geminiMessageNavigationEnabled', chatgpt: 'chatgptMessageNavigationEnabled' };
+    const NAVIGATION_KEYS = keyMap('navigation');
+    // 宽度与阅读对象的键；Gemini 用顶层键，这里为 null。
+    const SITE_WIDTH_KEYS = keyMap('width');
+    const SITE_READING_KEYS = keyMap('reading');
+    // 新装或从加入该网站之前的版本更新后、尚未打开弹窗时存在（chrome.storage.local），工具栏图标显示角标。
+    const SITE_INTRO_KEYS = keyMap('intro');
+    // 旧导出名保留给 chatgpt-content.js 与现有测试，直到它迁到内核。
+    const CHATGPT_WIDTH_KEY = SITE_WIDTH_KEYS.chatgpt;
+    const CHATGPT_READING_KEY = SITE_READING_KEYS.chatgpt;
+    const CHATGPT_INTRO_KEY = SITE_INTRO_KEYS.chatgpt;
     // 内容脚本协议版本：2 起支持总开关、阅读设置刷新与细分状态。
     const PROTOCOL_VERSION = 2;
     const DENSITY_KEYS = ['messageCompactness', 'messageSpacingCustom', 'messageLineHeight', 'messageParagraphSpacing'];
     const READING_KEYS = [...DENSITY_KEYS, 'messageFontSize', 'userFullWidth'];
     const GEMINI_WIDTH_KEYS = ['widthEnabled', 'chatWidth', 'chatWidthSetting', 'widthMin', 'widthMax',
         'widthPercentMin', 'widthPercentMax', 'presetsByUnit', 'presets'];
-    const TASK_PRESETS = {
-        gemini: {
-            reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110, codeWrap: true },
-            table: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: false },
-            code: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: true },
-            large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140, codeWrap: true }
-        },
-        // ChatGPT 代码换行由网站原生按钮控制，任务不涉及。
-        chatgpt: {
-            reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110 },
-            wide: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100 },
-            large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140 }
-        }
+    // 任务预设的定义；每个网站在注册表里选用其中几项。代码换行只对有 codeWrap 能力的网站生效。
+    const TASK_DEFINITIONS = {
+        reading: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 110, codeWrap: true },
+        table: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: false },
+        code: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100, codeWrap: true },
+        wide: { chatWidthSetting: { value: 90, unit: 'percent' }, messageFontSize: 100 },
+        large: { chatWidthSetting: { value: 1000, unit: 'px' }, messageFontSize: 140, codeWrap: true }
     };
-    const SITE_MATCHES = {
-        gemini: 'https://gemini.google.com/*',
-        chatgpt: 'https://chatgpt.com/*'
-    };
+    const TASK_PRESETS = Object.fromEntries(sites.sites.map(site => [site.id, Object.fromEntries(site.tasks.map(task => {
+        const preset = { ...TASK_DEFINITIONS[task] };
+        if (!hasCapability(site.id, 'codeWrap')) delete preset.codeWrap;
+        return [task, preset];
+    }))]));
+    const SITE_MATCHES = Object.fromEntries(sites.sites.map(site => [site.id, [...site.matches]]));
+
+    function hasCapability(site, capability) {
+        const record = sites.get(site);
+        return Boolean(record) && record.capabilities.includes(capability);
+    }
 
     const PX_RANGE = { min: 300, max: 5000, step: 50 };
     const PERCENT_RANGE = { min: 10, max: 100, step: 1 };
@@ -315,9 +327,60 @@
         };
     }
 
-    function normalizeSiteWidthSettings(result, site) {
-        const source = result && typeof result === 'object' ? result : {};
-        const settings = normalizeStorage(site === 'chatgpt' ? source[CHATGPT_WIDTH_KEY] : source);
+    /**
+     * 存储编解码器：读取时把存储内容转成统一的网站设置对象，写入时把修改转成要写的键。
+     * 默认编解码器按命名规则服务所有网站；Gemini 的顶层键由兼容编解码器处理，其它代码不接触键名。
+     */
+    const CODECS = {
+        default: {
+            storageKeys: keys => [keys.enabled, keys.navigation, keys.width, keys.reading],
+            widthSource: (stored, keys) => stored[keys.width],
+            readingSource: (stored, keys) => stored[keys.reading],
+            widthPayload: (width, keys) => ({ [keys.width]: width }),
+            readingPatch: (next, changed, edit, keys) => ({ [keys.reading]: next }),
+            taskPatch: (stored, site, chatWidthSetting, reading) => ({
+                ...getSiteWidthStoragePayload({ ...normalizeSiteSettings(stored, site), chatWidthSetting }, site),
+                ...getSiteReadingPatch(stored, site, reading)
+            })
+        },
+        'gemini-legacy': {
+            storageKeys: keys => [keys.enabled, keys.navigation, ...GEMINI_WIDTH_KEYS, ...READING_KEYS, 'codeWrap'],
+            widthSource: stored => stored,
+            readingSource: stored => stored,
+            widthPayload: width => ({
+                ...width,
+                chatWidth: getLegacyChatWidth(width.chatWidthSetting),
+                presets: width.presetsByUnit[UNIT_PX]
+            }),
+            // 密度四个字段相互关联，编辑其中任一项时一起写入；其余只写本次涉及的字段。
+            readingPatch(next, changed, edit) {
+                const keys = new Set(changed);
+                if (DENSITY_KEYS.some(key => keys.has(key))) DENSITY_KEYS.forEach(key => keys.add(key));
+                const patch = Object.fromEntries([...keys].map(key => [key, next[key]]));
+                if (Object.hasOwn(edit, 'codeWrap')) patch.codeWrap = edit.codeWrap === true;
+                return patch;
+            },
+            taskPatch: (stored, site, chatWidthSetting, reading, managed) => ({
+                chatWidthSetting,
+                chatWidth: getLegacyChatWidth(chatWidthSetting),
+                ...reading,
+                codeWrap: managed.codeWrap === true
+            })
+        }
+    };
+
+    function codecFor(site) {
+        const record = sites.get(site);
+        return CODECS[record && record.storage] || CODECS.default;
+    }
+
+    function keysFor(site) {
+        return keysById[site] || sites.getStorageKeys(site);
+    }
+
+    // 从一个扁平对象（顶层宽度字段）得到宽度视图。
+    function normalizeWidthFields(source) {
+        const settings = normalizeStorage(source);
         return {
             widthEnabled: settings.widthEnabled,
             chatWidthSetting: settings.chatWidthSetting,
@@ -329,17 +392,17 @@
         };
     }
 
-    function getSiteWidthStoragePayload(settings, site) {
-        const widthSettings = normalizeSiteWidthSettings(settings, 'gemini');
-        if (site === 'chatgpt') return { [CHATGPT_WIDTH_KEY]: widthSettings };
-        return {
-            ...widthSettings,
-            chatWidth: getLegacyChatWidth(widthSettings.chatWidthSetting),
-            presets: widthSettings.presetsByUnit[UNIT_PX]
-        };
+    function normalizeSiteWidthSettings(result, site) {
+        const source = result && typeof result === 'object' ? result : {};
+        return normalizeWidthFields(codecFor(site).widthSource(source, keysFor(site)));
     }
 
-    // 阅读设置：Gemini 沿用顶层字段；ChatGPT 使用独立对象，宽度对象整体写入时不会抹掉它。
+    /** settings 是扁平的宽度字段；写入时按该网站的编解码器转成要写的键。 */
+    function getSiteWidthStoragePayload(settings, site) {
+        return codecFor(site).widthPayload(normalizeWidthFields(settings), keysFor(site));
+    }
+
+    // 阅读设置：Gemini 沿用顶层字段；其它网站使用独立对象，宽度对象整体写入时不会抹掉它。
     function normalizeReadingSettings(source) {
         const reading = source && typeof source === 'object' ? source : {};
         return {
@@ -351,41 +414,46 @@
 
     function getReadingSource(stored, site) {
         const source = stored && typeof stored === 'object' ? stored : {};
-        return site === 'chatgpt' ? source[CHATGPT_READING_KEY] : source;
+        return codecFor(site).readingSource(source, keysFor(site));
     }
 
+    /** 该网站在 storage.sync 里的全部键（读取与监听用）。 */
     function getSiteStorageKeys(site) {
-        if (site === 'chatgpt') {
-            return [SITE_ENABLED_KEYS.chatgpt, NAVIGATION_KEYS.chatgpt, CHATGPT_WIDTH_KEY, CHATGPT_READING_KEY];
-        }
-        return [SITE_ENABLED_KEYS.gemini, NAVIGATION_KEYS.gemini, ...GEMINI_WIDTH_KEYS, ...READING_KEYS, 'codeWrap'];
+        return codecFor(site).storageKeys(keysFor(site));
+    }
+
+    /** 该网站的全部键名（含 local 的任务恢复记录与提示标记）。 */
+    function getSiteKeys(site) {
+        return { ...keysFor(site) };
     }
 
     /** 一个站点的完整只读视图：总开关、宽度与阅读偏好。缺失字段取原生默认值。 */
     function normalizeSiteSettings(stored, site) {
         const source = stored && typeof stored === 'object' ? stored : {};
+        const keys = keysFor(site);
         const settings = {
             site,
-            siteEnabled: source[SITE_ENABLED_KEYS[site]] !== false,
-            navigationEnabled: source[NAVIGATION_KEYS[site]] !== false,
+            siteEnabled: source[keys.enabled] !== false,
+            navigationEnabled: source[keys.navigation] !== false,
             ...normalizeSiteWidthSettings(source, site),
             ...normalizeReadingSettings(getReadingSource(source, site))
         };
-        if (site === 'gemini') settings.codeWrap = source.codeWrap === true;
+        // 代码换行目前只有 Gemini 支持，且仍是顶层键。
+        if (hasCapability(site, 'codeWrap')) settings.codeWrap = (getReadingSource(source, site) || {}).codeWrap === true;
         return settings;
     }
 
     function getSiteEnabledPatch(site, enabled) {
-        return { [SITE_ENABLED_KEYS[site]]: enabled === true };
+        return { [keysFor(site).enabled]: enabled === true };
     }
 
     function getSiteNavigationPatch(site, enabled) {
-        return { [NAVIGATION_KEYS[site]]: enabled === true };
+        return { [keysFor(site).navigation]: enabled === true };
     }
 
     /**
-     * 只生成本次编辑涉及的阅读字段。ChatGPT 对象先合并最新已存值再整体替换；
-     * 密度四个字段相互关联，编辑其中任一项时一起写入。
+     * 只生成本次编辑涉及的阅读字段。独立阅读对象先合并最新已存值再整体替换；
+     * Gemini 的顶层键只写涉及的字段（见兼容编解码器）。
      */
     function getSiteReadingPatch(stored, site, edit) {
         const changed = READING_KEYS.filter(key => Object.hasOwn(edit, key));
@@ -393,16 +461,10 @@
             ...normalizeReadingSettings(getReadingSource(stored, site)),
             ...Object.fromEntries(changed.map(key => [key, edit[key]]))
         });
-        if (site === 'chatgpt') return { [CHATGPT_READING_KEY]: next };
-
-        const keys = new Set(changed);
-        if (DENSITY_KEYS.some(key => keys.has(key))) DENSITY_KEYS.forEach(key => keys.add(key));
-        const patch = Object.fromEntries([...keys].map(key => [key, next[key]]));
-        if (Object.hasOwn(edit, 'codeWrap')) patch.codeWrap = edit.codeWrap === true;
-        return patch;
+        return codecFor(site).readingPatch(next, changed, edit, keysFor(site));
     }
 
-    // 任务预设管理的字段：宽度、字号、间距（Gemini 另含代码换行）。总开关、宽度开关、
+    // 任务预设管理的字段：宽度、字号、间距（有代码换行能力的网站另含代码换行）。总开关、宽度开关、
     // 用户消息铺满、范围和命名宽度预设都不属于任务。
     function getTaskManaged(settings, site) {
         const managed = {
@@ -410,7 +472,7 @@
             messageFontSize: settings.messageFontSize,
             ...normalizeDensity(settings)
         };
-        if (site === 'gemini') managed.codeWrap = settings.codeWrap === true;
+        if (hasCapability(site, 'codeWrap')) managed.codeWrap = settings.codeWrap === true;
         return managed;
     }
 
@@ -431,18 +493,7 @@
             ...normalizeDensity(managed),
             messageFontSize: normalizeFontSize(managed.messageFontSize)
         };
-        if (site === 'chatgpt') {
-            return {
-                ...getSiteWidthStoragePayload({ ...current, chatWidthSetting }, 'chatgpt'),
-                ...getSiteReadingPatch(stored, 'chatgpt', reading)
-            };
-        }
-        return {
-            chatWidthSetting,
-            chatWidth: getLegacyChatWidth(chatWidthSetting),
-            ...reading,
-            codeWrap: managed.codeWrap === true
-        };
+        return codecFor(site).taskPatch(stored, site, chatWidthSetting, reading, managed);
     }
 
     function isSameManaged(a, b, site) {
@@ -481,15 +532,24 @@
     global.widerGeminiSettings = {
         UNIT_PX,
         UNIT_PERCENT,
+        SITE_IDS,
         CHATGPT_WIDTH_KEY,
         CHATGPT_READING_KEY,
         SITE_ENABLED_KEYS,
         NAVIGATION_KEYS,
         TASK_UNDO_KEYS,
+        SITE_WIDTH_KEYS,
+        SITE_READING_KEYS,
+        SITE_INTRO_KEYS,
         CHATGPT_INTRO_KEY,
+        TASK_DEFINITIONS,
         TASK_PRESETS,
         PROTOCOL_VERSION,
         SITE_MATCHES,
+        READING_KEYS,
+        DENSITY_KEYS,
+        hasCapability,
+        getSiteKeys,
         PX_RANGE,
         PERCENT_RANGE,
         DEFAULTS,

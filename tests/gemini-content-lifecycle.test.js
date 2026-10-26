@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
+const sitesSource = fs.readFileSync(path.join(__dirname, '..', 'src/shared/sites.js'), 'utf8');
 const utilsSource = fs.readFileSync(path.join(__dirname, '..', 'src/shared/settings-utils.js'), 'utf8');
 const contentSource = fs.readFileSync(path.join(__dirname, '..', 'src/content/gemini-content.js'), 'utf8');
 
@@ -185,6 +186,7 @@ function createPage(readyState, { supported = true, deferStorage = false, stored
     sandbox.globalThis = sandbox;
 
     const context = vm.createContext(sandbox);
+    vm.runInContext(sitesSource, context, { filename: 'sites.js' });
     vm.runInContext(utilsSource, context, { filename: 'settings-utils.js' });
 
     return {

@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const vm = require('vm');
 
 const sourceRoot = path.resolve(__dirname, '..');
 const powershell = process.env.WG_POWERSHELL || (process.platform === 'win32' ? 'powershell.exe' : 'pwsh');
@@ -15,16 +16,33 @@ const notesPath = path.join(tempRoot, 'release notes.md');
 const manifestPath = path.join(fixtureRoot, 'manifest.json');
 const changelogPath = path.join(fixtureRoot, 'CHANGELOG.md');
 const runnerPath = path.join(tempRoot, 'run-package.ps1');
-const files = [
-    'manifest.json', 'src/popup/popup.html', 'src/popup/popup.js', 'src/popup/popup.css',
-    'src/shared/settings-utils.js', 'src/help/help.html', 'src/help/help.css', 'src/help/help.js',
-    'src/content/gemini-content.js', 'src/content/gemini-content.css', 'src/background.js', 'LICENSE',
-    'src/content/chatgpt-content.js', 'src/content/chatgpt-content.css',
-    'src/content/message-navigation.js', 'src/content/message-navigation.css',
-    'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
-    '_locales/en/messages.json', '_locales/zh_CN/messages.json', '_locales/zh_TW/messages.json',
-    '_locales/ko/messages.json', '_locales/ja/messages.json', '_locales/es/messages.json'
-];
+// 与 scripts/package.ps1 相同的目录规则：manifest、LICENSE、src/ 下的 js/css/html、每种语言的字典和三个 PNG 图标。
+function packageFiles(root) {
+    const list = ['manifest.json', 'LICENSE'];
+    const walk = directory => {
+        for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes: true })) {
+            const relative = `${directory}/${entry.name}`;
+            if (entry.isDirectory()) walk(relative);
+            else if (/\.(js|css|html)$/.test(entry.name)) list.push(relative);
+        }
+    };
+    walk('src');
+    for (const locale of fs.readdirSync(path.join(root, '_locales'))) list.push(`_locales/${locale}/messages.json`);
+    list.push('icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png');
+    return [...new Set(list)].sort();
+}
+const files = packageFiles(sourceRoot);
+// 注册表引用的每个文件都必须进 ZIP。
+const registrySandbox = { globalThis: {} };
+registrySandbox.globalThis = registrySandbox;
+vm.runInNewContext(fs.readFileSync(path.join(sourceRoot, 'src/shared/sites.js'), 'utf8'), registrySandbox);
+const registry = registrySandbox.widerRoomySites;
+const referenced = [...new Set(registry.sites.flatMap(site => {
+    const script = registry.getContentScript(site.id);
+    return [...script.js, ...script.css];
+}))];
+for (const file of referenced) assert.ok(files.includes(file), `${file} from the registry is packaged`);
+assert.ok(files.includes('src/background.js') && files.includes('src/popup/popup.html') && files.includes('src/help/help.html'));
 const baseManifest = JSON.parse(fs.readFileSync(path.join(sourceRoot, 'manifest.json'), 'utf8'));
 const noteBodies = {
     '2.6.0-rc.10': 'RC ten: must not be selected for rc.1.',
@@ -70,7 +88,8 @@ function expectSuccess(version, prerelease) {
     assert.strictEqual(report.Package.Prerelease, prerelease);
     assert.strictEqual(report.Package.ArchivePath, path.join(outputRoot, `roomy-${version}.zip`));
     assert.strictEqual(fs.readFileSync(notesPath, 'utf8'), noteBodies[version]);
-    assert.deepStrictEqual(report.Entries.map(entry => entry.Name).sort(), [...files].sort());
+    assert.deepStrictEqual(report.Entries.map(entry => entry.Name).sort(), [...files].sort(), 'ZIP follows the directory rules');
+    for (const file of referenced) assert.ok(report.Entries.some(entry => entry.Name === file), `${file} is in the ZIP`);
     for (const entry of report.Entries) {
         assert.strictEqual(entry.Hash, hashFile(path.join(fixtureRoot, entry.Name)), entry.Name);
     }
@@ -97,7 +116,8 @@ try {
         fs.copyFileSync(path.join(sourceRoot, file), destination);
     }
     fs.copyFileSync(path.join(sourceRoot, 'scripts/package.ps1'), path.join(fixtureRoot, 'scripts/package.ps1'));
-    for (const file of ['README.md', '.env', 'tests/local.test.js', 'icons/promotion/unwanted.png']) {
+    for (const file of ['README.md', '.env', 'tests/local.test.js', 'icons/promotion/unwanted.png', 'src/notes.md',
+        'src/content/sites/capture.json', 'src/popup/popup.css.map', '_locales/en/README.md', 'icons/icon.svg']) {
         const destination = path.join(fixtureRoot, file);
         fs.mkdirSync(path.dirname(destination), { recursive: true });
         fs.writeFileSync(destination, 'This file must never enter the release ZIP.');

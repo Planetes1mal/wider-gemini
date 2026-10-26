@@ -43,18 +43,32 @@ if ($sections.Count -ne 1 -or [string]::IsNullOrWhiteSpace($sections[0].Groups[1
 }
 $releaseNotes = $sections[0].Groups[1].Value.Trim()
 
-# Explicit allowlist: source docs, tests, scripts, and promotional images stay outside the ZIP.
-$files = @(
-    'manifest.json', 'LICENSE', 'src/background.js', 'src/shared/settings-utils.js',
-    'src/popup/popup.html', 'src/popup/popup.js', 'src/popup/popup.css',
-    'src/help/help.html', 'src/help/help.css', 'src/help/help.js',
-    'src/content/message-navigation.js', 'src/content/message-navigation.css',
-    'src/content/gemini-content.js', 'src/content/gemini-content.css',
-    'src/content/chatgpt-content.js', 'src/content/chatgpt-content.css',
-    'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png',
-    '_locales/en/messages.json', '_locales/zh_CN/messages.json', '_locales/zh_TW/messages.json',
-    '_locales/ko/messages.json', '_locales/ja/messages.json', '_locales/es/messages.json'
-)
+# Directory rules: the manifest, the license, every js/css/html file under src/, each locale dictionary and the
+# three PNG icons. Source docs, tests, scripts, SVG sources and promotional images stay outside the ZIP.
+# Entry names use forward slashes so the ZIP is identical on Windows and on Unix PowerShell.
+function Get-PackageFiles([string]$root) {
+    $list = [System.Collections.Generic.List[string]]::new()
+    $list.Add('manifest.json')
+    $list.Add('LICENSE')
+    $sourceRoot = Join-Path $root 'src'
+    if (Test-Path -LiteralPath $sourceRoot -PathType Container) {
+        Get-ChildItem -LiteralPath $sourceRoot -Recurse -File |
+            Where-Object { $_.Extension -in '.js', '.css', '.html' } |
+            ForEach-Object { $list.Add('src/' + $_.FullName.Substring($sourceRoot.Length + 1).Replace('\', '/')) }
+    }
+    $localeRoot = Join-Path $root '_locales'
+    if (Test-Path -LiteralPath $localeRoot -PathType Container) {
+        Get-ChildItem -LiteralPath $localeRoot -Directory |
+            ForEach-Object { $list.Add('_locales/' + $_.Name + '/messages.json') }
+    }
+    foreach ($icon in 'icons/icon16.png', 'icons/icon48.png', 'icons/icon128.png') { $list.Add($icon) }
+    return @($list | Sort-Object -Unique)
+}
+$files = Get-PackageFiles $repoRoot
+foreach ($required in 'src/background.js', 'src/shared/sites.js', 'src/shared/settings-utils.js',
+    'src/popup/popup.html', 'src/help/help.html', '_locales/en/messages.json') {
+    if ($files -cnotcontains $required) { throw "Missing package file: $required" }
+}
 foreach ($file in $files) {
     if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $file) -PathType Leaf)) {
         throw "Missing package file: $file"

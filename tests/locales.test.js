@@ -38,19 +38,22 @@ for (const locale of LOCALES) {
     assert.ok(length('brandName') <= 12, `${locale}.brandName is longer than 12 characters`);
 }
 
-// 代码引用的文案键必须存在；英文里的每个键也都要被代码用到。
-const sources = ['manifest.json', ...['src/background.js', 'src/popup/popup.html', 'src/popup/popup.js',
-    'src/help/help.html', 'src/help/help.js', 'src/content/gemini-content.js', 'src/content/chatgpt-content.js',
-    'src/content/message-navigation.js']].map(read).join('\n');
-// 弹窗按 popup.js 里的 ids 列表把文案写进 id="i18n-<key>" 的元素；其他 i18n- 开头的 id 由脚本另行填写。
-const popupIds = (read('src/popup/popup.js').match(/const ids = \[([\s\S]*?)\];/) || [])[1] || '';
+// 代码引用的文案键必须存在；英文里的每个键也都要被代码用到。被扫描的是 src/ 下的全部 js 与 html 文件。
+function walk(directory) {
+    return fs.readdirSync(path.join(root, directory), { withFileTypes: true }).flatMap(entry => {
+        const relative = `${directory}/${entry.name}`;
+        return entry.isDirectory() ? walk(relative) : /\.(js|html)$/.test(entry.name) ? [relative] : [];
+    });
+}
+const sourceFiles = walk('src').sort();
+assert.ok(sourceFiles.includes('src/popup/popup.js') && sourceFiles.includes('src/background.js'), 'src/ scan finds the scripts');
+const sources = ['manifest.json', ...sourceFiles].map(read).join('\n');
+// 文案键的引用方式：manifest 的 __MSG_key__、HTML 的 data-i18n="key"、脚本里的 t('key') / getMessage('key')。
 const referenced = new Set([
     ...[...sources.matchAll(/__MSG_([A-Za-z0-9_]+)__/g)].map(match => match[1]),
-    ...[...sources.matchAll(/data-i18n="([A-Za-z0-9_]+)"/g)].map(match => match[1]),
-    ...[...popupIds.matchAll(/"([A-Za-z0-9_]+)"/g)].map(match => match[1]),
+    ...[...sources.matchAll(/data-i18n(?:-[a-z]+)?="([A-Za-z0-9_]+)"/g)].map(match => match[1]),
     ...[...sources.matchAll(/\b(?:t|getMessage)\('([A-Za-z0-9_]+)'/g)].map(match => match[1])
 ]);
-assert.ok(popupIds.includes('"brandName"'), 'popup.js ids list was not found');
 assert.deepStrictEqual([...referenced].filter(key => !english[key]).sort(), [], 'code references missing message keys');
 assert.deepStrictEqual(keys.filter(key => !sources.includes(key)), [], 'unused message keys');
 

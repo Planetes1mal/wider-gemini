@@ -3,39 +3,57 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifest.json'), 'utf8'));
-const backgroundSource = fs.readFileSync(path.join(__dirname, '..', manifest.background.service_worker), 'utf8');
-const contentSource = fs.readFileSync(path.join(__dirname, '..', 'src/content/gemini-content.js'), 'utf8');
+const root = path.join(__dirname, '..');
+const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const manifest = JSON.parse(read('manifest.json'));
+const backgroundSource = read(manifest.background.service_worker);
+const sitesSource = read('src/shared/sites.js');
 const declared = manifest.content_scripts[0];
+const plain = value => JSON.parse(JSON.stringify(value));
 
-// manifest：service worker 已注册，补注入所需权限齐全，且不引入会触发新权限警告的 tabs 权限
+// 注册表与 manifest 的一致性由 sites.test.js 核对；这里只确认后台依赖的前提。
 assert.strictEqual(manifest.background.service_worker, 'src/background.js');
 assert.ok(manifest.permissions.includes('scripting'), 'scripting permission is required for executeScript/insertCSS');
 assert.deepStrictEqual(manifest.host_permissions, manifest.content_scripts.flatMap(script => script.matches),
     'host permissions must match the declared sites');
 assert.ok(!manifest.permissions.includes('tabs'), 'tabs permission would add a browsing-history warning');
-assert.ok(manifest.permissions.includes('activeTab'), 'toolbar popup must recognize an ungranted ChatGPT tab');
+assert.ok(manifest.permissions.includes('activeTab'), 'toolbar popup must recognize an ungranted optional site tab');
 assert.deepStrictEqual(manifest.host_permissions, ['https://gemini.google.com/*']);
-assert.deepStrictEqual(manifest.optional_host_permissions, ['https://chatgpt.com/*']);
-assert.strictEqual(manifest.content_scripts.length, 1, 'ChatGPT must not have a static content script');
+assert.strictEqual(manifest.content_scripts.length, 1, 'optional sites must not have a static content script');
+assert.ok(backgroundSource.startsWith("// Service worker") && backgroundSource.includes("importScripts('shared/sites.js')"),
+    'background loads the registry');
+assert.ok(read('src/content/gemini-content.js').includes('window.widerGeminiContentLoaded = true'),
+    'Gemini content script must set the loaded flag');
 
-// 内容脚本必须设置 background.js 用来判断“本页已注入”的标记
-assert.ok(contentSource.includes('window.widerGeminiContentLoaded = true'), 'content script must set the loaded flag');
+const registrySandbox = { globalThis: {} };
+registrySandbox.globalThis = registrySandbox;
+vm.runInNewContext(sitesSource, registrySandbox);
+const registry = registrySandbox.widerRoomySites;
+const optional = registry.optional();
+assert.ok(optional.length >= 1 && optional[0].id === 'chatgpt', 'ChatGPT is the first optional site');
+const scriptFor = site => plain(registry.getContentScript(site.id));
+const introKey = site => registry.getStorageKeys(site.id).intro;
 
+// 标签页：Gemini 各种状态，每个可选网站一个未加载和一个已加载的页面，加一个无关网站。
 const tabs = [
     { id: 1, url: 'https://gemini.google.com/app', loaded: false },
     { id: 2, url: 'https://gemini.google.com/app/abc123', loaded: true },
     { id: 3, url: 'https://gemini.google.com/app', loaded: false, discarded: true },
     { id: 4, url: 'https://gemini.google.com/app', loaded: false, fails: true },
-    { id: 5, url: 'https://chatgpt.com/c/example', loaded: false },
-    { id: 6, url: 'https://chatgpt.com/', loaded: true },
     { id: 7, url: 'https://example.com/', loaded: false }
 ];
+const siteTabs = {};
+let nextId = 10;
+for (const site of optional) {
+    siteTabs[site.id] = [nextId, nextId + 1];
+    tabs.push({ id: nextId++, url: `${site.url}c/example`, loaded: false, site: site.id });
+    tabs.push({ id: nextId++, url: site.url, loaded: true, site: site.id });
+}
 const tabsById = new Map(tabs.map(tab => [tab.id, tab]));
 const listeners = {};
 const calls = [];
 const queries = [];
-let granted = false;
+const granted = Object.fromEntries(optional.map(site => [site.id, false]));
 let registered = [];
 let registrations = 0;
 const localStore = {};
@@ -43,38 +61,38 @@ let badgeText = '';
 let popupOpens = 0;
 let popupFails = false;
 
+function siteOf(origins) {
+    const site = optional.find(site => plain(site.matches).join() === Array.from(origins).join());
+    assert.ok(site, `permissions are checked per site: ${Array.from(origins)}`);
+    return site;
+}
+
 const sandbox = {
     console: { log() {}, error() {} },
+    importScripts(file) {
+        assert.strictEqual(file, 'shared/sites.js');
+        vm.runInContext(sitesSource, context, { filename: 'sites.js' });
+    },
     chrome: {
         permissions: {
-            async contains(request) {
-                assert.deepStrictEqual(Array.from(request.origins), manifest.optional_host_permissions);
-                return granted;
-            },
+            async contains(request) { return granted[siteOf(request.origins).id]; },
             onAdded: { addListener(listener) { listeners.onAdded = listener; } },
             onRemoved: { addListener(listener) { listeners.onRemoved = listener; } }
         },
         runtime: {
-            getManifest() {
-                return manifest;
-            },
-            onStartup: {
-                addListener(listener) {
-                    listeners.onStartup = listener;
-                }
-            },
-            onInstalled: {
-                addListener(listener) {
-                    listeners.onInstalled = listener;
-                }
-            }
+            getManifest() { return manifest; },
+            onStartup: { addListener(listener) { listeners.onStartup = listener; } },
+            onInstalled: { addListener(listener) { listeners.onInstalled = listener; } }
         },
         i18n: { getMessage: key => (key === 'badgeNew' ? 'NEW' : '') },
         storage: {
             local: {
-                async get(key) { return key in localStore ? { [key]: localStore[key] } : {}; },
+                async get(keys) {
+                    const list = Array.isArray(keys) ? keys : [keys];
+                    return Object.fromEntries(list.filter(key => key in localStore).map(key => [key, localStore[key]]));
+                },
                 async set(values) { Object.assign(localStore, values); },
-                async remove(key) { delete localStore[key]; }
+                async remove(keys) { for (const key of Array.isArray(keys) ? keys : [keys]) delete localStore[key]; }
             }
         },
         action: {
@@ -93,22 +111,20 @@ const sandbox = {
             }
         },
         scripting: {
-            async getRegisteredContentScripts() { return registered; },
+            async getRegisteredContentScripts({ ids }) { return registered.filter(script => ids.includes(script.id)); },
             async registerContentScripts(scripts) {
                 registrations++;
-                registered = scripts;
+                registered = registered.concat(scripts);
             },
-            async unregisterContentScripts() { registered = []; },
+            async unregisterContentScripts({ ids }) { registered = registered.filter(script => !ids.includes(script.id)); },
             async executeScript(injection) {
                 const tab = tabsById.get(injection.target.tabId);
 
                 if (injection.func) {
-                    // func 会在页面的隔离世界中执行，这里用页面的 window 求值
-                    const chatgpt = tab.url.startsWith('https://chatgpt.com/');
-                    sandbox.window = {
-                        widerGeminiContentLoaded: chatgpt ? true : tab.loaded,
-                        widerChatgptContentLoaded: chatgpt ? tab.loaded : true
-                    };
+                    // func 会在页面的隔离世界中执行：只有本站脚本的标记取决于页面状态，其它网站的标记无意义。
+                    const flags = { widerGeminiContentLoaded: tab.site ? true : tab.loaded };
+                    for (const site of optional) flags[scriptFor(site).loadedFlag] = tab.site === site.id ? tab.loaded : true;
+                    sandbox.window = flags;
                     const result = injection.func(...injection.args);
                     delete sandbox.window;
                     calls.push({ tabId: tab.id, type: 'check', immediate: injection.injectImmediately });
@@ -141,14 +157,18 @@ function typesFor(tabId) {
     return calls.filter(call => call.tabId === tabId).map(call => call.type);
 }
 
+function filesFor(tabId, type) {
+    return plain(calls.find(call => call.tabId === tabId && call.type === type).files);
+}
+
 (async () => {
     await listeners.onStartup();
 
-    assert.strictEqual(queries.length, 1, 'ungranted ChatGPT is not queried or injected');
+    assert.strictEqual(queries.length, 1, 'ungranted optional sites are not queried or injected');
     queries.forEach(query => assert.deepStrictEqual(Object.keys(query), ['url']));
-    assert.strictEqual(queries[0].url, declared.matches);
+    assert.deepStrictEqual(plain(queries[0].url), declared.matches);
     assert.strictEqual(registered.length, 0);
-    assert.deepStrictEqual(typesFor(5), []);
+    for (const site of optional) assert.deepStrictEqual(typesFor(siteTabs[site.id][0]), [], `${site.id} stays native`);
 
     // 错过声明式注入的页面：先检查标记，再按 manifest 顺序注入 CSS 与 JS
     assert.deepStrictEqual(typesFor(1), ['check', 'css', 'js']);
@@ -167,98 +187,135 @@ function typesFor(tabId) {
     // 某个标签页注入失败不影响其他标签页，也不抛出
     assert.deepStrictEqual(typesFor(4), ['check']);
 
-    // 授权后注册未来导航，并立即补注入已打开的页面，不刷新。
-    calls.length = 0;
-    granted = true;
+    // 授权一个网站后注册未来导航，并立即补注入已打开的页面，不刷新；其它网站不受影响。
+    for (const site of optional) {
+        calls.length = 0;
+        granted[site.id] = true;
+        await listeners.onAdded();
+        const expected = scriptFor(site);
+        const own = plain(registered.find(script => script.id === expected.id));
+        assert.ok(own, `${site.id} is registered`);
+        assert.deepStrictEqual(own.matches, plain(site.matches));
+        assert.strictEqual(own.runAt, 'document_start');
+        assert.strictEqual(own.persistAcrossSessions, true);
+        assert.deepStrictEqual(own.js, expected.js);
+        assert.deepStrictEqual(own.css, expected.css);
+        assert.strictEqual(own.loadedFlag, undefined, 'registry-only fields are not passed to Chrome');
+        assert.deepStrictEqual(own.js.slice(0, 2), ['src/shared/sites.js', 'src/shared/settings-utils.js']);
+        const [fresh, loaded] = siteTabs[site.id];
+        assert.deepStrictEqual(typesFor(fresh), ['check', 'css', 'js']);
+        assert.deepStrictEqual(filesFor(fresh, 'css'), expected.css);
+        assert.deepStrictEqual(filesFor(fresh, 'js'), expected.js);
+        assert.deepStrictEqual(typesFor(loaded), ['check']);
+        assert.deepStrictEqual(typesFor(7), [], 'unrelated sites must not be injected');
+        assert.deepStrictEqual(typesFor(1), [], `${site.id} grant does not touch Gemini`);
+        for (const other of optional.filter(other => other !== site && !granted[other.id])) {
+            assert.deepStrictEqual(typesFor(siteTabs[other.id][0]), [], `${site.id} grant does not touch ${other.id}`);
+            assert.ok(!registered.some(script => script.id === scriptFor(other).id), `${other.id} stays unregistered`);
+        }
+        granted[site.id] = false;
+        await listeners.onRemoved();
+        assert.ok(!registered.some(script => script.id === expected.id), `${site.id} revoke unregisters it`);
+    }
+    granted.chatgpt = true;
     await listeners.onAdded();
-    const chatgptDeclared = registered[0];
-    assert.deepStrictEqual(Array.from(chatgptDeclared.matches), manifest.optional_host_permissions);
-    assert.strictEqual(chatgptDeclared.runAt, 'document_start');
-    assert.strictEqual(chatgptDeclared.persistAcrossSessions, true);
-    assert.deepStrictEqual(typesFor(5), ['check', 'css', 'js']);
-    assert.deepStrictEqual(calls.find(call => call.tabId === 5 && call.type === 'css').files, chatgptDeclared.css);
-    assert.deepStrictEqual(calls.find(call => call.tabId === 5 && call.type === 'js').files, chatgptDeclared.js);
-    assert.deepStrictEqual(typesFor(6), ['check']);
-    assert.deepStrictEqual(typesFor(7), [], 'unrelated sites must not be injected');
-    assert.deepStrictEqual(typesFor(1), [], 'ChatGPT grant does not touch Gemini');
+    assert.strictEqual(registered.length, 1);
 
     // 再次触发（如扩展更新）时，已补注入的页面不再重复注入
     calls.length = 0;
+    const before = registrations;
     await listeners.onInstalled();
     assert.deepStrictEqual(typesFor(1), ['check']);
-    assert.deepStrictEqual(typesFor(5), ['check']);
+    assert.deepStrictEqual(typesFor(siteTabs.chatgpt[0]), ['check']);
     await listeners.onStartup();
-    assert.strictEqual(registrations, 1, 'startup and install registration must be idempotent');
+    assert.strictEqual(registrations, before, 'startup and install registration must be idempotent');
 
     // 重启时缺失注册会补回；撤销后注销，不再补注入。
     registered = [];
     await listeners.onStartup();
-    assert.strictEqual(registrations, 2);
+    assert.strictEqual(registrations, before + 1);
     calls.length = 0;
-    granted = false;
+    granted.chatgpt = false;
     await listeners.onRemoved();
     assert.strictEqual(registered.length, 0);
     assert.strictEqual(calls.length, 0);
     await listeners.onInstalled();
-    assert.deepStrictEqual(typesFor(5), [], 'revoked ChatGPT access must remain native');
+    assert.deepStrictEqual(typesFor(siteTabs.chatgpt[0]), [], 'revoked ChatGPT access must remain native');
     assert.strictEqual(popupOpens, 0, 'restoring scripts alone must not open the popup');
     assert.strictEqual(badgeText, '');
 
     // 键名与弹窗共用的常量一致。
-    const settingsSandbox = {};
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src/shared/settings-utils.js'), 'utf8'),
-        { globalThis: settingsSandbox });
-    const introKey = settingsSandbox.widerGeminiSettings.CHATGPT_INTRO_KEY;
-    assert.ok(backgroundSource.includes(`'${introKey}'`), 'background must use the shared intro key');
+    const settingsSandbox = { globalThis: {} };
+    settingsSandbox.globalThis = settingsSandbox;
+    vm.runInNewContext(sitesSource, settingsSandbox);
+    vm.runInNewContext(read('src/shared/settings-utils.js'), settingsSandbox);
+    assert.strictEqual(settingsSandbox.widerGeminiSettings.CHATGPT_INTRO_KEY, introKey(optional[0]));
+    assert.strictEqual(introKey(optional[0]), 'chatgptIntroPending', 'ChatGPT keeps the 3.0 intro key');
 
-    // 从 2.x 更新：只加角标并记下提示，不弹出任何窗口。
+    // 提示矩阵：从旧版本更新时，只提示加入版本晚于旧版本、且尚未授权的网站；只加角标，不弹窗。
+    const flagged = () => plain(optional.filter(site => localStore[introKey(site)]).map(site => site.id));
+    const clearFlags = () => optional.forEach(site => delete localStore[introKey(site)]);
+    const since = version => plain(registry.addedSince(version).map(site => site.id));
     await listeners.onInstalled({ reason: 'update', previousVersion: '2.8.0' });
-    assert.strictEqual(localStore[introKey], true);
+    assert.deepStrictEqual(flagged(), plain(optional.map(site => site.id)), 'updating from 2.x flags every optional site');
+    assert.ok(flagged().every(id => localStore[introKey({ id })] === 'update'));
     assert.strictEqual(badgeText, 'NEW');
     assert.strictEqual(popupOpens, 0, 'updates must not open the popup');
 
-    // 浏览器重启后角标重新显示；授权 ChatGPT 后清除提示和角标。
+    // 浏览器重启后角标重新显示；授权一个网站后清除它的提示，角标只在还有未授权的提示时保留。
     badgeText = '';
     await listeners.onStartup();
     assert.strictEqual(badgeText, 'NEW');
-    granted = true;
+    granted.chatgpt = true;
     await listeners.onAdded();
-    assert.ok(!(introKey in localStore));
+    assert.ok(!(introKey(optional[0]) in localStore), 'granting ChatGPT clears its flag');
+    assert.deepStrictEqual(flagged(), since('3.0.0').filter(id => id !== 'chatgpt'));
+    assert.strictEqual(badgeText, flagged().length ? 'NEW' : '', 'badge stays only while another ungranted site is flagged');
+    for (const site of optional) granted[site.id] = true;
+    await listeners.onAdded();
+    assert.deepStrictEqual(flagged(), [], 'granting every site clears every flag');
     assert.strictEqual(badgeText, '');
 
     // 已授权时，新装或更新都不再提示。
     await listeners.onInstalled({ reason: 'install' });
     assert.strictEqual(popupOpens, 0);
     assert.strictEqual(badgeText, '');
-    granted = false;
+    for (const site of optional) granted[site.id] = false;
     await listeners.onRemoved();
 
-    // 3.x 之间的更新、缺少旧版本号的更新和浏览器更新都不提示。
-    for (const details of [{ reason: 'update', previousVersion: '3.0.0' }, { reason: 'update', previousVersion: '3.1.2' },
-        { reason: 'update' }, { reason: 'chrome_update' }]) {
+    // 从 3.0.x 更新：只提示 3.0 之后加入的网站；同版本之间、缺少旧版本号和浏览器更新都不提示。
+    await listeners.onInstalled({ reason: 'update', previousVersion: '3.0.1' });
+    assert.deepStrictEqual(flagged(), since('3.0.1'), 'updating from 3.0.1 flags only sites added later');
+    assert.strictEqual(badgeText, flagged().length ? 'NEW' : '');
+    assert.strictEqual(popupOpens, 0);
+    clearFlags();
+    badgeText = '';
+    for (const details of [{ reason: 'update', previousVersion: manifest.version },
+        { reason: 'update', previousVersion: '99.0.0' }, { reason: 'update' }, { reason: 'chrome_update' }]) {
         await listeners.onInstalled(details);
     }
-    assert.ok(!(introKey in localStore));
+    assert.deepStrictEqual(flagged(), []);
     assert.strictEqual(badgeText, '');
 
-    // 新装：从工具栏弹出扩展弹窗，同时保留角标。
+    // 新装：从工具栏弹出扩展弹窗，所有可选网站都带标记（标记值为 install），同时保留角标。
     await listeners.onInstalled({ reason: 'install' });
     assert.strictEqual(popupOpens, 1);
-    assert.strictEqual(localStore[introKey], true);
+    assert.deepStrictEqual(flagged(), plain(optional.map(site => site.id)));
+    assert.ok(flagged().every(id => localStore[introKey({ id })] === 'install'));
     assert.strictEqual(badgeText, 'NEW');
 
     // 无法弹出（例如窗口未激活）时仍保留角标，并完成补注入。
-    delete localStore[introKey];
+    clearFlags();
     badgeText = '';
     popupFails = true;
     calls.length = 0;
     await listeners.onInstalled({ reason: 'install' });
     assert.strictEqual(popupOpens, 1);
-    assert.strictEqual(localStore[introKey], true);
+    assert.deepStrictEqual(flagged(), plain(optional.map(site => site.id)));
     assert.strictEqual(badgeText, 'NEW');
     assert.deepStrictEqual(typesFor(1), ['check']);
 
-    console.log('background tests passed');
+    console.log(`background tests passed (${optional.length} optional sites)`);
 })().catch(error => {
     console.error(error);
     process.exit(1);

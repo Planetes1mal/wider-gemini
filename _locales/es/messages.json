@@ -8,9 +8,6 @@
   "appDesc": {
     "message": "Amplía Gemini y ChatGPT, ajusta el tamaño del texto y la densidad de lectura por sitio, y pausa cualquiera cuando quieras."
   },
-  "headerSubtitle": {
-    "message": "Conversaciones más amplias y cómodas de leer"
-  },
   "widthLabel": {
     "message": "Ancho del chat"
   },
@@ -41,9 +38,6 @@
   "donePresets": {
     "message": "Listo"
   },
-  "cancelPresets": {
-    "message": "Cancelar"
-  },
   "managePresets": {
     "message": "Gestionar preajustes"
   },
@@ -61,12 +55,6 @@
   },
   "userFullWidthLabel": {
     "message": "Mis mensajes a todo el ancho"
-  },
-  "statusOn": {
-    "message": "Activado"
-  },
-  "statusOff": {
-    "message": "Desactivado"
   },
   "refreshing": {
     "message": "Recargando la página…"
@@ -127,46 +115,40 @@
     "message": "Ayuda y comentarios"
   },
   "helpGettingStarted": {
-    "message": "Adapta Gemini y ChatGPT a tu pantalla"
+    "message": "Adapta {sites} a tu pantalla"
   },
   "helpOpenPopup": {
-    "message": "Abre Gemini o ChatGPT y haz clic en el icono de Roomy en la barra de herramientas. Elige el sitio que quieres ajustar con los botones superiores."
+    "message": "Abre {sites} y haz clic en el icono de Roomy en la barra de herramientas. En un sitio compatible, la ventana abre los ajustes de ese sitio; en otras páginas muestra la lista de todos los sitios."
   },
   "helpWidthTitle": {
     "message": "Ancho de la conversación"
   },
   "helpWidthBody": {
-    "message": "Elige px para un ancho fijo o % para adaptarlo a la ventana. Mueve el control o elige un ajuste predefinido. Gemini y ChatGPT guardan por separado el ancho, los límites y los ajustes, también por unidad. Abre Rango y ajustes predefinidos para editarlos. El interruptor junto al título del ancho pausa la ampliación de ese sitio y restaura su ancho original. Se conservan los valores y ajustes; las opciones de lectura siguen activas."
+    "message": "Elige px para un ancho fijo o % para adaptarlo a la ventana. Mueve el control o elige un ajuste predefinido. Cada sitio guarda por separado el ancho, los límites y los ajustes, también por unidad. Abre Rango y ajustes predefinidos para editarlos. El interruptor junto al título del ancho pausa la ampliación de ese sitio y restaura su ancho original. Se conservan los valores y ajustes; las opciones de lectura siguen activas."
   },
   "helpCodeTitle": {
     "message": "Ajuste de línea del código"
   },
   "helpCodeBody": {
-    "message": "Solo en Gemini: Activa el ajuste de línea del código para leer líneas largas con menos desplazamiento horizontal. En ChatGPT, usa el botón de ajuste de cada bloque de código; la extensión no lo modifica."
+    "message": "El ajuste de línea del código solo está disponible en {sites}. Los demás sitios conservan sus propios controles de ajuste en cada bloque de código; la extensión no los modifica."
   },
   "helpReadingTitle": {
     "message": "Tamaño del texto y espaciado"
   },
   "helpReadingBody": {
-    "message": "Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página; títulos, código y tablas mantienen su proporción. Con densidad 0 en Auto se conservan las separaciones y alturas de línea originales; una densidad mayor reduce gradualmente solo el espaciado del texto. En ambos sitios, las líneas de código y las celdas de tablas conservan sus proporciones de altura de línea. Las fórmulas de ChatGPT también conservan su espaciado original. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual. Gemini y ChatGPT guardan ajustes de lectura por separado."
+    "message": "Ajusta el tamaño del texto entre el 75% y el 200% sin ampliar toda la página; títulos, código y tablas mantienen su proporción. Con densidad 0 en Auto se conservan las separaciones y alturas de línea originales; una densidad mayor reduce gradualmente solo el espaciado del texto. Las líneas de código y las celdas de tablas conservan sus proporciones de altura de línea, y las fórmulas conservan su espaciado original. Espaciado avanzado permite fijar valores manuales exactos; Restablecer espaciado vuelve a Auto con la densidad actual. Cada sitio guarda ajustes de lectura por separado."
   },
   "helpLiveSettings": {
-    "message": "Los cambios se guardan automáticamente y se aplican al instante a las pestañas abiertas del sitio seleccionado. Los ajustes de cada sitio son independientes; el idioma de la extensión es compartido. La sincronización entre dispositivos depende de los ajustes del navegador."
-  },
-  "helpOpenGemini": {
-    "message": "Abrir Gemini"
-  },
-  "helpOpenChatgpt": {
-    "message": "Abrir ChatGPT"
+    "message": "Los cambios se guardan automáticamente y se aplican al instante a las pestañas abiertas de ese sitio. Los ajustes de cada sitio son independientes; el idioma de la extensión es compartido. La sincronización entre dispositivos depende de los ajustes del navegador."
   },
   "helpTroubleshooting": {
     "message": "¿Algo no se ve bien?"
   },
   "helpTroubleshootPage": {
-    "message": "Comprueba que estás en gemini.google.com o chatgpt.com y que Roomy está activado y tiene acceso al sitio. Las aplicaciones web instaladas desde Chrome (PWA) usan las mismas páginas. No se admiten las aplicaciones de escritorio nativas ni el panel de Gemini integrado en Chrome."
+    "message": "Comprueba que estás en un sitio compatible ({sites}) y que Roomy está activado y tiene acceso a ese sitio. Las aplicaciones web instaladas desde Chrome (PWA) usan las mismas páginas. No se admiten las aplicaciones de escritorio nativas ni el panel de Gemini integrado en Chrome."
   },
   "helpTroubleshootRefresh": {
-    "message": "Si los ajustes no aparecen tras instalar o actualizar la extensión, recarga la página una vez. Si la ventana indica que la página ejecuta una versión anterior, recarga primero la extensión en chrome://extensions. Si aparece un aviso de diseño no compatible, no se amplía la página actual. Usa el interruptor Activar bajo las pestañas de sitio para pausar todos los efectos en ese sitio; los ajustes guardados se conservan."
+    "message": "Si los ajustes no aparecen tras instalar o actualizar la extensión, recarga la página una vez. Si la ventana indica que la página ejecuta una versión anterior, recarga primero la extensión en chrome://extensions. Si aparece un aviso de diseño no compatible, no se amplía la página actual. Usa el interruptor junto al nombre del sitio para pausar todos los efectos en ese sitio; los ajustes guardados se conservan."
   },
   "helpTroubleshootReport": {
     "message": "Si el problema continúa, indica el sitio, los pasos para reproducirlo y el tamaño de la ventana. Puedes adjuntar una captura sin contenido privado; menciona otras extensiones que cambien el diseño de la página."
@@ -178,7 +160,7 @@
     "message": "Informe de ajustes"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "Genera un informe y revísalo antes de compartirlo al informar de un problema. Solo incluye la versión de la extensión, el nombre y la versión principal del navegador, la plataforma, el idioma de la interfaz, el interruptor Activar de cada sitio, los ajustes de diseño de Gemini y los ajustes de ancho y lectura de ChatGPT. No contiene conversaciones, URL de páginas, títulos ni nombres de preajustes personalizados. No se envía nada automáticamente."
+    "message": "Genera un informe y revísalo antes de compartirlo al informar de un problema. Solo incluye la versión de la extensión, el nombre y la versión principal del navegador, la plataforma, el idioma de la interfaz y, para cada sitio, el interruptor Activar y los ajustes de ancho, rango y lectura. No contiene conversaciones, URL de páginas, títulos ni nombres de preajustes personalizados. No se envía nada automáticamente."
   },
   "helpGenerateReport": {
     "message": "Generar informe"
@@ -250,13 +232,10 @@
     "message": "Preajustes por tarea"
   },
   "helpTaskBody": {
-    "message": "Elige un preajuste por tarea, revisa el resumen y haz clic en Aplicar. Gemini ofrece Lectura larga, Tablas, Código y Texto grande; ChatGPT ofrece Lectura larga, Ancho (tablas y código) y Texto grande. Los preajustes cambian el ancho, el tamaño del texto y el espaciado (y el ajuste de línea del código en Gemini) dentro de tus límites. Restaurar ajustes anteriores deshace el último preajuste de ese sitio en este dispositivo, incluso tras cerrar la ventana, y reemplaza los cambios posteriores en esos ajustes."
+    "message": "Elige un preajuste por tarea, revisa el resumen y haz clic en Aplicar. Cada sitio ofrece sus propios preajustes, como Lectura larga, Ancho (tablas y código) y Texto grande. Los preajustes cambian el ancho, el tamaño del texto y el espaciado (y el ajuste de línea del código donde esté disponible) dentro de tus límites. Restaurar ajustes anteriores deshace el último preajuste de ese sitio en este dispositivo, incluso tras cerrar la ventana, y reemplaza los cambios posteriores en esos ajustes."
   },
   "autoSpacingHint": {
     "message": "Auto respeta el espaciado original de cada mensaje. Al mover cualquier control, se aplican manualmente los dos valores siguientes."
-  },
-  "settingsSite": {
-    "message": "Sitio web"
   },
   "currentSite": {
     "message": "Actual"
@@ -265,7 +244,7 @@
     "message": "Límites y preajustes"
   },
   "readingSettings": {
-    "message": "Lectura y tipografía"
+    "message": "Texto y espaciado"
   },
   "layoutUnsupported": {
     "message": "Este diseño de página aún no es compatible. Se conserva el ancho original."
@@ -275,9 +254,6 @@
   },
   "layoutUnavailable": {
     "message": "No se puede consultar el estado. Recarga la página e inténtalo de nuevo."
-  },
-  "siteEnabled": {
-    "message": "Activar en {site}"
   },
   "siteEnabledA11y": {
     "message": "Activar Roomy en {site}"
@@ -336,25 +312,52 @@
   "navigationEarlier": {
     "message": "Mensajes anteriores"
   },
-  "grantChatgptPermission": {
-    "message": "Permitir acceso a ChatGPT"
-  },
-  "chatgptPermissionHint": {
-    "message": "El acceso a ChatGPT es opcional. Permítelo para aplicar estos ajustes."
-  },
-  "chatgptPermissionFailed": {
-    "message": "No se pudo solicitar acceso. Inténtalo de nuevo."
-  },
-  "chatgptIntroHint": {
-    "message": "Novedad: ahora también funciona en ChatGPT. Permite el acceso para ampliar sus conversaciones y ajustar el texto."
-  },
-  "chatgptAccessNeeded": {
-    "message": "Requiere acceso"
-  },
   "badgeNew": {
     "message": "NEW"
   },
   "helpSiteAccess": {
-    "message": "El acceso a Gemini es obligatorio. El acceso a ChatGPT es opcional: selecciona ChatGPT y permite el acceso en la ventana emergente."
+    "message": "El acceso a {required} es obligatorio. El acceso a {optional} es opcional: haz clic en Permitir junto al sitio en la lista de la ventana emergente."
+  },
+  "yourSites": {
+    "message": "Tus sitios"
+  },
+  "addableSites": {
+    "message": "Sitios que puedes añadir"
+  },
+  "allSites": {
+    "message": "Todos los sitios"
+  },
+  "siteNew": {
+    "message": "Nuevo"
+  },
+  "allowAccess": {
+    "message": "Permitir"
+  },
+  "stateEnabled": {
+    "message": "Activado"
+  },
+  "stateWidthOff": {
+    "message": "Ampliación desactivada"
+  },
+  "siteAccessNeeded": {
+    "message": "Requiere acceso"
+  },
+  "grantSitePermission": {
+    "message": "Permitir acceso a {site}"
+  },
+  "sitePermissionHint": {
+    "message": "El acceso a {site} es opcional. Permítelo para aplicar estos ajustes."
+  },
+  "sitePermissionFailed": {
+    "message": "No se pudo solicitar acceso. Inténtalo de nuevo."
+  },
+  "siteIntroLine": {
+    "message": "Novedad: compatible con {sites}"
+  },
+  "layoutNotApplicable": {
+    "message": "Roomy no modifica esta página. Abre una conversación para ajustarla."
+  },
+  "helpOpenSite": {
+    "message": "Abrir {site}"
   }
 }

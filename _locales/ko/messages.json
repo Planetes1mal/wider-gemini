@@ -8,9 +8,6 @@
   "appDesc": {
     "message": "Gemini와 ChatGPT 대화 영역을 각각 넓히고, 사이트별로 글자 크기와 읽기 밀도를 조정하며, 언제든 일시 중지할 수 있습니다."
   },
-  "headerSubtitle": {
-    "message": "대화를 더 넓고 편안하게"
-  },
   "widthLabel": {
     "message": "대화 너비"
   },
@@ -41,9 +38,6 @@
   "donePresets": {
     "message": "완료"
   },
-  "cancelPresets": {
-    "message": "취소"
-  },
   "managePresets": {
     "message": "프리셋 관리"
   },
@@ -61,12 +55,6 @@
   },
   "userFullWidthLabel": {
     "message": "내 메시지도 전체 너비로"
-  },
-  "statusOn": {
-    "message": "켜짐"
-  },
-  "statusOff": {
-    "message": "꺼짐"
   },
   "refreshing": {
     "message": "페이지 새로고침 중…"
@@ -127,46 +115,40 @@
     "message": "도움말 및 피드백"
   },
   "helpGettingStarted": {
-    "message": "Gemini와 ChatGPT를 화면에 맞추기"
+    "message": "{sites}를 화면에 맞추기"
   },
   "helpOpenPopup": {
-    "message": "Gemini 또는 ChatGPT를 열고 도구 모음의 Roomy 아이콘을 누르세요. 상단의 사이트 버튼으로 조절할 사이트를 선택할 수 있습니다."
+    "message": "{sites}를 열고 도구 모음의 Roomy 아이콘을 누르세요. 지원하는 사이트에서는 해당 사이트의 설정이 바로 열리고, 다른 페이지에서는 모든 사이트 목록이 표시됩니다."
   },
   "helpWidthTitle": {
     "message": "대화 너비"
   },
   "helpWidthBody": {
-    "message": "고정 너비는 px, 창 크기에 따른 너비는 %를 선택하세요. 슬라이더를 움직이거나 프리셋을 선택하세요. Gemini와 ChatGPT는 너비, 범위, 프리셋을 각각 저장하며 단위별 프리셋도 별개입니다. 범위 및 프리셋을 펼쳐 편집할 수 있습니다. 너비 제목 옆 스위치로 해당 사이트의 확장을 일시 중지하면 원래 너비로 돌아갑니다. 저장한 값과 프리셋은 유지되며 읽기 설정도 계속 적용됩니다."
+    "message": "고정 너비는 px, 창 크기에 따른 너비는 %를 선택하세요. 슬라이더를 움직이거나 프리셋을 선택하세요. 너비, 범위, 프리셋은 사이트별로 따로 저장되며 단위별 프리셋도 별개입니다. 범위 및 프리셋을 펼쳐 편집할 수 있습니다. 너비 제목 옆 스위치로 해당 사이트의 확장을 일시 중지하면 원래 너비로 돌아갑니다. 저장한 값과 프리셋은 유지되며 읽기 설정도 계속 적용됩니다."
   },
   "helpCodeTitle": {
     "message": "코드 줄바꿈"
   },
   "helpCodeBody": {
-    "message": "Gemini 전용: 코드 자동 줄바꿈을 켜면 긴 코드를 읽을 때 가로 스크롤을 줄일 수 있습니다. ChatGPT에서는 각 코드 블록의 줄바꿈 버튼을 사용하세요. 확장 프로그램은 이를 변경하지 않습니다."
+    "message": "코드 자동 줄바꿈은 {sites}에서만 제공됩니다. 다른 사이트에서는 각 코드 블록의 줄바꿈 기능을 사용하세요. 확장 프로그램은 이를 변경하지 않습니다."
   },
   "helpReadingTitle": {
     "message": "글자 크기와 간격"
   },
   "helpReadingBody": {
-    "message": "페이지 전체를 확대하지 않고 글자 크기를 75%~200%로 조절하며, 제목·코드·표의 비율은 유지됩니다. 자동 모드의 밀도 0은 기본 문단 간격과 줄 높이를 유지하고, 밀도를 높이면 본문 간격만 점진적으로 줄어듭니다. 두 사이트의 코드 줄과 표 셀은 원래 줄 높이 비율을 유지합니다. ChatGPT 수식도 원래 간격을 유지합니다. 간격 세부 설정에서는 정확한 값을 직접 지정할 수 있으며, 간격 초기화를 누르면 현재 밀도의 자동 모드로 돌아갑니다. Gemini와 ChatGPT의 읽기 설정은 따로 저장됩니다."
+    "message": "페이지 전체를 확대하지 않고 글자 크기를 75%~200%로 조절하며, 제목·코드·표의 비율은 유지됩니다. 자동 모드의 밀도 0은 기본 문단 간격과 줄 높이를 유지하고, 밀도를 높이면 본문 간격만 점진적으로 줄어듭니다. 코드 줄과 표 셀은 원래 줄 높이 비율을 유지하고 수식도 원래 간격을 유지합니다. 간격 세부 설정에서는 정확한 값을 직접 지정할 수 있으며, 간격 초기화를 누르면 현재 밀도의 자동 모드로 돌아갑니다. 읽기 설정은 사이트별로 따로 저장됩니다."
   },
   "helpLiveSettings": {
-    "message": "변경 사항은 자동 저장되며 선택한 사이트의 열린 탭에 바로 적용됩니다. 사이트별 설정은 독립적이고 팝업 언어는 공통입니다. 기기 간 동기화는 브라우저의 동기화 설정에 따라 달라집니다."
-  },
-  "helpOpenGemini": {
-    "message": "Gemini 열기"
-  },
-  "helpOpenChatgpt": {
-    "message": "ChatGPT 열기"
+    "message": "변경 사항은 자동 저장되며 해당 사이트의 열린 탭에 바로 적용됩니다. 사이트별 설정은 독립적이고 팝업 언어는 공통입니다. 기기 간 동기화는 브라우저의 동기화 설정에 따라 달라집니다."
   },
   "helpTroubleshooting": {
     "message": "화면이 제대로 표시되지 않나요?"
   },
   "helpTroubleshootPage": {
-    "message": "gemini.google.com 또는 chatgpt.com을 열었는지, Roomy가 활성화되어 있고 해당 사이트 접근이 허용되어 있는지 확인하세요. Chrome에서 설치한 웹 앱(PWA)은 같은 웹페이지를 사용합니다. 네이티브 데스크톱 앱이나 Chrome 내장 Gemini 패널은 지원하지 않습니다."
+    "message": "지원하는 사이트({sites})를 열었는지, Roomy가 활성화되어 있고 해당 사이트 접근이 허용되어 있는지 확인하세요. Chrome에서 설치한 웹 앱(PWA)은 같은 웹페이지를 사용합니다. 네이티브 데스크톱 앱이나 Chrome 내장 Gemini 패널은 지원하지 않습니다."
   },
   "helpTroubleshootRefresh": {
-    "message": "설치 또는 업데이트 후 설정이 적용되지 않으면 해당 페이지를 한 번 새로고침하세요. 이전 버전이 실행 중이라는 안내가 보이면 먼저 chrome://extensions에서 확장 프로그램을 다시 로드하세요. 지원하지 않는 레이아웃이라는 안내가 표시되면 현재 페이지에는 너비 확장이 적용되지 않습니다. 사이트 탭 아래의 사용 스위치로 해당 사이트의 모든 효과를 일시 중지할 수 있으며, 저장된 설정은 유지됩니다."
+    "message": "설치 또는 업데이트 후 설정이 적용되지 않으면 해당 페이지를 한 번 새로고침하세요. 이전 버전이 실행 중이라는 안내가 보이면 먼저 chrome://extensions에서 확장 프로그램을 다시 로드하세요. 지원하지 않는 레이아웃이라는 안내가 표시되면 현재 페이지에는 너비 확장이 적용되지 않습니다. 사이트 이름 옆의 스위치로 해당 사이트의 모든 효과를 일시 중지할 수 있으며, 저장된 설정은 유지됩니다."
   },
   "helpTroubleshootReport": {
     "message": "문제가 계속되면 사이트, 재현 단계와 창 크기를 기록해 주세요. 개인 정보를 지운 스크린샷을 첨부하고 페이지 레이아웃을 바꾸는 다른 확장 프로그램도 알려 주세요."
@@ -178,7 +160,7 @@
     "message": "설정 보고서"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "문제 신고에 첨부하기 전에 보고서를 생성하고 내용을 확인할 수 있습니다. 확장 프로그램 버전, 브라우저 이름과 주 버전, 운영체제, 인터페이스 언어, 사이트별 사용 스위치, Gemini 화면 설정, ChatGPT 너비와 읽기 설정만 포함됩니다. 대화, 페이지 URL, 제목, 사용자 지정 프리셋 이름은 포함되지 않습니다. 보고서는 자동으로 전송되지 않습니다."
+    "message": "문제 신고에 첨부하기 전에 보고서를 생성하고 내용을 확인할 수 있습니다. 확장 프로그램 버전, 브라우저 이름과 주 버전, 운영체제, 인터페이스 언어, 사이트별 사용 스위치·너비·범위·읽기 설정만 포함됩니다. 대화, 페이지 URL, 제목, 사용자 지정 프리셋 이름은 포함되지 않습니다. 보고서는 자동으로 전송되지 않습니다."
   },
   "helpGenerateReport": {
     "message": "보고서 생성"
@@ -250,13 +232,10 @@
     "message": "작업별 프리셋"
   },
   "helpTaskBody": {
-    "message": "작업 프리셋을 선택하고 요약을 확인한 뒤 적용을 누르세요. Gemini는 긴 글 읽기, 표, 코드, 큰 글자를, ChatGPT는 긴 글 읽기, 와이드(표·코드), 큰 글자를 제공합니다. 프리셋은 너비, 글자 크기, 간격(Gemini는 코드 줄바꿈 포함)만 바꾸며 설정한 너비 범위를 따릅니다. 적용 전 설정 복원은 팝업을 닫은 뒤에도 이 기기에서 해당 사이트에 마지막으로 적용한 프리셋을 되돌리며, 이후 변경 사항도 덮어씁니다."
+    "message": "작업 프리셋을 선택하고 요약을 확인한 뒤 적용을 누르세요. 프리셋은 사이트별로 제공되며 긴 글 읽기, 와이드(표·코드), 큰 글자 등이 있습니다. 프리셋은 너비, 글자 크기, 간격(지원하는 사이트에서는 코드 줄바꿈 포함)만 바꾸며 설정한 너비 범위를 따릅니다. 적용 전 설정 복원은 팝업을 닫은 뒤에도 이 기기에서 해당 사이트에 마지막으로 적용한 프리셋을 되돌리며, 이후 변경 사항도 덮어씁니다."
   },
   "autoSpacingHint": {
     "message": "자동 모드는 각 메시지의 기본 간격을 따릅니다. 슬라이더 하나를 움직이면 아래 두 값이 모두 수동으로 적용됩니다."
-  },
-  "settingsSite": {
-    "message": "설정할 웹사이트"
   },
   "currentSite": {
     "message": "현재 페이지"
@@ -265,7 +244,7 @@
     "message": "범위와 프리셋"
   },
   "readingSettings": {
-    "message": "읽기와 글자 설정"
+    "message": "글자와 간격"
   },
   "layoutUnsupported": {
     "message": "아직 지원하지 않는 페이지 레이아웃입니다. 원래 너비가 유지됩니다."
@@ -275,9 +254,6 @@
   },
   "layoutUnavailable": {
     "message": "페이지 상태를 확인할 수 없습니다. 새로고침 후 다시 시도하세요."
-  },
-  "siteEnabled": {
-    "message": "{site}에서 사용"
   },
   "siteEnabledA11y": {
     "message": "{site}에서 Roomy 사용"
@@ -336,25 +312,52 @@
   "navigationEarlier": {
     "message": "이전 메시지"
   },
-  "grantChatgptPermission": {
-    "message": "ChatGPT 접근 허용"
-  },
-  "chatgptPermissionHint": {
-    "message": "ChatGPT 접근 권한은 선택 사항입니다. 허용하면 이 설정이 적용됩니다."
-  },
-  "chatgptPermissionFailed": {
-    "message": "접근 권한을 요청할 수 없습니다. 다시 시도하세요."
-  },
-  "chatgptIntroHint": {
-    "message": "이제 ChatGPT도 지원합니다. 접근을 허용하면 ChatGPT 대화를 넓히고 글자를 조절할 수 있습니다."
-  },
-  "chatgptAccessNeeded": {
-    "message": "접근 허용 필요"
-  },
   "badgeNew": {
     "message": "NEW"
   },
   "helpSiteAccess": {
-    "message": "Gemini 접근 권한은 필수입니다. ChatGPT 접근 권한은 선택 사항입니다. 팝업에서 ChatGPT를 선택하고 접근을 허용하세요."
+    "message": "{required} 접근 권한은 필수입니다. {optional} 접근 권한은 선택 사항입니다. 팝업의 사이트 목록에서 해당 사이트 옆의 허용을 누르세요."
+  },
+  "yourSites": {
+    "message": "내 사이트"
+  },
+  "addableSites": {
+    "message": "추가할 수 있는 사이트"
+  },
+  "allSites": {
+    "message": "모든 사이트"
+  },
+  "siteNew": {
+    "message": "NEW"
+  },
+  "allowAccess": {
+    "message": "허용"
+  },
+  "stateEnabled": {
+    "message": "사용 중"
+  },
+  "stateWidthOff": {
+    "message": "너비 확장 꺼짐"
+  },
+  "siteAccessNeeded": {
+    "message": "접근 허용 필요"
+  },
+  "grantSitePermission": {
+    "message": "{site} 접근 허용"
+  },
+  "sitePermissionHint": {
+    "message": "{site} 접근 권한은 선택 사항입니다. 허용하면 이 설정이 적용됩니다."
+  },
+  "sitePermissionFailed": {
+    "message": "접근 권한을 요청할 수 없습니다. 다시 시도하세요."
+  },
+  "siteIntroLine": {
+    "message": "새로 지원: {sites}"
+  },
+  "layoutNotApplicable": {
+    "message": "이 페이지는 해당되지 않아 Roomy가 변경하지 않습니다. 대화를 열면 조절할 수 있습니다."
+  },
+  "helpOpenSite": {
+    "message": "{site} 열기"
   }
 }

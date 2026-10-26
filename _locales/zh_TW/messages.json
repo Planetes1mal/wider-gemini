@@ -8,9 +8,6 @@
   "appDesc": {
     "message": "分別加寬 Gemini 和 ChatGPT 的對話區域，依網站調整字型大小與閱讀密度，並可隨時暫停任一網站。"
   },
-  "headerSubtitle": {
-    "message": "讓對話介面更寬、更舒適"
-  },
   "widthLabel": {
     "message": "對話區域寬度"
   },
@@ -41,9 +38,6 @@
   "donePresets": {
     "message": "完成"
   },
-  "cancelPresets": {
-    "message": "取消"
-  },
   "managePresets": {
     "message": "管理預設"
   },
@@ -61,12 +55,6 @@
   },
   "userFullWidthLabel": {
     "message": "使用者訊息填滿寬度"
-  },
-  "statusOn": {
-    "message": "啟用"
-  },
-  "statusOff": {
-    "message": "停用"
   },
   "refreshing": {
     "message": "正在重新整理頁面..."
@@ -127,46 +115,40 @@
     "message": "使用說明與意見回饋"
   },
   "helpGettingStarted": {
-    "message": "讓 Gemini 與 ChatGPT 適合你的螢幕"
+    "message": "讓 {sites} 適合你的螢幕"
   },
   "helpOpenPopup": {
-    "message": "開啟 Gemini 或 ChatGPT，點選工具列上的 Roomy 圖示，再透過頂端的網站按鈕選擇要調整的網站。"
+    "message": "開啟 {sites}，點選工具列上的 Roomy 圖示。在支援的網站上，彈出視窗會直接進入該網站的設定；在其他頁面則顯示全部網站的清單。"
   },
   "helpWidthTitle": {
     "message": "訊息區域寬度"
   },
   "helpWidthBody": {
-    "message": "選擇 px 使用固定寬度，選擇 % 跟隨視窗大小。拖曳滑桿或點選預設。Gemini 和 ChatGPT 分別儲存寬度、範圍與預設，每種單位也有獨立預設。展開「範圍與預設」即可編輯。寬度標題旁的開關可以單獨暫停該網站的加寬並恢復原站寬度，已儲存的數值與預設會保留，閱讀設定仍然有效。"
+    "message": "選擇 px 使用固定寬度，選擇 % 跟隨視窗大小。拖曳滑桿或點選預設。每個網站分別儲存寬度、範圍與預設，每種單位也有獨立預設。展開「範圍與預設」即可編輯。寬度標題旁的開關可以單獨暫停該網站的加寬並恢復原站寬度，已儲存的數值與預設會保留，閱讀設定仍然有效。"
   },
   "helpCodeTitle": {
     "message": "程式碼換行"
   },
   "helpCodeBody": {
-    "message": "僅適用於 Gemini：開啟「程式碼自動換行」，減少閱讀長程式碼時的橫向捲動。ChatGPT 請使用程式碼區塊內建的換行按鈕，擴充功能不會變更它。"
+    "message": "程式碼自動換行只在 {sites} 提供。其他網站請使用程式碼區塊內建的換行控制項，擴充功能不會變更它。"
   },
   "helpReadingTitle": {
     "message": "字級與間距"
   },
   "helpReadingBody": {
-    "message": "字級可在75%至200%之間調整，不必縮放整個頁面，標題、程式碼和表格維持原有比例。自動密度為0時保留原生段距和行高，提高密度只會逐漸收緊正文。兩個網站的程式碼行和表格儲存格保留原生行高比例。ChatGPT 公式也保留原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。Gemini 與 ChatGPT 分別儲存閱讀設定。"
+    "message": "字級可在75%至200%之間調整，不必縮放整個頁面，標題、程式碼和表格維持原有比例。自動密度為0時保留原生段距和行高，提高密度只會逐漸收緊正文。程式碼行和表格儲存格保留原生行高比例，公式也保留原生間距。進階間距可手動指定精確數值；還原間距會回到目前密度的自動模式。每個網站分別儲存閱讀設定。"
   },
   "helpLiveSettings": {
-    "message": "設定會自動儲存並即時套用至所選網站已開啟的分頁。兩個網站的設定互相獨立，彈出視窗語言共用。跨裝置同步取決於瀏覽器的同步設定。"
-  },
-  "helpOpenGemini": {
-    "message": "開啟 Gemini"
-  },
-  "helpOpenChatgpt": {
-    "message": "開啟 ChatGPT"
+    "message": "設定會自動儲存並即時套用至該網站已開啟的分頁。各網站的設定互相獨立，彈出視窗語言共用。跨裝置同步取決於瀏覽器的同步設定。"
   },
   "helpTroubleshooting": {
     "message": "顯示不如預期？"
   },
   "helpTroubleshootPage": {
-    "message": "確認目前網站是 gemini.google.com 或 chatgpt.com，且 Roomy 已啟用並獲准存取該網站。透過 Chrome 安裝的網頁應用程式（PWA）使用同一網頁。不支援原生桌面應用程式或 Chrome 內建的 Gemini 面板。"
+    "message": "確認目前網站是受支援的網站（{sites}），且 Roomy 已啟用並獲准存取該網站。透過 Chrome 安裝的網頁應用程式（PWA）使用同一網頁。不支援原生桌面應用程式或 Chrome 內建的 Gemini 面板。"
   },
   "helpTroubleshootRefresh": {
-    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理對應頁面一次。若彈出視窗提示頁面仍在執行舊版，請先在 chrome://extensions 重新載入擴充功能。出現版面尚未支援的提示時，目前頁面不會套用加寬。站點分頁下方的「啟用」開關可暫停該網站的所有效果，已儲存的設定會保留。"
+    "message": "安裝或更新擴充功能後，如果設定沒有生效，請重新整理對應頁面一次。若彈出視窗提示頁面仍在執行舊版，請先在 chrome://extensions 重新載入擴充功能。出現版面尚未支援的提示時，目前頁面不會套用加寬。網站名稱旁的開關可暫停該網站的所有效果，已儲存的設定會保留。"
   },
   "helpTroubleshootReport": {
     "message": "如果問題持續，請記錄網站、重現步驟與視窗大小。可附上已移除私人內容的螢幕截圖，並說明其他會調整網頁版面的擴充功能。"
@@ -178,7 +160,7 @@
     "message": "設定診斷報告"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器名稱與主版本、平台、介面語言、各網站的啟用開關、Gemini 版面設定，以及 ChatGPT 寬度與閱讀設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
+    "message": "產生後可先預覽，再決定是否分享到問題回報中。報告僅包含擴充功能版本、瀏覽器名稱與主版本、平台、介面語言，以及各網站的啟用開關、寬度、範圍與閱讀設定，不包含對話內容、網頁網址、標題或自訂預設名稱，也不會自動傳送。"
   },
   "helpGenerateReport": {
     "message": "產生報告"
@@ -250,13 +232,10 @@
     "message": "任務預設"
   },
   "helpTaskBody": {
-    "message": "選擇任務預設，查看摘要後點選套用。Gemini 提供長文閱讀、表格、程式碼和大字；ChatGPT 提供長文閱讀、寬螢幕（表格與程式碼）和大字。預設只調整寬度、字級和間距（Gemini 另含程式碼換行），並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上該網站最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這些設定的調整。"
+    "message": "選擇任務預設，查看摘要後點選套用。每個網站提供各自的預設，例如長文閱讀、寬螢幕（表格與程式碼）和大字。預設只調整寬度、字級和間距（支援的網站另含程式碼換行），並遵守自訂寬度範圍。「還原套用前設定」可復原此裝置上該網站最近一次套用，即使已關閉彈出視窗；還原會覆蓋之後對這些設定的調整。"
   },
   "autoSpacingHint": {
     "message": "自動模式跟隨各則訊息的原生間距。移動任一滑桿後，將手動套用下方兩項數值。"
-  },
-  "settingsSite": {
-    "message": "設定網站"
   },
   "currentSite": {
     "message": "目前網頁"
@@ -265,7 +244,7 @@
     "message": "範圍與預設"
   },
   "readingSettings": {
-    "message": "閱讀與排版"
+    "message": "文字與間距"
   },
   "layoutUnsupported": {
     "message": "尚未支援目前的頁面版面，已保留原站寬度。"
@@ -275,9 +254,6 @@
   },
   "layoutUnavailable": {
     "message": "暫時無法讀取頁面狀態，請重新整理頁面後再試。"
-  },
-  "siteEnabled": {
-    "message": "在 {site} 上啟用"
   },
   "siteEnabledA11y": {
     "message": "在 {site} 上啟用 Roomy"
@@ -336,25 +312,52 @@
   "navigationEarlier": {
     "message": "較早的訊息"
   },
-  "grantChatgptPermission": {
-    "message": "允許存取 ChatGPT"
-  },
-  "chatgptPermissionHint": {
-    "message": "ChatGPT 存取權限為選用。允許存取後才會套用這些設定。"
-  },
-  "chatgptPermissionFailed": {
-    "message": "無法要求存取權限，請重試。"
-  },
-  "chatgptIntroHint": {
-    "message": "新增 ChatGPT 支援。允許存取後，即可加寬 ChatGPT 對話並調整文字。"
-  },
-  "chatgptAccessNeeded": {
-    "message": "需要授權"
-  },
   "badgeNew": {
     "message": "新"
   },
   "helpSiteAccess": {
-    "message": "Gemini 存取權限為必要。ChatGPT 存取權限為選用：在彈出視窗選擇 ChatGPT 並允許存取。"
+    "message": "{required} 存取權限為必要。{optional} 存取權限為選用：在彈出視窗的網站清單中點選該網站旁的「允許」。"
+  },
+  "yourSites": {
+    "message": "你的網站"
+  },
+  "addableSites": {
+    "message": "可加入的網站"
+  },
+  "allSites": {
+    "message": "全部網站"
+  },
+  "siteNew": {
+    "message": "新"
+  },
+  "allowAccess": {
+    "message": "允許"
+  },
+  "stateEnabled": {
+    "message": "已啟用"
+  },
+  "stateWidthOff": {
+    "message": "寬度已關閉"
+  },
+  "siteAccessNeeded": {
+    "message": "需要授權"
+  },
+  "grantSitePermission": {
+    "message": "允許存取 {site}"
+  },
+  "sitePermissionHint": {
+    "message": "{site} 存取權限為選用。允許存取後才會套用這些設定。"
+  },
+  "sitePermissionFailed": {
+    "message": "無法要求存取權限，請重試。"
+  },
+  "siteIntroLine": {
+    "message": "新增 {sites} 支援"
+  },
+  "layoutNotApplicable": {
+    "message": "此頁面不適用，Roomy 不會變更它。開啟一段對話即可調整。"
+  },
+  "helpOpenSite": {
+    "message": "開啟 {site}"
   }
 }

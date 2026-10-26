@@ -8,9 +8,6 @@
   "appDesc": {
     "message": "Widen Gemini and ChatGPT, adjust font size and reading density per site, and pause either site at any time."
   },
-  "headerSubtitle": {
-    "message": "Make the conversation interface wider and more comfortable"
-  },
   "widthLabel": {
     "message": "Chat Width"
   },
@@ -41,9 +38,6 @@
   "donePresets": {
     "message": "Done"
   },
-  "cancelPresets": {
-    "message": "Cancel"
-  },
   "managePresets": {
     "message": "Manage presets"
   },
@@ -61,12 +55,6 @@
   },
   "userFullWidthLabel": {
     "message": "User Message Full Width"
-  },
-  "statusOn": {
-    "message": "On"
-  },
-  "statusOff": {
-    "message": "Off"
   },
   "refreshing": {
     "message": "Refreshing page..."
@@ -127,46 +115,40 @@
     "message": "Help & feedback"
   },
   "helpGettingStarted": {
-    "message": "Make Gemini and ChatGPT fit your screen"
+    "message": "Make {sites} fit your screen"
   },
   "helpOpenPopup": {
-    "message": "Open Gemini or ChatGPT, then click the Roomy toolbar icon. Use the site buttons to choose which website to adjust."
+    "message": "Open {sites}, then click the Roomy toolbar icon. On a supported website the popup opens that website's settings; elsewhere it lists all websites."
   },
   "helpWidthTitle": {
     "message": "Conversation width"
   },
   "helpWidthBody": {
-    "message": "Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Gemini and ChatGPT save width, limits, and presets separately; each unit has its own presets. Expand Range & presets to edit them. The switch beside the width title pauses widening for that site and restores its original width. Your saved values and presets are kept; reading settings remain active."
+    "message": "Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Each website saves width, limits, and presets separately; each unit has its own presets. Expand Range & presets to edit them. The switch beside the width title pauses widening for that website and restores its original width. Your saved values and presets are kept; reading settings remain active."
   },
   "helpCodeTitle": {
     "message": "Code wrapping"
   },
   "helpCodeBody": {
-    "message": "Gemini only: Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. In ChatGPT, use its own wrap button on each code block; the extension leaves it unchanged."
+    "message": "Code auto wrap is available on {sites}. Other websites keep their own code-block wrap controls; the extension leaves them unchanged."
   },
   "helpReadingTitle": {
     "message": "Text size & spacing"
   },
   "helpReadingBody": {
-    "message": "Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. On both sites, code lines and table cells keep their native line-height proportions. ChatGPT formulas also keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Gemini and ChatGPT keep separate reading settings."
+    "message": "Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. Code lines and table cells keep their native line-height proportions, and formulas keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Each website keeps separate reading settings."
   },
   "helpLiveSettings": {
-    "message": "Changes are saved automatically and apply live to open tabs of the selected website. The two websites keep separate settings; the popup language is shared. Sync across devices depends on your browser’s sync settings."
-  },
-  "helpOpenGemini": {
-    "message": "Open Gemini"
-  },
-  "helpOpenChatgpt": {
-    "message": "Open ChatGPT"
+    "message": "Changes are saved automatically and apply live to open tabs of that website. Each website keeps separate settings; the popup language is shared. Sync across devices depends on your browser’s sync settings."
   },
   "helpTroubleshooting": {
     "message": "Something looks wrong?"
   },
   "helpTroubleshootPage": {
-    "message": "Check that you are on gemini.google.com or chatgpt.com and Roomy is enabled with access to that site. Chrome-installed web apps (PWAs) use the same webpages. Native desktop apps and Chrome’s built-in Gemini panel are not supported."
+    "message": "Check that you are on a supported website ({sites}) and Roomy is enabled with access to that website. Chrome-installed web apps (PWAs) use the same webpages. Native desktop apps and Chrome’s built-in Gemini panel are not supported."
   },
   "helpTroubleshootRefresh": {
-    "message": "If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the Enable switch below the site tabs to pause everything on a site; saved settings are kept."
+    "message": "If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the switch beside the website name to pause everything on that website; saved settings are kept."
   },
   "helpTroubleshootReport": {
     "message": "If the problem continues, note the website, steps to reproduce it, and window size. A screenshot with private content removed can help; mention other extensions that change the page layout."
@@ -178,7 +160,7 @@
     "message": "Settings report"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser name and major version, platform, interface language, each site's Enable switch, Gemini layout settings, and ChatGPT width and reading settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
+    "message": "Generate a report to preview before sharing it in an issue. It includes only the extension version, browser name and major version, platform, interface language, and each website's Enable switch, width, range, and reading settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically."
   },
   "helpGenerateReport": {
     "message": "Generate report"
@@ -250,13 +232,10 @@
     "message": "Task presets"
   },
   "helpTaskBody": {
-    "message": "Choose a task preset, review the summary, then click Apply. Gemini offers Long reading, Tables, Code, and Large text; ChatGPT offers Long reading, Wide (tables & code), and Large text. Presets change width, font size, and spacing (and code wrapping in Gemini), within your width limits. Restore previous settings undoes the most recent preset for that site on this device, even after closing the popup; it replaces later changes to those settings."
+    "message": "Choose a task preset, review the summary, then click Apply. Each website offers its own presets, such as Long reading, Wide (tables & code), and Large text. Presets change width, font size, and spacing (and code wrapping where available), within your width limits. Restore previous settings undoes the most recent preset for that website on this device, even after closing the popup; it replaces later changes to those settings."
   },
   "autoSpacingHint": {
     "message": "Auto follows each message's native spacing. Moving either slider applies both values below manually."
-  },
-  "settingsSite": {
-    "message": "Website settings"
   },
   "currentSite": {
     "message": "Current"
@@ -265,7 +244,7 @@
     "message": "Range & presets"
   },
   "readingSettings": {
-    "message": "Reading & typography"
+    "message": "Text & spacing"
   },
   "layoutUnsupported": {
     "message": "This page layout is not supported yet. Original page width is preserved."
@@ -275,9 +254,6 @@
   },
   "layoutUnavailable": {
     "message": "Page status unavailable. Refresh the page and try again."
-  },
-  "siteEnabled": {
-    "message": "Enable on {site}"
   },
   "siteEnabledA11y": {
     "message": "Enable Roomy on {site}"
@@ -336,25 +312,52 @@
   "navigationEarlier": {
     "message": "Earlier messages"
   },
-  "grantChatgptPermission": {
-    "message": "Allow ChatGPT access"
-  },
-  "chatgptPermissionHint": {
-    "message": "ChatGPT access is optional. Allow access to apply these settings."
-  },
-  "chatgptPermissionFailed": {
-    "message": "Could not request access. Please try again."
-  },
-  "chatgptIntroHint": {
-    "message": "New: ChatGPT is supported too. Allow access to widen its conversations and adjust their text."
-  },
-  "chatgptAccessNeeded": {
-    "message": "Access needed"
-  },
   "badgeNew": {
     "message": "NEW"
   },
   "helpSiteAccess": {
-    "message": "Gemini access is required. ChatGPT access is optional: select ChatGPT and allow access in the popup."
+    "message": "Access to {required} is required. Access to {optional} is optional: click Allow next to the website in the popup's list."
+  },
+  "yourSites": {
+    "message": "Your websites"
+  },
+  "addableSites": {
+    "message": "Websites you can add"
+  },
+  "allSites": {
+    "message": "All websites"
+  },
+  "siteNew": {
+    "message": "New"
+  },
+  "allowAccess": {
+    "message": "Allow"
+  },
+  "stateEnabled": {
+    "message": "Enabled"
+  },
+  "stateWidthOff": {
+    "message": "Widening off"
+  },
+  "siteAccessNeeded": {
+    "message": "Access needed"
+  },
+  "grantSitePermission": {
+    "message": "Allow {site} access"
+  },
+  "sitePermissionHint": {
+    "message": "{site} access is optional. Allow access to apply these settings."
+  },
+  "sitePermissionFailed": {
+    "message": "Could not request access. Please try again."
+  },
+  "siteIntroLine": {
+    "message": "New: {sites} supported"
+  },
+  "layoutNotApplicable": {
+    "message": "Roomy does not change this page. Open a conversation to adjust it."
+  },
+  "helpOpenSite": {
+    "message": "Open {site}"
   }
 }

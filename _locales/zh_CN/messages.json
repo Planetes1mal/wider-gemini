@@ -8,9 +8,6 @@
   "appDesc": {
     "message": "分别拓宽 Gemini 和 ChatGPT 的对话区域，按网站调整字号与阅读密度，并可随时暂停任一网站。"
   },
-  "headerSubtitle": {
-    "message": "让对话界面更宽更舒适"
-  },
   "widthLabel": {
     "message": "对话区域宽度"
   },
@@ -41,9 +38,6 @@
   "donePresets": {
     "message": "完成"
   },
-  "cancelPresets": {
-    "message": "取消"
-  },
   "managePresets": {
     "message": "管理预设"
   },
@@ -61,12 +55,6 @@
   },
   "userFullWidthLabel": {
     "message": "用户消息铺满宽度"
-  },
-  "statusOn": {
-    "message": "开启"
-  },
-  "statusOff": {
-    "message": "关闭"
   },
   "refreshing": {
     "message": "正在刷新页面..."
@@ -127,46 +115,40 @@
     "message": "帮助与反馈"
   },
   "helpGettingStarted": {
-    "message": "让 Gemini 和 ChatGPT 适合你的屏幕"
+    "message": "让 {sites} 适合你的屏幕"
   },
   "helpOpenPopup": {
-    "message": "打开 Gemini 或 ChatGPT，点击工具栏中的 Roomy 图标，再通过顶部站点按钮选择要调整的网站。"
+    "message": "打开 {sites}，点击工具栏中的 Roomy 图标。在支持的网站上，弹窗直接进入该网站的设置；在其它页面则显示全部网站的列表。"
   },
   "helpWidthTitle": {
     "message": "消息区域宽度"
   },
   "helpWidthBody": {
-    "message": "选择 px 使用固定宽度，选择 % 跟随窗口大小。拖动滑块或点选预设。Gemini 和 ChatGPT 分别保存宽度、范围和预设，每种单位也有独立预设。展开“范围与预设”即可编辑。宽度标题旁的开关可以单独暂停该网站的拓宽并恢复原站宽度，已保存的数值和预设会保留，阅读设置仍然有效。"
+    "message": "选择 px 使用固定宽度，选择 % 跟随窗口大小。拖动滑块或点选预设。每个网站分别保存宽度、范围和预设，每种单位也有独立预设。展开“范围与预设”即可编辑。宽度标题旁的开关可以单独暂停该网站的拓宽并恢复原站宽度，已保存的数值和预设会保留，阅读设置仍然有效。"
   },
   "helpCodeTitle": {
     "message": "代码换行"
   },
   "helpCodeBody": {
-    "message": "仅适用于 Gemini：开启“代码自动换行”，减少阅读长代码时的横向滚动。ChatGPT 请使用代码块自带的换行按钮，扩展不会改动它。"
+    "message": "代码自动换行只在 {sites} 上提供。其它网站请使用代码块自带的换行控件，扩展不会改动它。"
   },
   "helpReadingTitle": {
     "message": "字号与间距"
   },
   "helpReadingBody": {
-    "message": "字号可在75%至200%之间调整，无需缩放整个页面，标题、代码和表格保持原有比例。自动密度为0时保留原生段距和行高，提高密度只会逐渐收紧正文。两站的代码行和表格单元格保留原生行高比例。ChatGPT 公式也保留原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。Gemini 与 ChatGPT 分别保存阅读设置。"
+    "message": "字号可在75%至200%之间调整，无需缩放整个页面，标题、代码和表格保持原有比例。自动密度为0时保留原生段距和行高，提高密度只会逐渐收紧正文。代码行和表格单元格保留原生行高比例，公式也保留原生间距。高级间距可手动指定精确数值；重置间距会回到当前密度的自动模式。每个网站分别保存阅读设置。"
   },
   "helpLiveSettings": {
-    "message": "设置会自动保存并实时应用到所选网站已打开的标签页。两个网站的设置互相独立，弹窗语言共用。跨设备同步取决于浏览器的同步设置。"
-  },
-  "helpOpenGemini": {
-    "message": "打开 Gemini"
-  },
-  "helpOpenChatgpt": {
-    "message": "打开 ChatGPT"
+    "message": "设置会自动保存并实时应用到该网站已打开的标签页。各网站的设置互相独立，弹窗语言共用。跨设备同步取决于浏览器的同步设置。"
   },
   "helpTroubleshooting": {
     "message": "显示不符合预期？"
   },
   "helpTroubleshootPage": {
-    "message": "确认当前网站是 gemini.google.com 或 chatgpt.com，且 Roomy 已启用并获准访问该网站。通过 Chrome 安装的网页应用（PWA）使用同一网页。不支持原生桌面客户端或 Chrome 内置的 Gemini 面板。"
+    "message": "确认当前网站是受支持的网站（{sites}），且 Roomy 已启用并获准访问该网站。通过 Chrome 安装的网页应用（PWA）使用同一网页。不支持原生桌面客户端或 Chrome 内置的 Gemini 面板。"
   },
   "helpTroubleshootRefresh": {
-    "message": "安装或更新扩展后，如果设置没有生效，请刷新对应页面一次。若弹窗提示页面仍在运行旧版扩展，请先在 chrome://extensions 重新加载扩展。出现布局未适配提示时，当前页不会应用拓宽。站点标签下方的“启用”开关可暂停该网站的全部效果，已保存的设置会保留。"
+    "message": "安装或更新扩展后，如果设置没有生效，请刷新对应页面一次。若弹窗提示页面仍在运行旧版扩展，请先在 chrome://extensions 重新加载扩展。出现布局未适配提示时，当前页不会应用拓宽。网站名称旁的开关可暂停该网站的全部效果，已保存的设置会保留。"
   },
   "helpTroubleshootReport": {
     "message": "如果问题仍然存在，请记录网站、复现步骤和窗口大小。可附上已移除隐私内容的截图，并说明其他会调整网页布局的扩展。"
@@ -178,7 +160,7 @@
     "message": "设置诊断报告"
   },
   "helpDiagnosticsPrivacy": {
-    "message": "生成后可先预览，再决定是否分享到问题反馈中。报告仅包含扩展版本、浏览器名称和主版本、平台、界面语言、各网站的启用开关、Gemini 布局设置以及 ChatGPT 宽度和阅读设置，不包含聊天内容、网页网址、标题或自定义预设名称，也不会自动发送。"
+    "message": "生成后可先预览，再决定是否分享到问题反馈中。报告仅包含扩展版本、浏览器名称和主版本、平台、界面语言，以及各网站的启用开关、宽度、范围和阅读设置，不包含聊天内容、网页网址、标题或自定义预设名称，也不会自动发送。"
   },
   "helpGenerateReport": {
     "message": "生成报告"
@@ -250,13 +232,10 @@
     "message": "任务预设"
   },
   "helpTaskBody": {
-    "message": "选择任务预设，查看摘要后点击应用。Gemini 提供长文阅读、表格、代码和大字；ChatGPT 提供长文阅读、宽屏（表格与代码）和大字。预设只调整宽度、字号和间距（Gemini 另含代码换行），并遵守自定义宽度范围。“恢复应用前设置”可撤销此设备上该网站最近一次应用，即使已关闭弹窗；恢复会覆盖之后对这些设置的调整。"
+    "message": "选择任务预设，查看摘要后点击应用。每个网站提供各自的预设，例如长文阅读、宽屏（表格与代码）和大字。预设只调整宽度、字号和间距（支持的网站另含代码换行），并遵守自定义宽度范围。“恢复应用前设置”可撤销此设备上该网站最近一次应用，即使已关闭弹窗；恢复会覆盖之后对这些设置的调整。"
   },
   "autoSpacingHint": {
     "message": "自动模式跟随各消息的原生间距。移动任一滑块后，将手动应用下方两项数值。"
-  },
-  "settingsSite": {
-    "message": "设置网站"
   },
   "currentSite": {
     "message": "当前网页"
@@ -265,7 +244,7 @@
     "message": "范围与预设"
   },
   "readingSettings": {
-    "message": "阅读与排版"
+    "message": "文字与间距"
   },
   "layoutUnsupported": {
     "message": "暂未适配当前页面布局，已保留原站宽度。"
@@ -275,9 +254,6 @@
   },
   "layoutUnavailable": {
     "message": "暂时无法读取页面状态，请刷新页面后重试。"
-  },
-  "siteEnabled": {
-    "message": "在 {site} 上启用"
   },
   "siteEnabledA11y": {
     "message": "在 {site} 上启用 Roomy"
@@ -336,25 +312,52 @@
   "navigationEarlier": {
     "message": "更早的消息"
   },
-  "grantChatgptPermission": {
-    "message": "允许访问 ChatGPT"
-  },
-  "chatgptPermissionHint": {
-    "message": "ChatGPT 访问权限可选。允许访问后才会应用这些设置。"
-  },
-  "chatgptPermissionFailed": {
-    "message": "无法请求访问权限，请重试。"
-  },
-  "chatgptIntroHint": {
-    "message": "新增 ChatGPT 支持。允许访问后，即可拓宽 ChatGPT 对话并调整文字。"
-  },
-  "chatgptAccessNeeded": {
-    "message": "需要授权"
-  },
   "badgeNew": {
     "message": "新"
   },
   "helpSiteAccess": {
-    "message": "Gemini 访问权限为必选。ChatGPT 访问权限可选：在弹窗选择 ChatGPT 并允许访问。"
+    "message": "{required} 访问权限为必选。{optional} 访问权限可选：在弹窗的网站列表里点击该网站旁的“允许”。"
+  },
+  "yourSites": {
+    "message": "你的网站"
+  },
+  "addableSites": {
+    "message": "可添加的网站"
+  },
+  "allSites": {
+    "message": "全部网站"
+  },
+  "siteNew": {
+    "message": "新"
+  },
+  "allowAccess": {
+    "message": "允许"
+  },
+  "stateEnabled": {
+    "message": "已开启"
+  },
+  "stateWidthOff": {
+    "message": "宽度已关闭"
+  },
+  "siteAccessNeeded": {
+    "message": "需要授权"
+  },
+  "grantSitePermission": {
+    "message": "允许访问 {site}"
+  },
+  "sitePermissionHint": {
+    "message": "{site} 访问权限可选。允许访问后才会应用这些设置。"
+  },
+  "sitePermissionFailed": {
+    "message": "无法请求访问权限，请重试。"
+  },
+  "siteIntroLine": {
+    "message": "新增 {sites} 支持"
+  },
+  "layoutNotApplicable": {
+    "message": "此页面不适用，Roomy 不会改动它。打开一段对话即可调整。"
+  },
+  "helpOpenSite": {
+    "message": "打开 {site}"
   }
 }

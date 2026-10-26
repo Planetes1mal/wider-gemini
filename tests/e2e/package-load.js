@@ -10,6 +10,11 @@
     const { spawn } = require('child_process');
     const extension = path.resolve(process.argv[2]);
     const expected = JSON.parse(fs.readFileSync(path.join(extension, 'manifest.json'), 'utf8'));
+    const registrySandbox = { globalThis: {} };
+    registrySandbox.globalThis = registrySandbox;
+    require('vm').runInNewContext(fs.readFileSync(path.join(extension, 'src/shared/sites.js'), 'utf8'), registrySandbox);
+    const widerRoomySites = registrySandbox.widerRoomySites;
+    const plain = value => JSON.parse(JSON.stringify(value));
     const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'wg-package-load-'));
     const child = spawn(process.env.WG_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe', [
         '--headless=new', '--remote-debugging-pipe', '--enable-unsafe-extension-debugging',
@@ -68,18 +73,22 @@
             const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
             const state = await waitForPage(sessionId, `(() => {
                 const controls = document.getElementById('settingsControls');
+                const list = document.getElementById('siteListView');
                 if (document.readyState !== 'complete' || !globalThis.chrome?.runtime?.id ||
-                    !globalThis.widerGeminiSettings || !controls || controls.disabled) return null;
+                    !globalThis.widerGeminiSettings || !globalThis.widerRoomySites || !controls || controls.disabled ||
+                    !list || list.hidden) return null;
                 const manifest = chrome.runtime.getManifest();
                 return { version:manifest.version, versionName:manifest.version_name,
                     slider:!!document.getElementById('widthSlider'), name:manifest.name,
+                    sites:[...document.querySelectorAll('.site-row')].map(row => row.dataset.site),
                     width:getComputedStyle(document.body).width,
                     styles:[...document.styleSheets].some(sheet => sheet.href && sheet.cssRules.length > 0),
-                    helpUrl:document.getElementById('i18n-helpLink').href };
+                    helpUrl:document.querySelector('[data-i18n="helpLink"]').href };
             })()`, 'Packaged popup scripts should initialize and enable its controls');
             assert.strictEqual(state.version, expected.version);
             assert.strictEqual(state.versionName, expected.version_name);
             assert.strictEqual(state.slider, true);
+            assert.deepStrictEqual(state.sites, plain(widerRoomySites.sites.map(site => site.id)), 'The site list follows the registry');
             assert.strictEqual(state.width, '400px', 'Packaged popup CSS should apply');
             assert.strictEqual(state.styles, true, 'Packaged popup stylesheet should load');
             assert(!state.name.startsWith('__MSG_'), 'Manifest localization should resolve');
@@ -91,10 +100,12 @@
                 const version = document.getElementById('extensionVersion')?.textContent;
                 if (!version) return null;
                 return { version, shared:typeof widerGeminiSettings.normalizeStorage === 'function',
+                    links:[...document.querySelectorAll('#siteLinks a')].map(a => a.href),
                     styles:[...document.styleSheets].some(sheet => sheet.href && sheet.cssRules.length > 0) };
             })()`, 'The popup help link should load its shared helper and help script');
             assert.strictEqual(help.version, `v${expected.version_name || expected.version}`);
             assert.strictEqual(help.shared, true);
+            assert.deepStrictEqual(help.links, plain(widerRoomySites.sites.map(site => site.url)), 'Help links every registered site');
             assert.strictEqual(help.styles, true, 'Packaged help stylesheet should load');
             console.log('Packaged extension loaded in Chrome:', JSON.stringify(state));
             console.log('Packaged help loaded through the popup link:', JSON.stringify(help));

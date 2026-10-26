@@ -1,12 +1,8 @@
 (function () {
     'use strict';
 
-    const SETTINGS_KEYS = [
-        'widthEnabled', 'chatWidth', 'chatWidthSetting', 'widthMin', 'widthMax', 'widthPercentMin', 'widthPercentMax',
-        'messageCompactness', 'messageLineHeight', 'messageParagraphSpacing', 'messageSpacingCustom',
-        'messageFontSize', 'codeWrap', 'userFullWidth', 'uiLanguage', 'chatgptWidthSettings',
-        'geminiEnabled', 'chatgptEnabled', 'chatgptReadingSettings'
-    ];
+    const sites = window.widerRoomySites;
+    const settingsUtils = window.widerGeminiSettings;
     const generateButton = document.getElementById('generateReport');
     const preview = document.getElementById('reportPreview');
     const report = document.getElementById('diagnosticReport');
@@ -25,8 +21,38 @@
         return (dictionary && dictionary[key] && dictionary[key].message) || chrome.i18n.getMessage(key) || fallback;
     }
 
+    // 文案与网站无关：{sites}、{required}、{optional}、{codeWrapSites} 按注册表和界面语言填入。
+    function placeholders() {
+        const language = t('localeCode', 'en');
+        const names = list => sites.joinNames(list.map(site => site.name), language);
+        return {
+            sites: names(sites.sites),
+            required: names(sites.required()),
+            optional: names(sites.optional()),
+            codeWrapSites: names(sites.sites.filter(site => site.capabilities.includes('codeWrap')))
+        };
+    }
+
+    function fill(text, values) {
+        return Object.keys(values).reduce((result, key) => result.split(`{${key}}`).join(values[key]), text);
+    }
+
+    function renderSiteLinks() {
+        const container = document.getElementById('siteLinks');
+        container.textContent = '';
+        for (const site of sites.sites) {
+            const link = document.createElement('a');
+            link.className = 'text-link';
+            link.href = site.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = fill(t('helpOpenSite', 'Open {site}'), { site: site.name });
+            container.appendChild(link);
+        }
+    }
+
     async function localize(language) {
-        const selected = window.widerGeminiSettings.normalizeUiLanguage(language);
+        const selected = settingsUtils.normalizeUiLanguage(language);
         dictionary = null;
         if (selected !== 'auto') {
             try {
@@ -37,9 +63,14 @@
             }
         }
         document.documentElement.lang = t('localeCode', 'en');
+        const values = placeholders();
+        // 代码换行的说明只列出支持它的网站。
         document.querySelectorAll('[data-i18n]').forEach(element => {
-            element.textContent = t(element.dataset.i18n, element.textContent);
+            const key = element.dataset.i18n;
+            const text = t(key, element.textContent);
+            element.textContent = fill(text, key === 'helpCodeBody' ? { ...values, sites: values.codeWrapSites } : values);
         });
+        renderSiteLinks();
         status.textContent = '';
     }
 
@@ -49,6 +80,33 @@
         return { name: match ? names[match[1]] : 'Unknown', major: match ? Number(match[2]) : null };
     }
 
+    // 逐项构造每个网站的报告字段，避免把未来新增设置或用户自定义名称带入诊断。
+    function siteReport(stored, site) {
+        const settings = settingsUtils.normalizeSiteSettings(stored, site.id);
+        const entry = {
+            enabled: settings.siteEnabled,
+            navigationEnabled: settings.navigationEnabled,
+            width: {
+                widthEnabled: settings.widthEnabled,
+                chatWidthSetting: { value: settings.chatWidthSetting.value, unit: settings.chatWidthSetting.unit },
+                widthMin: settings.widthMin,
+                widthMax: settings.widthMax,
+                widthPercentMin: settings.widthPercentMin,
+                widthPercentMax: settings.widthPercentMax
+            },
+            reading: {
+                messageCompactness: settings.messageCompactness,
+                messageLineHeight: settings.messageLineHeight,
+                messageParagraphSpacing: settings.messageParagraphSpacing,
+                messageSpacingCustom: settings.messageSpacingCustom,
+                messageFontSize: settings.messageFontSize,
+                userFullWidth: settings.userFullWidth
+            }
+        };
+        if (site.capabilities.includes('codeWrap')) entry.reading.codeWrap = settings.codeWrap === true;
+        return entry;
+    }
+
     generateButton.addEventListener('click', async function () {
         if (!isExtensionContextValid()) return;
         generateButton.disabled = true;
@@ -56,56 +114,21 @@
         report.value = '';
         status.textContent = t('helpReportGenerating', 'Reading settings…');
         try {
+            const keys = [...new Set(sites.sites.flatMap(site => settingsUtils.getSiteStorageKeys(site.id))), 'uiLanguage'];
             const [stored, platform] = await Promise.all([
-                chrome.storage.sync.get(SETTINGS_KEYS),
+                chrome.storage.sync.get(keys),
                 chrome.runtime.getPlatformInfo()
             ]);
-            const settings = window.widerGeminiSettings.normalizeStorage(stored);
-            const chatgpt = window.widerGeminiSettings.normalizeSiteSettings(stored, 'chatgpt');
-            const geminiEnabled = window.widerGeminiSettings.normalizeSiteSettings(stored, 'gemini').siteEnabled;
             const manifest = chrome.runtime.getManifest();
-            // 逐项构造报告，避免把未来新增设置或用户自定义名称带入诊断。
+            const grants = await Promise.all(sites.sites.map(async site => [site.id,
+                site.access === 'required' ? 'required' : (await chrome.permissions.contains({ origins: site.matches }) ? 'granted' : 'notGranted')]));
             const diagnostics = {
                 extensionVersion: manifest.version_name || manifest.version,
                 browser: getBrowserVersion(),
                 platform: platform.os,
-                settings: {
-                    uiLanguage: settings.uiLanguage,
-                    geminiEnabled,
-                    widthEnabled: settings.widthEnabled,
-                    chatWidthSetting: settings.chatWidthSetting,
-                    widthMin: settings.widthMin,
-                    widthMax: settings.widthMax,
-                    widthPercentMin: settings.widthPercentMin,
-                    widthPercentMax: settings.widthPercentMax,
-                    messageCompactness: settings.messageCompactness,
-                    messageLineHeight: settings.messageLineHeight,
-                    messageParagraphSpacing: settings.messageParagraphSpacing,
-                    messageSpacingCustom: settings.messageSpacingCustom,
-                    messageFontSize: settings.messageFontSize,
-                    codeWrap: settings.codeWrap,
-                    userFullWidth: settings.userFullWidth,
-                    chatgptEnabled: chatgpt.siteEnabled,
-                    chatgptReadingSettings: {
-                        messageCompactness: chatgpt.messageCompactness,
-                        messageLineHeight: chatgpt.messageLineHeight,
-                        messageParagraphSpacing: chatgpt.messageParagraphSpacing,
-                        messageSpacingCustom: chatgpt.messageSpacingCustom,
-                        messageFontSize: chatgpt.messageFontSize,
-                        userFullWidth: chatgpt.userFullWidth
-                    },
-                    chatgptWidthSettings: {
-                        widthEnabled: chatgpt.widthEnabled,
-                        chatWidthSetting: {
-                            value: chatgpt.chatWidthSetting.value,
-                            unit: chatgpt.chatWidthSetting.unit
-                        },
-                        widthMin: chatgpt.widthMin,
-                        widthMax: chatgpt.widthMax,
-                        widthPercentMin: chatgpt.widthPercentMin,
-                        widthPercentMax: chatgpt.widthPercentMax
-                    }
-                }
+                uiLanguage: settingsUtils.normalizeUiLanguage(stored.uiLanguage),
+                access: Object.fromEntries(grants),
+                sites: Object.fromEntries(sites.sites.map(site => [site.id, siteReport(stored, site)]))
             };
             report.value = JSON.stringify(diagnostics, null, 2);
             preview.hidden = false;

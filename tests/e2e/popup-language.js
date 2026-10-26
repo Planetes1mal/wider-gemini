@@ -91,13 +91,16 @@
                         state = await evaluate(`(async () => {
                             if (document.readyState !== 'complete' || !globalThis.chrome?.runtime?.id) return null;
                             const select = document.getElementById('uiLanguageSelect');
-                            if (!select) return null;
+                            if (!select || document.getElementById('siteListView').hidden) return null;
                             const stored = await chrome.storage.sync.get('uiLanguage');
                             return { browser: chrome.i18n.getUILanguage(), lang: document.documentElement.lang,
                                 selected: select.value, stored: stored.uiLanguage,
-                                label: document.getElementById('i18n-uiLanguageLabel').textContent,
-                                auto: document.getElementById('i18n-uiLanguageAuto').textContent,
-                                presets: [...document.querySelectorAll('.preset-btn .btn-text')].map(el => el.textContent) };
+                                label: document.querySelector('[data-i18n="uiLanguageLabel"]').textContent,
+                                auto: document.querySelector('[data-i18n="uiLanguageAuto"]').textContent,
+                                groups: [...document.querySelectorAll('.group-title')].filter(el => !el.parentElement.hidden).map(el => el.textContent),
+                                states: [...document.querySelectorAll('.site-state')].map(el => el.textContent),
+                                rows: [...document.querySelectorAll('.site-row')].map(row => ({ site: row.dataset.site,
+                                    fits: row.scrollWidth <= row.clientWidth + 0.5 })) };
                         })()`);
                     } catch (error) {
                         // A real popup reload can destroy the previous execution context during this load poll.
@@ -107,7 +110,7 @@
                     }
                     if (state?.selected === selection && state.stored === selection &&
                         state.lang === dictionary.localeCode.message &&
-                        state.label === dictionary.uiLanguageLabel.message && state.presets.length === 5) break;
+                        state.label === dictionary.uiLanguageLabel.message && state.rows.length >= 2) break;
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
                 assert(state, `Popup loads for ${selection}`);
@@ -119,8 +122,11 @@
                 assert.strictEqual(state.lang, dictionary.localeCode.message);
                 assert.strictEqual(state.label, dictionary.uiLanguageLabel.message);
                 assert.strictEqual(state.auto, dictionary.uiLanguageAuto.message);
-                assert.deepStrictEqual(state.presets, ['btnNarrow', 'btnDefault', 'btnWider', 'btnUltra', 'btnInsane']
-                    .map(key => dictionary[key].message), 'Dynamic preset names use the selected dictionary');
+                assert.deepStrictEqual(state.groups, [dictionary.yourSites.message, dictionary.addableSites.message],
+                    'Site list groups use the selected dictionary');
+                assert(state.states.includes(dictionary.stateEnabled.message) && state.states.includes(dictionary.siteAccessNeeded.message),
+                    'Site states use the selected dictionary');
+                assert(state.rows.every(row => row.fits), `Site rows do not overflow: ${JSON.stringify(state.rows)}`);
                 return state;
             }
             async function switchLanguage(selection, locale) {
@@ -161,7 +167,7 @@
             await switchLanguage('zh_TW', 'zh_TW');
             await evaluate('window.scrollTo(0, 0)');
             await capture('traditional-popup-top');
-            await evaluate("document.querySelector('.language-card').scrollIntoView({ block: 'center' })");
+            await evaluate("document.querySelector('.language-row').scrollIntoView({ block: 'center' })");
             await capture('traditional-language-closed');
             await evaluate(`(() => {
                 const select = document.getElementById('uiLanguageSelect');

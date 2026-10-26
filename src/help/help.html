@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="helpPageTitle">Roomy · Help</title>
     <link rel="stylesheet" href="help.css">
+    <script src="../shared/sites.js" defer></script>
     <script src="../shared/settings-utils.js" defer></script>
     <script src="help.js" defer></script>
 </head>
@@ -21,39 +22,37 @@
         </header>
 
         <section class="card" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle" data-i18n="helpGettingStarted">Make Gemini and ChatGPT fit your screen</h2>
-            <p data-i18n="helpOpenPopup">Open Gemini or ChatGPT, then click the Roomy toolbar icon. Choose the site tab to adjust its settings.</p>
-            <p data-i18n="helpSiteAccess">Gemini access is required. ChatGPT access is optional: select ChatGPT and allow access in the popup.</p>
+            <h2 id="gettingStartedTitle" data-i18n="helpGettingStarted">Make your AI chats fit your screen</h2>
+            <p data-i18n="helpOpenPopup">Open a supported website, then click the Roomy toolbar icon. On a supported website the popup opens that website's settings; elsewhere it lists all websites.</p>
+            <p data-i18n="helpSiteAccess">Gemini access is required. Other websites are optional: click Allow next to the website in the popup's list.</p>
             <dl class="instructions">
                 <div>
                     <dt data-i18n="helpTaskTitle">Task presets</dt>
-                    <dd data-i18n="helpTaskBody">Choose a task preset, review the summary, then click Apply. Gemini offers Long reading, Tables, Code, and Large text; ChatGPT offers Long reading, Wide (tables &amp; code), and Large text. Presets change width, font size, and spacing (and code wrapping in Gemini), within your width limits. Restore previous settings undoes the most recent preset for that site on this device, even after closing the popup; it replaces later changes to those settings.</dd>
+                    <dd data-i18n="helpTaskBody">Choose a task preset, review the summary, then click Apply. Each website offers its own presets, such as Long reading, Wide (tables &amp; code), and Large text. Presets change width, font size, and spacing (and code wrapping where available), within your width limits. Restore previous settings undoes the most recent preset for that website on this device, even after closing the popup; it replaces later changes to those settings.</dd>
                 </div>
                 <div>
                     <dt data-i18n="helpWidthTitle">Conversation width</dt>
-                    <dd data-i18n="helpWidthBody">Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Gemini and ChatGPT save width, limits, and presets separately; each unit has its own presets. Expand Range &amp; presets to edit them. The switch beside the width title pauses widening for that site and restores its original width. Your saved values and presets are kept; reading settings remain active.</dd>
+                    <dd data-i18n="helpWidthBody">Choose px for a fixed width or % to follow the window size. Move the slider or choose a preset. Each website saves width, limits, and presets separately; each unit has its own presets. Expand Range &amp; presets to edit them. The switch beside the width title pauses widening for that website and restores its original width. Your saved values and presets are kept; reading settings remain active.</dd>
                 </div>
                 <div>
                     <dt data-i18n="helpCodeTitle">Code wrapping</dt>
-                    <dd data-i18n="helpCodeBody">Gemini only: Turn on Code Auto Wrap to read long lines without as much horizontal scrolling. In ChatGPT, use its own wrap button on each code block; the extension leaves it unchanged.</dd>
+                    <dd data-i18n="helpCodeBody">Code auto wrap is available on Gemini. Other websites keep their own code-block wrap controls; the extension leaves them unchanged.</dd>
                 </div>
                 <div>
                     <dt data-i18n="helpReadingTitle">Text size & spacing</dt>
-                    <dd data-i18n="helpReadingBody">Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. On both sites, code lines and table cells keep their native line-height proportions. ChatGPT formulas also keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Gemini and ChatGPT keep separate reading settings.</dd>
+                    <dd data-i18n="helpReadingBody">Font size ranges from 75% to 200% without zooming the whole page, keeping headings, code, and tables in proportion. At Auto density 0, native paragraph gaps and line heights are preserved; higher density gradually tightens prose only. Code lines and table cells keep their native line-height proportions, and formulas keep their native spacing. Advanced spacing sets exact manual values; Reset spacing returns to Auto at the current density. Each website keeps separate reading settings.</dd>
                 </div>
             </dl>
-            <p class="note" data-i18n="helpLiveSettings">Changes apply to open tabs for the selected site and are saved automatically. Sync across devices depends on your browser's sync settings.</p>
-            <a class="text-link" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer"
-                data-i18n="helpOpenGemini">Open Gemini</a>
-            <a class="text-link" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer"
-                data-i18n="helpOpenChatgpt">Open ChatGPT</a>
+            <p class="note" data-i18n="helpLiveSettings">Changes are saved automatically and apply live to open tabs of that website. Each website keeps separate settings; the popup language is shared. Sync across devices depends on your browser's sync settings.</p>
+            <!-- “打开 X”链接由 help.js 按站点注册表生成。 -->
+            <nav class="site-links" id="siteLinks"></nav>
         </section>
 
         <section class="card" aria-labelledby="troubleshootingTitle">
             <h2 id="troubleshootingTitle" data-i18n="helpTroubleshooting">Something looks wrong?</h2>
             <ol class="troubleshooting">
-                <li data-i18n="helpTroubleshootPage">Check that you are on gemini.google.com or chatgpt.com and Roomy has access to that site. Chrome-installed site app windows use the same webpages. Native desktop apps and Chrome's built-in Gemini panel are not supported.</li>
-                <li data-i18n="helpTroubleshootRefresh">If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the Enable switch below the site tabs to pause everything on a site; saved settings are kept.</li>
+                <li data-i18n="helpTroubleshootPage">Check that you are on a supported website and Roomy is enabled with access to that website. Chrome-installed web apps (PWAs) use the same webpages. Native desktop apps and Chrome's built-in Gemini panel are not supported.</li>
+                <li data-i18n="helpTroubleshootRefresh">If a setting does not appear after installing or updating the extension, reload the affected page once. If the popup says the page runs an older version, reload the extension on chrome://extensions first. An unsupported-layout notice means widening is not applied to the current page. Use the switch beside the website name to pause everything on that website; saved settings are kept.</li>
                 <li data-i18n="helpTroubleshootReport">If the problem continues, note the site, steps to reproduce it, and your window size. A screenshot with private content removed can help; mention any other extensions that change the page layout.</li>
             </ol>
             <a class="button primary" href="https://github.com/Planetes1mal/roomy/issues/new/choose"
@@ -62,7 +61,7 @@
 
         <section class="card" aria-labelledby="diagnosticsTitle">
             <h2 id="diagnosticsTitle" data-i18n="helpDiagnosticsTitle">Settings report</h2>
-            <p id="diagnosticPrivacy" data-i18n="helpDiagnosticsPrivacy">Generate a report to preview before sharing it in an issue. It includes only the extension version, browser name and major version, platform, interface language, each site's Enable switch, Gemini layout settings, and ChatGPT width and reading settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically.</p>
+            <p id="diagnosticPrivacy" data-i18n="helpDiagnosticsPrivacy">Generate a report to preview before sharing it in an issue. It includes only the extension version, browser name and major version, platform, interface language, and each website's Enable switch, width, range, and reading settings. It contains no chats, page URLs, titles, or custom preset names. Nothing is sent automatically.</p>
             <div class="actions">
                 <button type="button" id="generateReport" class="button primary"
                     data-i18n="helpGenerateReport">Generate report</button>

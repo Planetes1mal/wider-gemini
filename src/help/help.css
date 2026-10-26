@@ -119,6 +119,12 @@ a:hover {
     text-decoration-thickness: 2px;
 }
 
+.site-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+}
+
 .text-link {
     display: inline-flex;
     align-items: center;

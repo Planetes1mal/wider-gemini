@@ -19,7 +19,7 @@ The same full Gemini conversation at the same window size, with the conversation
 ## Features
 
 - **Adjust the width**: Select Gemini or ChatGPT, set pixels (`px`) or a percentage of the window (`%`), and save separate limits and presets for each site.
-- **Enable or pause by site**: The Enable switch below the site tabs pauses every effect on that site and restores the original page, while all settings stay editable and saved. A separate width switch turns off only widening. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
+- **Enable or pause by site**: The switch beside the site name pauses every effect on that site and restores the original page, while all settings stay editable and saved. A separate width switch turns off only widening. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
 - **Adjust text size and spacing**: On both sites, scale message text from 75% to 200% while keeping headings, code, and tables in proportion, tighten spacing with reading density, or set line height and paragraph spacing manually.
 - **Message navigation**: A thin column of ticks beside the conversation jumps to your messages on Gemini and ChatGPT, with a short preview and keyboard support. Long conversations show at most 20 ticks around the current message. ChatGPT remembers messages with stable keys as you scroll, without scanning history automatically. Turn it off per site in the popup.
 - **Task presets**: Apply a reading, wide, or large-text setup in one step and restore the previous settings for that site.
@@ -50,10 +50,10 @@ If you manually installed a release candidate, replace its files with the stable
 ## Usage
 
 1. Open [Gemini](https://gemini.google.com/) or [ChatGPT](https://chatgpt.com/) and click the Roomy icon in your browser toolbar.
-2. Select the site tab, choose `px` or `%`, then move the width slider or click a preset.
-3. Expand **Reading & typography** to adjust the font size and reading density. On Gemini you can also turn on code wrapping; ChatGPT keeps its own wrap button on each code block.
+2. On a supported site the popup opens that site's settings; elsewhere it lists all sites, and each row opens its page. Choose `px` or `%`, then move the width slider or click a preset.
+3. Expand **Text & spacing** to adjust the font size and reading density. On Gemini you can also turn on code wrapping; ChatGPT keeps its own wrap button on each code block.
 
-After a new install, the popup opens once from the toolbar icon. Click **Allow ChatGPT access** there and confirm Chrome's prompt to turn on ChatGPT. After updating from a version before 3.0, nothing opens: a **NEW** badge appears on the toolbar icon until you next open the popup. Until access is granted, the popup's ChatGPT tab shows a dot and keeps the same button.
+After a new install, the popup opens once from the toolbar icon and lists the sites you can add. Click **Allow** next to ChatGPT and confirm Chrome's prompt to turn it on. After an update that adds a site, nothing opens: a **NEW** badge appears on the toolbar icon until you next open the popup, where the new site is marked in the list. Until access is granted, the site stays under **Websites you can add** with the same button.
 
 Expand **Range & presets** for width limits and **Manage presets**. Each site and unit has its own presets. The language selector is at the bottom of the popup.
 
@@ -63,7 +63,7 @@ Use **Help & feedback** at the bottom of the popup for troubleshooting or to pre
 
 ## Privacy
 
-Gemini access is required. ChatGPT access is optional: Chrome asks for it only after you click **Allow ChatGPT access** in the popup. The extension uses `activeTab` to identify the current site when you open the toolbar popup, `storage` for preferences, and `scripting` to register and restore content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
+Gemini access is required. ChatGPT access is optional: Chrome asks for it only after you click **Allow** next to ChatGPT in the popup. The extension uses `activeTab` to identify the current site when you open the toolbar popup, `storage` for preferences, and `scripting` to register and restore content scripts. It does not collect or upload conversations, and it has no analytics or tracking services.
 
 Preferences are saved in Chrome's extension storage. Whether they sync across devices depends on your browser's sync settings. See the [privacy policy](./docs/PRIVACY.md) for details.
 

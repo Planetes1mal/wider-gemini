@@ -84,7 +84,7 @@ Maintainer references: [settings defaults and normalization](../../src/shared/se
 
 ## ChatGPT
 
-Select the **ChatGPT** tab in the popup, then click **Allow ChatGPT access** and confirm Chrome's prompt if access has not been granted yet. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
+Open ChatGPT's page in the popup (from the site list, or directly when ChatGPT is the current tab), then click **Allow ChatGPT access** and confirm Chrome's prompt if access has not been granted yet. Font size, reading density, Advanced spacing, and full-width user messages work as described above, with separate saved values for ChatGPT. Density and manual spacing change prose only: code lines, table rows, and formulas keep ChatGPT's own spacing. ChatGPT has no extension code-wrap switch; use the wrap button on each code block.
 
 | Task | Requested width | Font |
 |---|---|---|
@@ -92,4 +92,4 @@ Select the **ChatGPT** tab in the popup, then click **Allow ChatGPT access** and
 | Wide (tables & code) | 90% | 100% |
 | Large text | 1000 px | 140% |
 
-Use **Enable on ChatGPT** (or **Enable on Gemini**) below the site tabs to compare with the original page: turning it off pauses everything on that site while keeping your settings.
+Use the switch beside the site name at the top of its page to compare with the original page: turning it off pauses everything on that site while keeping your settings.

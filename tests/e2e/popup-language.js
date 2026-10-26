@@ -180,7 +180,7 @@
             await key('Enter', 13);
             await expectLanguage('zh_CN', 'zh_CN');
             await switchLanguage('auto', 'zh_TW');
-            console.log('PASS: zh-TW browser auto; all manual choices persist; translated presets; keyboard picker; return to auto');
+            console.log('PASS: zh-TW browser auto; all manual choices persist; translated site list; keyboard picker; return to auto');
         });
         for (const [browserLanguage, locale, name] of [
             ['ko', 'ko', 'korean'], ['ja', 'ja', 'japanese'], ['es-ES', 'es', 'spanish']

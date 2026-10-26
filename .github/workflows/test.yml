@@ -35,3 +35,7 @@ jobs:
           node tests/e2e/chatgpt-reading.js
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           node tests/e2e/navigation-surfaces.js
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node tests/e2e/sites.js
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node tests/e2e/popup-sites.js . popup-sites-check

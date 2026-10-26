@@ -5,7 +5,7 @@ const { spawnSync } = require('child_process');
 const root = path.join(__dirname, '..');
 
 // 仓库只放扩展本身、测试、构建脚本和公开文档。
-// 调研、指标、验证记录、实验和工作笔记放在被忽略的 internal/ 目录，不进入 GitHub。
+// 笔记、截图、工具等本地文件放在被忽略的 local/ 目录，不进入 GitHub。
 const PUBLIC = [
     /^\.gitattributes$/,
     /^\.gitignore$/,
@@ -32,6 +32,6 @@ const files = listed.stdout.split('\0').filter(Boolean);
 assert.ok(files.includes('manifest.json'), 'git ls-files did not list the repository');
 const unexpected = files.filter(file => !PUBLIC.some(pattern => pattern.test(file)));
 assert.deepStrictEqual(unexpected, [],
-    'These files are not on the public list. Move internal notes to the ignored internal/ folder, '
+    'These files are not on the public list. Move local files to the ignored local/ folder, '
     + 'or add a genuinely public file to tests/repository-files.test.js.');
 console.log(`repository file tests passed (${files.length} files)`);

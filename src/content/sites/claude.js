@@ -1,6 +1,6 @@
 // @ts-check
 // Claude（claude.ai）适配器：只负责“在这个网站上，对话、消息、滚动区、输入框分别是哪个元素”。
-// 选择器来自 2026-10-26 在维护者 Chrome 里的只读结构采集（internal/dom-capture/runs/2026-10-26/claude/）。
+// 选择器来自 2026-10-26 在维护者 Chrome 里的只读结构采集。
 // 宽度策略 variable：Claude 用 html 上的 --transcript-width（48rem）同时限制消息列与对话列，见 claude.css。
 (function () {
     'use strict';

@@ -24,7 +24,7 @@
     const extension = path.join(temp, 'extension');
     fs.cpSync(source, extension, {
         recursive: true,
-        filter: file => !/(^|[\\/])(\.git|\.claude|\.scratch|internal|archive|tests|node_modules)([\\/]|$)/.test(path.relative(source, file))
+        filter: file => !/(^|[\\/])(\.git|\.claude|local|tests|node_modules)([\\/]|$)/.test(path.relative(source, file))
     });
     const registryPath = path.join(extension, 'src/shared/sites.js');
     const registry = fs.readFileSync(registryPath, 'utf8');

@@ -101,7 +101,7 @@ node tests/e2e/message-width.js
 node tests/e2e/chatgpt-reading.js
 node tests/e2e/navigation-surfaces.js
 node tests/e2e/sites.js
-node tests/e2e/popup-sites.js . archive/popup-sites-check
+node tests/e2e/popup-sites.js . local/popup-sites-check
 ```
 
 `WG_CHROME` selects the browser executable; the local default is Chrome's standard Windows installation path. The layout script prints the temporary fixture directory and retains the synthetic HTML and measurements for inspection.
@@ -116,7 +116,7 @@ For full release validation, `node scripts/test.js` also runs packaging tests an
 | `gemini-content-lifecycle.test.js` | Single initialization, repeated injection, and late injection |
 | `background.test.js` | Check-before-inject, manifest permissions, discarded tabs, per-tab failures, per-site registration and revocation, and the new-site notice matrix |
 | `locales.test.js` | Identical keys in all six locales, preserved placeholders, store/manifest length limits, and no missing or unused keys in any file under `src/` |
-| `repository-files.test.js` | Only the listed public files are tracked; internal notes stay in the ignored `internal/` folder |
+| `repository-files.test.js` | Only the listed public files are tracked; local working files stay in the ignored `local/` folder |
 | `release-package.test.js` (full suite only) | RC/stable tags, exact release notes, directory-rule ZIP contents including every registry file, and failed-build behavior |
 | `e2e/message-width.js` | Real-browser measurements on synthetic message trees: px/%, nested width limits, late messages, tables, code wrapping, images, input, and protected overlay content |
 | `e2e/chatgpt-reading.js` | Real-browser measurements on stripped ChatGPT markup: font/density/manual spacing boundaries, protected code/table/controls, user full width gated by width, native wrap, streamed content, pause restoration, and fresh resampling on resume |
@@ -132,10 +132,10 @@ Two additional existing scripts can load the source directory directly:
 
 ```sh
 node tests/e2e/package-load.js .
-node tests/e2e/popup-language.js . archive/popup-language-check
+node tests/e2e/popup-language.js . local/popup-language-check
 ```
 
-These commands do not build a ZIP. Package-load checks extension loading, the manifest, and popup localization; popup-language checks the localized popup and captures diagnostic screenshots in the ignored archive. They use isolated browser profiles and require a Chrome version supporting the extension debugging APIs they invoke. The Release workflow runs package-load on the extracted release ZIP; locally, substitute an extracted package directory for `.`. `node tests/e2e/performance.js` is an optional local benchmark of the Gemini content script on generated conversations; it has no pass/fail threshold.
+These commands do not build a ZIP. Package-load checks extension loading, the manifest, and popup localization; popup-language checks the localized popup and captures diagnostic screenshots in the ignored `local/` folder. They use isolated browser profiles and require a Chrome version supporting the extension debugging APIs they invoke. The Release workflow runs package-load on the extracted release ZIP; locally, substitute an extracted package directory for `.`. `node tests/e2e/performance.js` is an optional local benchmark of the Gemini content script on generated conversations; it has no pass/fail threshold.
 
 ## Manual compatibility checklist
 

@@ -9,7 +9,7 @@ const path = require('node:path');
 const sharp = require(process.argv[2] || 'sharp');
 
 const iconDirectory = __dirname;
-const previewDirectory = path.resolve(iconDirectory, '../archive/icon-redesign-2026-09-24');
+const previewDirectory = path.resolve(iconDirectory, '../local/icon-preview');
 
 async function renderIcons() {
     fs.mkdirSync(previewDirectory, { recursive: true });

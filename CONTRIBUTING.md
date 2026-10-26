@@ -42,11 +42,11 @@ Optional popup checks can also use the repository root directly:
 
 ```sh
 node tests/e2e/package-load.js .
-node tests/e2e/popup-language.js . archive/popup-language-check
-node tests/e2e/popup-sites.js . archive/popup-sites-check
+node tests/e2e/popup-language.js . local/popup-language-check
+node tests/e2e/popup-sites.js . local/popup-sites-check
 ```
 
-These use isolated browser profiles. Despite its name, `package-load.js` accepts any unpacked extension directory, including the source tree; the language and site-list checks store diagnostic screenshots under the ignored archive. None of these commands builds a ZIP.
+These use isolated browser profiles. Despite its name, `package-load.js` accepts any unpacked extension directory, including the source tree; the language and site-list checks store diagnostic screenshots under the ignored `local/` folder. None of these commands builds a ZIP.
 
 For layout changes, also try the affected flow on the real Gemini, ChatGPT or Claude website. Record the site, browser, OS, extension version, and steps in the PR. The existing Gemini fixtures do not establish ChatGPT compatibility, compatibility with every live site rollout, or macOS acceptance. See [engineering and compatibility notes](docs/engineering.md) for the supported boundaries and manual scenarios.
 
@@ -59,9 +59,9 @@ For layout changes, also try the affected flow on the real Gemini, ChatGPT or Cl
 - Reuse the existing checks. Add a regression case when a reproduced behavior needs one; routine wording and documentation changes do not need new tests.
 - In a PR, explain the user-visible change, link its issue when applicable, and report which existing checks and manual flows you ran. Include before/after images for visible layout changes, with personal content removed.
 
-Do not include private conversations, account details, tokens, or local diagnostic archives in an issue or commit. `tests/diagnostics/` and experimental browser scripts remain local.
+Do not include private conversations, account details, tokens, or local diagnostic archives in an issue or commit. Keep local diagnostics and experimental browser scripts in the ignored `local/` folder.
 
-The repository holds only the extension, its tests and build scripts, and the public documentation. Keep research, metrics, verification logs, experiments and other working notes in the ignored `internal/` folder. `tests/repository-files.test.js` lists every public path and fails when anything else is committed; extend that list in the same PR when a new public file is genuinely needed.
+The repository holds only the extension, its tests and build scripts, and the public documentation. Keep research, metrics, verification logs, experiments and other working notes in the ignored `local/` folder. `tests/repository-files.test.js` lists every public path and fails when anything else is committed; extend that list in the same PR when a new public file is genuinely needed.
 
 ## Translations
 

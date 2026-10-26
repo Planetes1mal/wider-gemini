@@ -15,7 +15,8 @@
         "https://gemini.google.com/*"
     ],
     "optional_host_permissions": [
-        "https://chatgpt.com/*"
+        "https://chatgpt.com/*",
+        "https://claude.ai/*"
     ],
     "background": {
         "service_worker": "src/background.js"

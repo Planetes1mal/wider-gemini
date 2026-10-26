@@ -197,6 +197,8 @@
                 column: next.column || next.root || null,
                 scroll: next.scroll || null,
                 footer: next.footer || null,
+                // 可用宽度所在的窗格：默认是对话列的父元素；对话列外还有限宽容器的网站另行指定。
+                pane: next.pane || null,
                 host: next.host || null,
                 navigationContainer: next.navigationContainer || null,
                 nativeWidth: next.nativeWidth === true,

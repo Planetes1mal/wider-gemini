@@ -33,10 +33,14 @@
             return element.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
         }
 
-        // 所有宽度所有者共用对话列父容器的内容宽度，输入区与消息列始终按同一上限封顶、保持对齐。
+        // 所有宽度所有者共用窗格（默认为对话列的父容器）的内容宽度，输入区与消息列始终按同一上限封顶、保持对齐。
+        function paneOf(surface) {
+            return surface.pane || (surface.column && surface.column.parentElement) || null;
+        }
+
         function availableWidth(surface) {
-            const parent = surface.column && surface.column.parentElement;
-            return parent ? contentWidth(parent) : null;
+            const pane = paneOf(surface);
+            return pane ? contentWidth(pane) : null;
         }
 
         function unmarkOwners(keep) {
@@ -84,9 +88,9 @@
             });
             markedOwners = marked;
 
-            // 对话列的父容器、滚动容器与宿主浮窗始终观察：尺寸变化后重新封顶与布局导航条。
-            const parent = reserve && surface.column ? surface.column.parentElement : null;
-            const observed = [parent, surface.scroll, surface.host].filter(Boolean);
+            // 窗格、滚动容器与宿主浮窗始终观察：尺寸变化后重新封顶与布局导航条。
+            const parent = reserve ? paneOf(surface) : null;
+            const observed = [...new Set([parent, surface.scroll, surface.host].filter(Boolean))];
             if (observed.length !== observedTargets.length || observed.some((el, i) => el !== observedTargets[i])) {
                 availableWidthObserver.disconnect();
                 observedTargets = observed;

@@ -1,0 +1,146 @@
+<!doctype html>
+<html data-theme="claude" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<!-- Claude（claude.ai）对话页的精简结构，按 2026-10-26 的只读结构采集还原（标签、data-testid、类名片段、
+     盒模型与宽度链）；文字一律是中性占位。只保留与宽度、阅读排版、消息导航有关的层级。
+     桌面（≥48rem）且顶栏带 data-title-row-ruled 时，chat-column 的上限是 --transcript-width + 1.5rem。 -->
+<style>
+    html { --transcript-width: calc(768 / 16 * 1rem); --frame-row-h: 45px; }
+    *, ::before, ::after { box-sizing: border-box; }
+    body { margin: 0; font: 14px/21px sans-serif; background: #1c1c1a; color: #eee; }
+    main.dframe-content { position: absolute; inset: 0; overflow: hidden; }
+    .dframe-content-inner { display: flex; height: 100%; padding-left: 296px; }
+    .dframe-pane { position: relative; display: flex; flex: 1; min-width: 0; flex-direction: column; }
+    [data-testid="chat-header"] { position: absolute; top: 0; left: 0; right: 0; z-index: 11; height: var(--frame-row-h); }
+    [data-testid="chat-column-body"] { display: flex; flex: 1; min-height: 0; height: 100%; flex-direction: column; }
+    [data-autoscroll-container] { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable both-edges;
+        padding-top: calc(var(--frame-row-h, 3rem) + .5rem); }
+    .chat-column-outer { position: relative; display: flex; width: 100%; min-height: 100%; flex-direction: column; }
+    [data-testid="chat-column"] { display: flex; flex: 1; flex-direction: column; width: 100%; margin: 0 auto;
+        max-width: calc(var(--transcript-width, 48rem) + 1.5rem); padding: 0 12px; }
+    .transcript { display: flex; flex: 1; flex-direction: column; width: 100%; margin: 0 auto;
+        max-width: var(--transcript-width, 48rem); padding: 4px 16px 0; }
+    [data-testid="transcript-row"] { position: relative; display: flow-root; }
+    [data-turn-key] { display: flex; width: 100%; min-width: 0; flex-direction: column; gap: 8px; }
+    .user-turn { margin-top: 24px; margin-left: auto; align-items: flex-end; font: 15px/24px sans-serif; }
+    .user-bubble { position: relative; display: flex; max-width: 85%; flex-direction: column; gap: 8px; padding: 12px 16px; border-radius: 16px; background: #2b2b28; }
+    [data-testid="user-message"] { display: grid; min-width: 0; grid-template-columns: 1fr; gap: 8px; }
+    [data-testid="user-message"] p { margin: 0; white-space: pre-wrap; overflow-wrap: break-word; }
+    [data-testid="assistant-message"] { position: relative; display: flex; width: 100%; min-width: 0; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .message-blocks { display: flex; min-width: 0; flex-direction: column; gap: 20px; }
+    .message-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    .contents { display: contents; }
+    .standard-markdown { display: grid; grid-template-columns: 1fr; font: 15px/24px serif; overflow-wrap: break-word; }
+    .standard-markdown > * { margin: 0; min-width: 0; }
+    .standard-markdown > * + * { margin-top: 7.5px; }
+    .standard-markdown > blockquote { margin-top: 11.25px; padding-left: 12px; border-left: 2px solid #555; }
+    .standard-markdown > h4, .standard-markdown > h5 { font-size: 15px; line-height: 24px; font-weight: 580; }
+    .standard-markdown > h5 { margin-top: 18.75px; }
+    .standard-markdown ol { padding-left: 24px; }
+    .standard-markdown li { margin: 0; }
+    .standard-markdown code { font-family: monospace; font-size: .9em; line-height: 1; }
+    .code-card { position: relative; border: 1px solid #444; border-radius: 8px; }
+    .code-card .overflow-x-auto { overflow-x: auto; }
+    pre.code-block__code { margin: 0; padding: 12px; font: 14px/22.75px monospace; white-space: pre; }
+    pre.code-block__code code { font-size: inherit; line-height: inherit; }
+    .md-table-scroll { overflow-x: auto; }
+    .standard-markdown table { min-width: 2400px; font-size: 15px; line-height: 24px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    [data-testid="message-actions"] { display: flex; gap: 4px; }
+    .answer-filler { min-height: 420px; }
+    [data-chat-input-container] { position: sticky; bottom: 0; z-index: 5; width: 100%; margin: 0 auto; padding-top: 24px; }
+    .composer-card { position: relative; display: flex; flex-direction: column; padding: 8px; border-radius: 12px; background: #333330; }
+    .composer-field { padding: 6px 36px 6px 0; }
+    [data-testid="chat-input"] { min-height: 21px; font-size: 15px; outline: none; }
+    button { font: inherit; font-size: 13px; }
+    /* 首页（/new）：只有输入区；卡片槽是 display: contents，限宽层是它的第一个子元素（41rem）。 */
+    .home { display: flex; height: 100%; flex-direction: column; }
+    [data-new-page-scroll-column] { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable both-edges; }
+    .home-container { position: relative; display: flex; width: 100%; flex: 1; flex-direction: column; align-items: center; max-width: 1280px; margin: 24px auto 0; padding: 0 56px; }
+    [data-chorus-card-slot] { display: contents; }
+    .home-dock { width: 100%; max-width: 41rem; }
+</style>
+</head>
+<body class="chat-ui-core">
+<main class="dframe-content"><div class="dframe-content-inner"><div class="dframe-pane dframe-pane-primary">
+    <div data-testid="chat-header" data-title-row-ruled></div>
+    <div data-testid="chat-column-body" class="cds-root" data-probe="chat-body">
+        <div data-autoscroll-container="auto" data-probe="scroll">
+            <div class="chat-column-outer"><div data-testid="chat-column" data-probe="chat-column">
+                <div data-testid="transcript-list" class="transcript" data-probe="column">
+                    <div data-testid="transcript-leading"></div>
+                    <div data-testid="transcript-sizer"><div role="feed">
+                        <div data-testid="transcript-row" data-index="0"><div role="article"><div class="contents"><div data-transcript-row>
+                            <div data-turn-key="turn-u1" class="user-turn"><div class="user-bubble" data-probe="bubble">
+                                <div data-testid="user-message"><div class="cds-user-message-body"><div>
+                                    <p class="whitespace-pre-wrap break-words" data-probe="user">Short user question</p>
+                                </div></div></div>
+                            </div></div>
+                        </div></div></div></div>
+                        <div data-testid="transcript-row" data-index="1"><div role="article"><div class="contents"><div data-transcript-row>
+                            <div data-turn-key="turn-a1" data-testid="assistant-message" data-is-streaming="false">
+                                <div class="message-blocks"><div><div class="message-grid"><div class="contents"><div class="prose">
+                                    <div class="standard-markdown" data-probe="markdown">
+                                        <h3 class="sr-only">Hidden heading</h3>
+                                        <h4 data-probe="h">Heading</h4>
+                                        <p data-probe="p1">First paragraph <code data-probe="inline">inline</code>
+                                            <span class="katex" data-probe="katex" style="font-size:1.21em;line-height:1.2">x</span></p>
+                                        <p data-probe="p2">Second paragraph</p>
+                                        <ol data-probe="ul"><li data-probe="li">Item</li></ol>
+                                        <blockquote><p>Quoted line</p></blockquote>
+                                        <div class="code-card"><div><button data-testid="code-block-copy" data-probe="copy">Copy</button></div>
+                                            <div class="overflow-x-auto"><pre class="code-block__code" data-probe="pre"><code class="language-python" data-probe="code">long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_long_code_without_spaces_</code></pre></div></div>
+                                        <div class="md-table-scroll prose-scroll" data-probe="table-scroll"><table><tbody>
+                                            <tr><td data-probe="td">wide cell wide cell wide cell wide cell wide cell wide cell</td></tr></tbody></table></div>
+                                        <div class="answer-filler"></div>
+                                    </div>
+                                </div></div></div></div></div>
+                                <div data-testid="message-actions"><button>Copy</button><button>Retry</button></div>
+                            </div>
+                        </div></div></div></div>
+                        <div data-testid="transcript-row" data-index="2"><div role="article"><div class="contents"><div data-transcript-row>
+                            <div data-turn-key="turn-u2" class="user-turn"><div class="user-bubble"><div data-testid="user-message"><div class="cds-user-message-body"><div>
+                                <p class="whitespace-pre-wrap break-words">Second question</p></div></div></div></div></div>
+                        </div></div></div></div>
+                        <div data-testid="transcript-row" data-index="3"><div role="article"><div class="contents"><div data-transcript-row>
+                            <div data-turn-key="turn-a2" data-testid="assistant-message" data-is-streaming="false">
+                                <div class="message-blocks"><div><div class="message-grid"><div class="contents"><div class="prose">
+                                    <div class="standard-markdown"><p>Second answer</p><div class="answer-filler"></div></div>
+                                </div></div></div></div></div>
+                            </div>
+                        </div></div></div></div>
+                        <div data-testid="transcript-row" data-index="4"><div role="article"><div class="contents"><div data-transcript-row>
+                            <div data-turn-key="turn-u3" class="user-turn"><div class="user-bubble"><div data-testid="user-message"><div class="cds-user-message-body"><div>
+                                <p class="whitespace-pre-wrap break-words">Third question</p></div></div></div></div></div>
+                        </div></div></div></div>
+                        <div data-testid="transcript-row" data-index="5" data-last-message="true"><div role="article"><div class="contents"><div data-transcript-row>
+                            <div data-turn-key="turn-a3" data-testid="assistant-message" data-is-streaming="false">
+                                <div class="message-blocks"><div><div class="message-grid"><div class="contents"><div class="prose">
+                                    <div class="standard-markdown"><p>Third answer</p><div class="answer-filler"></div></div>
+                                </div></div></div></div></div>
+                            </div>
+                        </div></div></div></div>
+                    </div></div>
+                    <div data-testid="transcript-trailing"><div data-testid="chat-footer-row"></div><div data-testid="transcript-end"></div></div>
+                </div>
+                <div data-chat-input-container="chat" data-probe="footer">
+                    <div class="composer-card" data-probe="composer"><fieldset data-form="chat" style="border:0;margin:0;padding:0;min-width:0">
+                        <div class="composer-field"><div contenteditable="true" role="textbox" data-testid="chat-input" data-probe="composer-input"></div></div>
+                        <button type="button" data-testid="chat-input-send">Send</button>
+                    </fieldset></div>
+                </div>
+            </div></div>
+        </div>
+    </div>
+    <div class="home" id="home" hidden>
+        <div data-new-page-scroll-column><div class="home-container"><div data-chorus-card-slot>
+            <div class="home-dock" data-probe="home-composer"><div class="composer-card"><fieldset style="border:0;margin:0;padding:0;min-width:0">
+                <div class="composer-field"><div contenteditable="true" role="textbox" data-testid="chat-input"></div></div>
+                <button type="button" data-testid="chat-input-send">Send</button>
+            </fieldset></div></div>
+        </div></div></div>
+    </div>
+</div></div></main>
+</body>
+</html>

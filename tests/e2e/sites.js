@@ -97,7 +97,8 @@
             code:px('code','fontSize'), preLine:px('pre','lineHeight'), td:px('td','fontSize'), tdLine:px('td','lineHeight'),
             user:px('user','fontSize'), li:px('li','fontSize'), copy:px('copy','fontSize'), composerInput:px('composer-input','fontSize'),
             bubble:rect('bubble').width, column:contentWidth('column'), composer:contentWidth('composer'),
-            columnLeft:contentLeft('column'), composerLeft:contentLeft('composer'),
+            columnOuter:rect('column').width, composerOuter:rect('composer').width,
+            columnLeft:rect('column').left, composerLeft:rect('composer').left,
             pageOverflow:root.scrollWidth - innerWidth, paneRight:paneRight()
         });
         window.addEventListener('load', async () => {
@@ -168,7 +169,7 @@
                 const navRect = q('.wg-nav').getBoundingClientRect();
                 out.gutter = { value:root.style.getPropertyValue('--wgx-gutter'), railLeft:navRect.left, railRight:navRect.right,
                     paneRight:paneRight(), contentRight:window.contexts[0].navigation.contentRight(), visible:rails(),
-                    column:contentWidth('column'), composer:contentWidth('composer') };
+                    column:rect('column').width, composer:rect('composer').width };
                 await save(K.navigation, false);
                 out.navOff = { gutter:root.style.getPropertyValue('--wgx-gutter'), rails:qa('.wg-nav').length, width:status().capabilities.width };
                 await save(K.navigation, true);
@@ -179,14 +180,15 @@
                 narrow.style.cssText = EXPECTED.narrowPane.style;
                 await width({ widthEnabled:false });
                 await save(K.navigation, false);
-                out.widthOffNative = { free:paneRight() - window.contexts[0].navigation.contentRight(), columnLeft:contentLeft('column'), composerLeft:contentLeft('composer') };
+                out.widthOffNative = { free:paneRight() - window.contexts[0].navigation.contentRight(), columnLeft:rect('column').left, composerLeft:rect('composer').left,
+                    column:contentWidth('column'), composer:rect('composer').width };
                 await save(K.navigation, true);
                 status();
                 await wait(100);
                 const offNav = q('.wg-nav') && !q('.wg-nav').hidden ? q('.wg-nav').getBoundingClientRect() : null;
                 out.widthOff = { gutterClass:root.classList.contains('wider-nav-gutter'), activeClass:root.classList.contains('wider-width-active'),
                     rail:!!offNav, railLeft:offNav && offNav.left, paneRight:paneRight(), contentRight:window.contexts[0].navigation.contentRight(),
-                    column:contentWidth('column'), composer:contentWidth('composer'), columnLeft:contentLeft('column'), composerLeft:contentLeft('composer'),
+                    column:contentWidth('column'), composer:rect('composer').width, columnLeft:rect('column').left, composerLeft:rect('composer').left,
                     width:status().capabilities.width };
                 await save(K.navigation, false);
                 out.widthOffNavOff = { gutterClass:root.classList.contains('wider-nav-gutter'), owners:qa('[data-wgx-width]').length };
@@ -208,7 +210,8 @@
                 // 8. 首页（只有输入区）与不适用的页面：按 expected.json 的描述切换页面状态。
                 const applyState = state => {
                     const undo = [];
-                    for (const el of qa(state.hide || '')) { undo.push(() => { el.hidden = false; }); el.hidden = true; }
+                    for (const el of state.hide ? qa(state.hide) : []) { undo.push(() => { el.hidden = false; }); el.hidden = true; }
+                    for (const el of state.show ? qa(state.show) : []) { undo.push(() => { el.hidden = true; }); el.hidden = false; }
                     for (const change of state.attributes || []) {
                         const el = q(change.selector);
                         const previous = el.getAttribute(change.attribute);
@@ -221,7 +224,7 @@
                 s = status();
                 await wait();
                 out.home = { surface:s.surface.kind, status:s.status, owners:qa('[data-wgx-width]').map(el => el.getAttribute('data-probe')),
-                    composer:contentWidth('composer'), rails:rails(), reading:s.capabilities.reading };
+                    composer:contentWidth(EXPECTED.home.composerProbe || 'composer'), rails:rails(), reading:s.capabilities.reading };
                 restoreState();
                 restoreState = applyState(EXPECTED.notApplicable);
                 s = status();
@@ -322,13 +325,13 @@
 
         // 宽度：px、%、封顶、对齐、无横向溢出。
         near(r.px1000.column, 1000, label('1000px widens the column'), 1);
-        near(r.px1000.composer, r.px1000.column, label('composer matches the column width'), 1);
+        near(r.px1000.composerOuter, r.px1000.columnOuter, label('composer matches the column width'), 1);
         near(r.px1000.composerLeft, r.px1000.columnLeft, label('composer aligns with the column'), 1);
         assert.strictEqual(r.px1000Status.status, 'active');
         assert.strictEqual(r.px1000Status.capabilities.width, 'active');
-        assert(r.owners.length >= 1 && r.owners.includes('column'), label(`width owners: ${r.owners}`));
+        assert.deepStrictEqual([...r.owners].sort(), [...(expected.widthOwners || ['column', 'composer'])].sort(), label('width owners'));
         assert(r.pct90.column > r.px1000.column + 100 && r.pct90.column <= r.pct90.paneRight, label(`90% is wider and inside the pane: ${JSON.stringify(r.pct90)}`));
-        near(r.pct90.composer, r.pct90.column, label('composer follows the % width'), 1);
+        near(r.pct90.composerOuter, r.pct90.columnOuter, label('composer follows the % width'), 1);
         assert(r.capped.column > r.pct90.column - 1 && r.capped.column <= r.capped.paneRight - r.capped.columnLeft + 1,
             label(`a width beyond the pane is capped to the available width: ${JSON.stringify(r.capped)}`));
         assert(r.capped.pageOverflow <= 0 && r.px1000.pageOverflow <= 0, label('no page horizontal overflow'));
@@ -377,14 +380,21 @@
         near(r.gutter.composer, r.gutter.column, label('composer stays aligned with the gutter'), 1);
         assert.strictEqual(r.navOff.gutter, '', label('navigation off releases the gutter'));
         assert.strictEqual(r.navOff.rails, 0);
-        assert(r.widthOffNative.free < 23, label(`fixture: native column in the narrow pane leaves no room for the rail: ${JSON.stringify(r.widthOffNative)}`));
-        assert.deepStrictEqual([r.widthOff.gutterClass, r.widthOff.activeClass, r.widthOff.rail, r.widthOff.width], [true, false, true, 'off'],
-            label(`width off keeps a navigation-only gutter: ${JSON.stringify(r.widthOff)}`));
+        if (r.widthOffNative.free < 23) {
+            // 原生列占满窄窗格：只为导航留白，列与输入区对称收窄、仍然对齐。
+            assert.deepStrictEqual([r.widthOff.gutterClass, r.widthOff.activeClass, r.widthOff.rail, r.widthOff.width], [true, false, true, 'off'],
+                label(`width off keeps a navigation-only gutter: ${JSON.stringify(r.widthOff)}`));
+            near(r.widthOff.composerLeft - r.widthOff.columnLeft, r.widthOffNative.composerLeft - r.widthOffNative.columnLeft,
+                label('composer keeps its native alignment with the column'), 1);
+        } else {
+            // 原生布局本来就留有导航条的位置：不收窄，列与输入区保持原生宽度。
+            assert.deepStrictEqual([r.widthOff.gutterClass, r.widthOff.activeClass, r.widthOff.rail, r.widthOff.width], [false, false, true, 'off'],
+                label(`width off needs no gutter when the native layout leaves room: ${JSON.stringify(r.widthOff)}`));
+            near(r.widthOff.column, r.widthOffNative.column, label('native column width is kept'), 1);
+            near(r.widthOff.composer, r.widthOffNative.composer, label('native composer width is kept'), 1);
+        }
         assert(r.widthOff.railLeft >= r.widthOff.contentRight - 0.5 && r.widthOff.railLeft + 24 <= r.widthOff.paneRight + 0.5,
             label(`rail fits beside the native column: ${JSON.stringify(r.widthOff)}`));
-        near(r.widthOff.composer, r.widthOff.column, label('composer stays aligned in the navigation-only gutter'), 1);
-        near(r.widthOff.composerLeft - r.widthOff.columnLeft, r.widthOffNative.composerLeft - r.widthOffNative.columnLeft,
-            label('composer keeps its native alignment with the column'), 1);
         assert.deepStrictEqual([r.widthOffNavOff.gutterClass, r.widthOffNavOff.owners], [false, 0], label('navigation off releases it'));
 
         // 界面识别。
@@ -395,7 +405,7 @@
         near(r.recovered.font, n.p * 1.25, label('recognition recovers when markers return'));
         near(r.recovered.column, 1000, label('width recovers when markers return'), 1);
         assert.deepStrictEqual([r.home.surface, r.home.status, r.home.owners, r.home.rails, r.home.reading],
-            ['home', 'active', ['composer'], 0, 'notApplicable'], label(`home widens only the composer: ${JSON.stringify(r.home)}`));
+            ['home', 'active', [expected.home.composerProbe || 'composer'], 0, 'notApplicable'], label(`home widens only the composer: ${JSON.stringify(r.home)}`));
         near(r.home.composer, 1000, label('home composer width'), 1);
         assert.deepStrictEqual([r.notApplicable.surface, r.notApplicable.status, r.notApplicable.width, r.notApplicable.owners],
             ['notApplicable', 'notApplicable', 'notApplicable', 0], label('native-only pages stay native'));

@@ -290,7 +290,9 @@ function filesFor(tabId, type) {
     assert.strictEqual(popupOpens, 0);
     clearFlags();
     badgeText = '';
-    for (const details of [{ reason: 'update', previousVersion: manifest.version },
+    // 开发中的网站 since 可能已经是下一个版本：以 manifest 与所有 since 里最新的版本作为“当前版本”。
+    const current = optional.reduce((latest, site) => registry.compareVersions(site.since, latest) > 0 ? site.since : latest, manifest.version);
+    for (const details of [{ reason: 'update', previousVersion: current },
         { reason: 'update', previousVersion: '99.0.0' }, { reason: 'update' }, { reason: 'chrome_update' }]) {
         await listeners.onInstalled(details);
     }

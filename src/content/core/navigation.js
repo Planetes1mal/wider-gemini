@@ -49,8 +49,9 @@
         // 对话列与窗格右缘之间不足 24px 时，在宽度生效的前提下对称收窄对话列，为导航条留出空间。
         function neededGutter() {
             const column = ctx.surface.column;
-            if (!column || !column.parentElement) return 0;
-            const available = column.parentElement.clientWidth;
+            const pane = ctx.surface.pane || (column && column.parentElement);
+            if (!column || !pane) return 0;
+            const available = pane.clientWidth;
             const padding = parseFloat(getComputedStyle(column).paddingRight) || 0;
             const setting = ctx.settings.chatWidthSetting;
             const requested = setting.unit === 'percent' ? innerWidth * setting.value / 100 : setting.value;

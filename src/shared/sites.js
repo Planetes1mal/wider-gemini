@@ -78,6 +78,19 @@
                 loadedFlag: 'widerChatgptContentLoaded',
                 takeoverEvent: 'wider-chatgpt-takeover'
             }
+        },
+        {
+            id: 'claude',
+            name: 'Claude',
+            url: 'https://claude.ai/',
+            matches: ['https://claude.ai/*'],
+            access: 'optional',
+            since: '3.1.0',
+            runtime: 'core',
+            storage: 'default',
+            capabilities: ['width', 'navigation', 'reading', 'userFullWidth'],
+            tasks: ['reading', 'wide', 'large'],
+            adapter: { js: 'src/content/sites/claude.js', css: 'src/content/sites/claude.css' }
         }
     ];
 

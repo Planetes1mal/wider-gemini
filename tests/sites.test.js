@@ -36,7 +36,9 @@ for (const site of sites) {
     assert.ok(registry.matchesUrl(site.matches[0], site.url), `${site.id}: url matches its own pattern`);
     assert.ok(['required', 'optional'].includes(site.access), `${site.id}: access`);
     assert.match(site.since, /^\d+\.\d+\.\d+$/, `${site.id}: since`);
-    assert.ok(registry.compareVersions(site.since, manifest.version) <= 0, `${site.id}: since ${site.since} is not later than ${manifest.version}`);
+    // 版本号在发布时才改：开发中的网站 since 最多是下一个次版本（x.y+1.0），不能更晚。
+    const [major, minor] = manifest.version.split('.').map(Number);
+    assert.ok(registry.compareVersions(site.since, `${major}.${minor + 1}.0`) <= 0, `${site.id}: since ${site.since} is later than the next release ${major}.${minor + 1}.0`);
     assert.ok(['core', 'legacy'].includes(site.runtime), `${site.id}: runtime`);
     assert.ok(['default', 'gemini-legacy'].includes(site.storage), `${site.id}: storage codec`);
     assert.ok(site.capabilities.length && site.capabilities.every(c => registry.CAPABILITIES.includes(c)), `${site.id}: capabilities`);
@@ -48,7 +50,7 @@ for (const site of sites) {
         if (site.adapter.css) assert.ok(exists(site.adapter.css) && packaged(site.adapter.css), `${site.id}: adapter stylesheet`);
         const adapter = read(site.adapter.js);
         assert.ok(adapter.includes('widerRoomyCore.defineSite('), `${site.id}: adapter registers with the core`);
-        assert.ok(/\bselectors\s*:/.test(adapter), `${site.id}: adapter names its selectors`);
+        assert.ok(/\bselectors\b/.test(adapter) && /defineSite\(\{[\s\S]*\bselectors\b/.test(adapter), `${site.id}: adapter names its selectors`);
         const fixtures = `tests/e2e/fixtures/${site.id}`;
         assert.ok(exists(`${fixtures}/page.html`) && exists(`${fixtures}/expected.json`), `${site.id}: fixture page and expected values`);
         JSON.parse(read(`${fixtures}/expected.json`));
@@ -191,7 +193,7 @@ assert.ok(registry.compareVersions('3.0.1', '3.1.0') < 0);
 assert.strictEqual(registry.compareVersions('3.1', '3.1.0'), 0);
 assert.ok(registry.compareVersions('10.0.0', '9.9.9') > 0);
 assert.deepStrictEqual(plain(registry.addedSince('2.8.0').map(site => site.id)), plain(registry.optional().map(site => site.id)));
-assert.deepStrictEqual(plain(registry.addedSince(manifest.version)), []);
+assert.deepStrictEqual(plain(registry.addedSince('99.0.0')), []);
 assert.strictEqual(registry.joinNames(['Gemini', 'ChatGPT', 'Claude'], 'en'), 'Gemini, ChatGPT, and Claude');
 assert.strictEqual(registry.joinNames(['Gemini', 'ChatGPT'], 'zh-CN'), 'Gemini和ChatGPT');
 

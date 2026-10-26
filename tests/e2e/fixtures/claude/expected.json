@@ -1,0 +1,27 @@
+{
+    "viewport": [
+        1600,
+        1000
+    ],
+    "turns": 3,
+    "scrollInset": 72,
+    "unknown": {
+        "selector": "[data-probe=\"column\"]",
+        "attribute": "data-testid"
+    },
+    "narrowPane": {
+        "selector": "main.dframe-content",
+        "style": "width:1040px"
+    },
+    "home": {
+        "hide": "[data-probe=\"chat-body\"]",
+        "show": "#home",
+        "composerProbe": "home-composer"
+    },
+    "notApplicable": {
+        "hide": "[data-probe=\"chat-body\"]"
+    },
+    "widthOwners": [
+        "chat-column"
+    ]
+}

@@ -51,6 +51,22 @@
                 <div class="upload-card" style="max-width:321px !important;width:500px">Attachment</div></input-area-v2>
             </input-container></section>`;
     };
+    // 2026-10-27 Gemini 实测结构：图片的两层 708px 上限不能随正文解锁。
+    // 仅保留结构和空白图片；同一正文里的代码、表格仍应加宽。
+    const generatedFixture = `<div class="conversation-container" data-generated>
+        <model-response><response-container><message-content><div class="markdown">
+            <div class="attachment-container generated-images"><response-element>
+                <generated-image><single-image class="generated-image large luminous-layout">
+                    <div class="image-container"><div class="overlay-container"><button class="image-button">
+                        <img width="1024" height="572" alt=""
+                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1024' height='572'/%3E">
+                    </button><div class="generated-image-controls"><button></button><button></button><button></button></div></div></div>
+                </single-image></generated-image>
+            </response-element></div>
+            <div class="attachment-container"><response-element><pre><code>${'x'.repeat(300)}</code></pre></response-element></div>
+            <table-block><div class="table-content"><table><tr><td></td></tr></table></div></table-block>
+        </div></message-content></response-container></model-response>
+    </div>`;
     const html = `<!doctype html><html><head><meta charset="utf-8"><style>
         body { margin:0; }
         section { margin:auto; }
@@ -64,6 +80,15 @@
         img { display:block; max-width:100%; }
         pre { margin:0; }
         table { min-width:3000px; }
+        [data-generated] .attachment-container, [data-generated] generated-image { max-width:708px; }
+        [data-generated] .generated-images { margin-inline:auto; }
+        [data-generated] response-element { max-width:740px; }
+        [data-generated] generated-image { display:block; }
+        [data-generated] .image-button { display:block; width:100%; padding:0; border:0; }
+        [data-generated] img { width:100%; height:auto; }
+        [data-generated] .overlay-container { position:relative; }
+        [data-generated] .generated-image-controls { position:absolute; top:12px; right:12px; display:flex; gap:8px; }
+        [data-generated] .generated-image-controls button { width:36px; height:36px; padding:0; border:0; }
     </style><style>${read('src/content/gemini-content.css')}</style></head><body>
         ${cases.map(fixture).join('')}
         <div class="conversation-container" data-captions style="width:100%;margin:auto">
@@ -187,17 +212,48 @@
                 conversation.style.setProperty('max-width','810px','important');
                 send({action:'updateWidthEnabled',enabled:false});
                 const siteOwned = conversation.style.getPropertyValue('max-width');
+                send({action:'updateCodeWrap',enabled:false});
+                const imageHost = document.createElement('section');
+                imageHost.innerHTML = ${JSON.stringify(generatedFixture)};
+                document.body.appendChild(imageHost);
+                const generated = [];
+                const measureImage = setting => {
+                    const image = imageHost.querySelector('img');
+                    const code = imageHost.querySelector('pre');
+                    const table = imageHost.querySelector('.table-content');
+                    generated.push({setting, viewport:innerWidth,
+                        image:width(image), height:image.getBoundingClientRect().height,
+                        imageLeft:image.getBoundingClientRect().left,
+                        bodyLeft:imageHost.querySelector('.markdown').getBoundingClientRect().left,
+                        controls:[...imageHost.querySelectorAll('.generated-image-controls button')].map(button => {
+                            const r=button.getBoundingClientRect();
+                            const imageRect=image.getBoundingClientRect();
+                            return [r.left-imageRect.left,r.top-imageRect.top,r.width,r.height];
+                        }),
+                        attachment:width(imageHost.querySelector('.generated-images')),
+                        component:width(imageHost.querySelector('generated-image')),
+                        body:width(imageHost.querySelector('.markdown')), code:width(code),
+                        codeScroll:code.scrollWidth, table:width(table), tableScroll:table.scrollWidth});
+                };
+                await imageHost.querySelector('img').decode();
+                measureImage('native');
+                for (const setting of [{value:1000,unit:'px'}, {value:2000,unit:'px'}, {value:90,unit:'percent'}]) {
+                    send({action:'updateWidthSetting',enabled:true,setting});
+                    measureImage(setting);
+                }
+                send({action:'updateWidthEnabled',enabled:false});
+                measureImage('paused');
                 const output=document.createElement('pre');
                 output.id='results';
-                output.textContent=JSON.stringify({rows,pageProtected,pageOverlayContent,captions,paused,resumed,siteOwned});
+                output.textContent=JSON.stringify({rows,pageProtected,pageOverlayContent,captions,paused,resumed,siteOwned,generated});
                 document.body.appendChild(output);
             });
         `)}</body></html>`;
     const file = path.join(temp, 'fixture.html');
     fs.writeFileSync(file, html);
     // 这是 CI 里第一次启动 Chrome，全新 Windows 环境的冷启动偶尔很慢：放宽超时，超时后用新的配置目录重试一次。
-    const runChrome = profile => spawnSync(chrome, ['--headless=new', '--no-first-run', '--no-default-browser-check',
-        '--disable-extensions', '--window-size=2000,1200', `--user-data-dir=${path.join(temp, profile)}`,
+    const runChrome = (profile, size = '2000,1200') => spawnSync(chrome, ['--headless=new', '--no-first-run', '--no-default-browser-check',
+        '--disable-extensions', `--window-size=${size}`, `--user-data-dir=${path.join(temp, profile)}`,
         '--dump-dom', '--virtual-time-budget=1000', pathToFileURL(file).href],
     { encoding:'utf8', windowsHide:true, timeout:90000, maxBuffer:4 * 1024 * 1024 });
     let result = runChrome('profile');
@@ -260,5 +316,42 @@
     assert.deepStrictEqual(report.resumed, {conversation:900,bubble:900}, 'resume restores width and bubble preference');
     assert.strictEqual(report.siteOwned, '810px', 'pause must not overwrite a newer native inline value');
     assert.strictEqual(failures.length, 0, `Width regressions:\n${failures.join('\n')}`);
+    const imageReports = [report];
+    for (const size of ['1470,956', '2560,1440']) {
+        const result = runChrome(`images-${size}`, size);
+        if (result.error) throw result.error;
+        const match = result.stdout?.match(/<pre id="results">([^<]+)<\/pre>/);
+        assert(match, `No generated-image browser report at ${size} (${result.status})`);
+        const measured = JSON.parse(match[1]);
+        fs.writeFileSync(path.join(temp, `images-${size}.json`), JSON.stringify(measured.generated, null, 4));
+        assert.strictEqual(measured.generated[0].viewport, Number(size.split(',')[0]), 'actual image test viewport');
+        imageReports.push(measured);
+    }
+    for (const {generated} of imageReports) {
+        const nativeImage = generated[0];
+        assert.strictEqual(nativeImage.image, 708, 'captured native generated image width');
+        assert(Math.abs(nativeImage.imageLeft-nativeImage.bodyLeft-(nativeImage.body-nativeImage.image)/2) <= 1,
+            'native generated image is centered');
+        for (const row of generated.slice(1)) {
+            for (const key of ['image', 'height', 'attachment', 'component']) {
+                assert(Math.abs(row[key] - nativeImage[key]) <= 1,
+                    `Generated image ${JSON.stringify(row.setting)} at ${row.viewport}px: ${key}=${row[key]}, native=${nativeImage[key]}`);
+            }
+            assert.deepStrictEqual(row.controls, nativeImage.controls, 'image controls must keep their size and position relative to the image');
+            if (row.setting === 'paused') {
+                assert(Math.abs(row.imageLeft-nativeImage.imageLeft) <= 1, 'pause restores native image centering');
+                continue;
+            }
+            assert(Math.abs(row.imageLeft-row.bodyLeft) <= 1,
+                `Generated image must align with prose: imageLeft=${row.imageLeft}, bodyLeft=${row.bodyLeft}`);
+            const requested = row.setting.unit === 'px' ? row.setting.value : row.viewport * row.setting.value / 100;
+            const expected = Math.min(requested, row.viewport);
+            for (const key of ['body', 'code', 'table']) {
+                assert(Math.abs(row[key] - expected) <= 1, `Generated image sibling ${key} did not widen`);
+            }
+            assert(row.codeScroll > row.code && row.tableScroll > row.table, 'wide siblings must retain scrolling');
+        }
+    }
     console.log(`Passed ${report.rows.length} message-width scenarios, plus pause/resume and inline restoration.`);
+    console.log('Passed generated-image native size, wide code/table siblings, and pause restoration.');
 })();

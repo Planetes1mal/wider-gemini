@@ -144,7 +144,7 @@ For a layout release, record the date, extension version, browser version, OS, a
 | Flow | Expected result |
 |---|---|
 | Regular chat and editing a question | Messages and input align; edited text remains visible |
-| Long code, wide tables, and images | Width applies; wrapping/scrolling controls work; image proportions are preserved |
+| Long code, wide tables, and images | Code and tables widen; wrapping/scrolling controls work; generated images keep Gemini's native display size and proportions, align with the left edge of the prose, and return to native centering when Roomy is paused |
 | Notebook Sources and file attachment | Sources is reachable; input growth does not cover landing content |
 | Add from Drive | Picker content and Add button remain visible |
 | Local file drag-and-drop | Input and message width remain stable |

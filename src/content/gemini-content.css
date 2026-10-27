@@ -338,16 +338,26 @@ html:where(.wider-gemini-width-enabled) {
 /* luminous 会给回复正文路径上的各类包装容器统一加阅读宽度上限
    （2026-09 实测 p≈708px、response-element=740px、.attachment-container=708px），
    逐组件点名会持续漏网，统一解除正文 markdown 内所有元素的限宽。
-   max-width:100% 只移除上限、不会拉伸元素，另排除媒体/表单控件与浮层菜单，
-   保住原生尺寸与弹窗布局。 */
+   生成图片按容器宽度显示，不能只排除 img：还需保留图片附件和组件子树的原生上限
+   （2026-10 实测附件与 generated-image 均为 708px），否则图片也会随正文放大。
+   代码、表格附件继续解锁；媒体、表单控件与浮层菜单保留原生布局。 */
 :where(html.wider-gemini-width-enabled) :is(model-response, response-container, .response-container, .presented-response-container)
     :is(.markdown, .markdown-main-panel)
     :not(
         img, video, svg, canvas, iframe, button, input, select, textarea,
+        :where(.attachment-container:has(generated-image), generated-image, generated-image *),
         :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]),
         :where(.cdk-overlay-pane, .mat-menu-panel, [role="dialog"], [role="menu"]) *
     ) {
     max-width: 100% !important;
+}
+
+/* 图片附件保留原生宽度，但加宽时与正文左缘对齐。
+   移动整块附件，让图片说明与悬停按钮沿用组件内部定位；暂停后恢复原生自动外边距。 */
+:where(html.wider-gemini-width-enabled) :is(model-response, response-container, .response-container, .presented-response-container)
+    .attachment-container:has(generated-image) {
+    margin-left: 0 !important;
+    margin-right: auto !important;
 }
 
 :where(html.wider-gemini-width-enabled) hallucination-disclaimer {

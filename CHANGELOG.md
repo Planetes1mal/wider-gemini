@@ -4,6 +4,30 @@ All notable changes to Roomy (formerly Wider Gemini) are documented in this file
 
 Release notes on GitHub are generated from the matching `## <release-version>` section when a `v<release-version>` tag is pushed. Candidate versions such as `2.6.0-rc.1` are marked as prereleases.
 
+## 3.1.0 (2026-10-27)
+
+Roomy now works on Claude as well as Gemini and ChatGPT. Claude access is optional: updating adds no permission warning, and Chrome asks for Claude access only after you click **Allow** next to Claude in the popup.
+
+### Features
+
+- Claude support (claude.ai): conversation and input width, font size, reading density, manual line height and paragraph spacing, full-width user messages, message navigation, and task presets (Long reading, Wide for tables and code, Large text). With the Artifacts panel open, the conversation fits the space beside it, and the panel and its content stay unchanged. Projects, settings, Claude Code and shared pages are left as they are.
+- A new popup. On a supported site it opens that site's settings directly; elsewhere it lists every site under **Your websites** and **Websites you can add**, with an **Allow** button for each site that still needs access. **All websites** returns to the list from a site's settings.
+- After an update that adds a website, a **NEW** badge appears on the toolbar icon until you next open the popup, where the new website is marked in the list. Nothing opens by itself.
+
+### Changes
+
+- The store title is now "Roomy: Wide Mode for Gemini, ChatGPT & Claude", translated for each interface language.
+- In each site's settings, task presets sit right below the width controls, and **Text & spacing** shows its current values while collapsed. The language selector and **Help & feedback** are at the bottom of the site list.
+- The help page and its settings report cover every supported website.
+
+### Fixes
+
+- Widening a Gemini conversation no longer enlarges generated images. They keep Gemini's own size and line up with the response text; pausing Roomy restores Gemini's centered layout ([#12](https://github.com/Planetes1mal/roomy/issues/12)).
+
+### Refactor
+
+- Supported websites are now described in one place, and Claude runs on a shared layout engine, so adding websites needs less site-specific code. Gemini and ChatGPT behave as before.
+
 ## 3.0.1 (2026-10-22)
 
 ### Fixes

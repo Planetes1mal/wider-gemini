@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Effective date:** October 26, 2026
+**Effective date:** October 27, 2026
 
 This policy describes how the **Roomy** browser extension, formerly named Wider Gemini (“Extension”, “we”, “us”), handles information when you use it. It is provided in English and Chinese; both sections have the same meaning.
 

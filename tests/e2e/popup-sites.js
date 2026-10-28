@@ -26,6 +26,12 @@
         recursive: true,
         filter: file => !/(^|[\\/])(\.git|\.claude|local|tests|node_modules)([\\/]|$)/.test(path.relative(source, file))
     });
+    // 弹窗测试不加载后台：后台在“安装”时写入的提示标记、角标和自动弹出的弹窗会与测试写入的标记竞争
+    // （Windows CI 上后台启动较慢时，安装标记晚于测试写入，覆盖了 alpha 的“新”标记）。后台行为由 background.test.js 覆盖。
+    const extensionManifestPath = path.join(extension, 'manifest.json');
+    const extensionManifest = JSON.parse(fs.readFileSync(extensionManifestPath, 'utf8'));
+    delete extensionManifest.background;
+    fs.writeFileSync(extensionManifestPath, JSON.stringify(extensionManifest, null, 4));
     const registryPath = path.join(extension, 'src/shared/sites.js');
     const registry = fs.readFileSync(registryPath, 'utf8');
     const start = registry.indexOf('const SITES = [');

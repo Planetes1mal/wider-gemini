@@ -1,8 +1,8 @@
-# Read Gemini tables, code, and long answers more comfortably
+# Read tables, code, and long answers more comfortably
 
 [繁體中文](./reading-layout.zh-TW.md)
 
-Open a conversation on **gemini.google.com**, then open Roomy from Chrome's extensions menu or its pinned toolbar icon. Keep an existing answer visible while changing a setting: you do not need to ask Gemini to generate it again. Changes are saved and applied to open Gemini tabs; cross-device synchronization depends on your browser's sync settings.
+The steps below use Gemini as the example; the ChatGPT and Claude sections at the end cover what differs on those sites. Open a conversation on **gemini.google.com**, then open Roomy from Chrome's extensions menu or its pinned toolbar icon. Keep an existing answer visible while changing a setting: you do not need to ask Gemini to generate it again. Changes are saved and applied to open Gemini tabs; cross-device synchronization depends on your browser's sync settings.
 
 The steps below use individual controls. They also work when your installed version does not have newer task presets or help features. Suggested values are starting points, not a claim that one layout suits every screen.
 

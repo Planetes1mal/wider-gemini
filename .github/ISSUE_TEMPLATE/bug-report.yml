@@ -39,7 +39,7 @@ body:
         - ChatGPT installed as a Chrome app / Chrome 安装的 ChatGPT 网站应用
         - Claude website in a browser tab / 浏览器中的 Claude 网页
         - Claude installed as a Chrome app / Chrome 安装的 Claude 网站应用
-        - Native Gemini app or Chrome's built-in panel / 原生 Gemini 应用或 Chrome 内置面板
+        - Native desktop app (Gemini, ChatGPT or Claude) or Chrome's built-in Gemini panel / 原生桌面应用（Gemini、ChatGPT 或 Claude）或 Chrome 内置的 Gemini 面板
         - Other / 其他
   - type: textarea
     id: evidence

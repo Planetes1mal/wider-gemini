@@ -221,7 +221,7 @@
                     const image = imageHost.querySelector('img');
                     const code = imageHost.querySelector('pre');
                     const table = imageHost.querySelector('.table-content');
-                    generated.push({setting, viewport:innerWidth,
+                    generated.push({setting, viewport:innerWidth, available:width(imageHost),
                         image:width(image), height:image.getBoundingClientRect().height,
                         imageLeft:image.getBoundingClientRect().left,
                         bodyLeft:imageHost.querySelector('.markdown').getBoundingClientRect().left,
@@ -324,7 +324,9 @@
         assert(match, `No generated-image browser report at ${size} (${result.status})`);
         const measured = JSON.parse(match[1]);
         fs.writeFileSync(path.join(temp, `images-${size}.json`), JSON.stringify(measured.generated, null, 4));
-        assert.strictEqual(measured.generated[0].viewport, Number(size.split(',')[0]), 'actual image test viewport');
+        // Windows 的无头 Chrome 视口比 --window-size 略窄（CI 实测 1470 → 1454），只确认尺寸大致正确。
+        assert(Math.abs(measured.generated[0].viewport - Number(size.split(',')[0])) <= 40,
+            `actual image test viewport ${measured.generated[0].viewport} for window ${size}`);
         imageReports.push(measured);
     }
     for (const {generated} of imageReports) {
@@ -344,8 +346,9 @@
             }
             assert(Math.abs(row.imageLeft-row.bodyLeft) <= 1,
                 `Generated image must align with prose: imageLeft=${row.imageLeft}, bodyLeft=${row.bodyLeft}`);
+            // % 按视口（含滚动条）计算；上限取页面实际可用宽度，Windows 的常规滚动条会占掉一部分。
             const requested = row.setting.unit === 'px' ? row.setting.value : row.viewport * row.setting.value / 100;
-            const expected = Math.min(requested, row.viewport);
+            const expected = Math.min(requested, row.available);
             for (const key of ['body', 'code', 'table']) {
                 assert(Math.abs(row[key] - expected) <= 1, `Generated image sibling ${key} did not widen`);
             }

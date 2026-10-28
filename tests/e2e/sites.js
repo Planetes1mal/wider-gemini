@@ -326,7 +326,8 @@
         // 宽度：px、%、封顶、对齐、无横向溢出。
         near(r.px1000.column, 1000, label('1000px widens the column'), 1);
         near(r.px1000.composerOuter, r.px1000.columnOuter, label('composer matches the column width'), 1);
-        near(r.px1000.composerLeft, r.px1000.columnLeft, label('composer aligns with the column'), 1);
+        // 与原生的相对位置比较：Windows 的常规滚动条会让原生对话列和输入区本来就错开半个滚动条宽。
+        near(r.px1000.composerLeft - r.px1000.columnLeft, n.composerLeft - n.columnLeft, label('composer keeps its native alignment at 1000px'), 1);
         assert.strictEqual(r.px1000Status.status, 'active');
         assert.strictEqual(r.px1000Status.capabilities.width, 'active');
         assert.deepStrictEqual([...r.owners].sort(), [...(expected.widthOwners || ['column', 'composer'])].sort(), label('width owners'));

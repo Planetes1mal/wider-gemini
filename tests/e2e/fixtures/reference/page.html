@@ -9,9 +9,10 @@
     body { margin: 0; font: 16px/26px sans-serif; }
     main { display: flex; flex-direction: column; height: 100vh; }
     .topbar { height: 56px; flex: 0 0 auto; }
-    .scroll { flex: 1; min-height: 0; overflow-y: auto; }
+    /* 和 Claude 一样，对话区与输入区两侧都保留滚动条槽：Windows 的常规滚动条下两者仍然对齐。 */
+    .scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable both-edges; }
     .column { max-width: 768px; width: 100%; margin: 0 auto; padding: 0 16px; }
-    .composer-wrap { flex: 0 0 auto; padding: 8px 0 16px; }
+    .composer-wrap { flex: 0 0 auto; padding: 8px 0 16px; overflow: hidden; scrollbar-gutter: stable both-edges; }
     .composer { max-width: 768px; width: 100%; margin: 0 auto; padding: 0 16px; }
     .composer [contenteditable] { min-height: 40px; border: 1px solid #ccc; font-size: 16px; }
     [data-role="user"] { display: flex; justify-content: flex-end; margin: 16px 0; }

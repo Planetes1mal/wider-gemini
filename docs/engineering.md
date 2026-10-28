@@ -157,10 +157,10 @@ For a layout release, record the date, extension version, browser version, OS, a
 | ChatGPT sidebar and Canvas | Chat width fits the remaining column without widening the side panel |
 | ChatGPT code, tables, and tool cards | Native wrapping, scrolling, and embedded component sizes are preserved |
 | Claude conversation, new chat, and the Artifacts panel | Transcript and composer widen together and stay aligned; with the panel open the width is capped beside it and the panel keeps its size and content |
-| Claude font, density, and navigation | Prose changes; code blocks, tables, formulas and toolbars keep native sizing; ticks jump to each user message with the panel open or closed |
+| Claude font, density, and navigation | Prose changes; code lines and table rows scale only with font size and keep their native line-height proportions; formulas scale with their surrounding text; toolbars keep native sizing; ticks jump to each user message with the panel open or closed |
 | Site list, site pages, width units, limits, and custom presets | Each site's values persist independently; a task preset changes only its own site |
 | Enable switch off, then edit values or apply a task | Page stays native; edits are saved; switching on applies the latest values |
-| ChatGPT font, density, and manual spacing | Prose changes; code lines, table rows, formulas, message toolbars, and the composer keep native sizing |
+| ChatGPT font, density, and manual spacing | Prose changes; code lines and table rows scale only with font size and keep their native line-height proportions; formulas scale with their surrounding text; message toolbars and the composer keep native sizing |
 | Pause and resume widening for one site | Native width returns while paused; saved values and presets survive; the other site and Gemini reading settings are unchanged |
 | Unrecognized layout or delayed page mounting | Unknown layouts keep native width; the popup reports the current page's status without adding a page banner |
 | Popup selects and disclosures | Unit and preset-editor selects, language menu, focus, keyboard operation, and advanced sections remain usable at popup size |

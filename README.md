@@ -20,7 +20,7 @@ The same full Gemini conversation at the same window size, with the conversation
 
 - **Adjust the width**: On Gemini, ChatGPT or Claude, set pixels (`px`) or a percentage of the window (`%`), and save separate limits and presets for each site.
 - **Enable or pause by site**: The switch beside the site name pauses every effect on that site and restores the original page, while all settings stay editable and saved. A separate width switch turns off only widening. Unrecognized layouts keep their original width, with a notice in the popup for the current page.
-- **Adjust text size and spacing**: On both sites, scale message text from 75% to 200% while keeping headings, code, and tables in proportion, tighten spacing with reading density, or set line height and paragraph spacing manually.
+- **Adjust text size and spacing**: On every supported site, scale message text from 75% to 200% while keeping headings, code, and tables in proportion, tighten spacing with reading density, or set line height and paragraph spacing manually.
 - **Message navigation**: A thin column of ticks beside the conversation jumps to your messages on Gemini, ChatGPT and Claude, with a short preview and keyboard support. Long conversations show at most 20 ticks around the current message. ChatGPT and Claude remember messages with stable keys as you scroll, without scanning history automatically. Turn it off per site in the popup.
 - **Task presets**: Apply a reading, wide, or large-text setup in one step and restore the previous settings for that site.
 - **Wrap Gemini code**: Keep long lines of code within the conversation area. ChatGPT keeps its own per-block wrap button; Claude has no wrap button, so long lines scroll inside the code block.
@@ -55,11 +55,11 @@ If you manually installed a release candidate, replace its files with the stable
 
 After a new install, the popup opens once from the toolbar icon and lists the sites you can add. Click **Allow** next to ChatGPT or Claude and confirm Chrome's prompt to turn that site on. After an update that adds a site, nothing opens: a **NEW** badge appears on the toolbar icon until you next open the popup, where the new site is marked in the list. Until access is granted, the site stays under **Websites you can add** with the same button.
 
-Expand **Range & presets** for width limits and **Manage presets**. Each site and unit has its own presets. The language selector is at the bottom of the popup.
+Expand **Range & presets** for width limits and **Manage presets**. Each site and unit has its own presets. The language selector is at the bottom of the site list.
 
 Use **Task presets** to change the layout in one step: long reading, tables, code, or large text on Gemini; long reading, wide (tables and code), or large text on ChatGPT and Claude. Preview the settings, then apply them; **Restore previous settings** restores that site's previous layout on this device, even after closing the popup. See the [reading guide](./docs/guides/reading-layout.md) for the values and restore behavior.
 
-Use **Help & feedback** at the bottom of the popup for troubleshooting or to preview and copy diagnostic settings. Roomy targets Gemini, ChatGPT and Claude webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. On Claude it adjusts conversations and the new-chat page; projects, settings, Claude Code and shared pages stay as they are, and the content of the Artifacts panel is never changed.
+Use **Help & feedback** at the bottom of the site list for troubleshooting or to preview and copy diagnostic settings. Roomy targets Gemini, ChatGPT and Claude webpages, including Chrome-installed site app windows; it does not change native desktop apps or Chrome’s built-in Gemini panel. On Claude it adjusts conversations and the new-chat page; projects, settings, Claude Code and shared pages stay as they are, and the content of the Artifacts panel is never changed.
 
 ## Privacy
 
